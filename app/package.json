@@ -1,0 +1,16 @@
+{
+  "name": "we-zjuers-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "seed": "node seed.mjs",
+    "photos": "node fetch-photos.mjs",
+    "seed:community": "node seed-community.mjs",
+    "refresh:demo": "node refresh-demo.mjs",
+    "seed:events": "node seed-events.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

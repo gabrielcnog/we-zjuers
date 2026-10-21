@@ -1,0 +1,1171 @@
+/* ============================================================
+   WeZJUers — Components v1.0
+   Requires tokens.css. Every value here composes from the
+   semantic layer; a raw hex in this file is a dark-mode bug
+   that hasn't happened yet.
+
+   Scope root: <body class="zl-ui">
+   ============================================================ */
+
+.zl-ui, .zl-ui *, .zl-ui *::before, .zl-ui *::after{ box-sizing:border-box; }
+.zl-ui{
+  margin:0;
+  background:var(--zl-bg);
+  color:var(--zl-text);
+  font-family:var(--zl-font-sans);
+  font-size:var(--zl-text-body);
+  line-height:var(--zl-lh-body);
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.zl-ui :focus-visible{ outline:2px solid var(--zl-focus); outline-offset:2px; }
+
+/* The `hidden` attribute only sets display:none through the UA stylesheet, so
+   ANY component rule that sets its own display silently defeats it. Three
+   controls here are hidden from script — the chip-scroll arrows, the share
+   button, the rail's no-JS submit — and all three set display, so all three
+   stayed visible. This makes `hidden` mean hidden. */
+.zl-ui [hidden]{ display:none !important; }
+
+@media (prefers-reduced-motion:reduce){
+  .zl-ui *{ animation-duration:.01ms !important; animation-iteration-count:1 !important;
+            transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}
+
+/* ---------- Layout ---------- */
+.zl-container{
+  width:100%; max-width:var(--zl-container); margin-inline:auto;
+  padding-inline:var(--zl-margin-mobile);
+}
+@media (min-width:640px){ .zl-container{ padding-inline:var(--zl-gutter); } }
+/* ---------- Layout primitives ----------
+   Spacing between things belongs to the parent, never to the child: a
+   component carries no outer margin, and the container it sits in decides
+   the gap. That one rule is what keeps pages on the same rhythm. */
+.zl-stack{ display:flex; flex-direction:column; gap:var(--zl-s-6); }
+.zl-stack--sm{ gap:var(--zl-s-2); }
+.zl-stack--md{ gap:var(--zl-s-4); }
+.zl-stack--lg{ gap:var(--zl-s-8); }
+.zl-row{ display:flex; align-items:center; gap:var(--zl-s-2); flex-wrap:wrap; }
+.zl-row--md{ gap:var(--zl-s-4); }
+.zl-grow{ flex:1 1 0; min-width:0; }
+.zl-narrow{ width:100%; max-width:var(--zl-narrow); }
+
+/* Page header: title, optional description, optional actions. Same gaps on
+   every page — the title-to-description and header-to-content distances were
+   different on almost every screen before this existed. */
+.zl-page-header{ display:grid; gap:var(--zl-s-2); margin-bottom:var(--zl-s-6); }
+.zl-page-header__title{ margin:0; }
+/* No reading measure on these two. --zl-measure protects text you *read* —
+   a post body, a comment, a chapter — by stopping the line before the eye
+   loses its place. A page lede is one or two lines you *scan*, and capping it
+   at 68ch while the grid underneath runs to the full column left a ragged
+   edge that reads as a bug: on Events the lede broke at 686px above tiles
+   922px wide, orphaning "your name down." on its own line. Uncapped it sets
+   on one line and the header lines up with what it heads. */
+.zl-page-header__description{ margin:0; color:var(--zl-text-muted); }
+.zl-page-header__meta{ margin:0; font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+.zl-page-header__actions{ display:flex; gap:var(--zl-s-2); flex-wrap:wrap; margin-top:var(--zl-s-2); }
+
+/* Panel — the one surface for grouped content (shadcn's Card). */
+.zl-panel{
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); padding:var(--zl-s-4);
+}
+@media (min-width:640px){ .zl-panel{ padding:var(--zl-s-6); } }
+.zl-panel--sunken{ background:var(--zl-bg-sunken); }
+.zl-panel__title{ margin:0 0 var(--zl-s-2); font-size:var(--zl-text-body); font-weight:var(--zl-weight-semi); }
+
+/* Section: vertical rhythm between page sections, and inside one.
+   The title used to carry its own bottom margin, which broke the rule above
+   and then silently lost: `.zl-h3` also sets `margin:0`, matches on one
+   class, and comes later in this file — so every section title that was also
+   a type class rendered with nothing under it at all. The parent owns the gap
+   instead, the same way .zl-page-header does, and it cannot be cancelled by
+   whatever type class the heading happens to wear. */
+.zl-section{ display:grid; gap:var(--zl-s-6); }
+.zl-section + .zl-section{ margin-top:var(--zl-s-12); }
+.zl-section__title{ margin:0; }
+/* Same reason: a bare <p> empty state ("Not going to anything yet.") brings
+   the browser's own margin and would sit further from its title than a grid
+   of cards does. The gap above is the section's to set, not the paragraph's. */
+.zl-section > p{ margin:0; }
+
+/* Form: fields fill their column; the column (.zl-narrow) sets the width. */
+.zl-form{ display:grid; gap:var(--zl-s-5); width:100%; }
+.zl-form__actions{ display:flex; gap:var(--zl-s-2); flex-wrap:wrap; }
+@media (max-width:640px){ .zl-form__actions > .zl-btn{ flex:1 1 100%; } }
+.zl-divider{ height:1px; background:var(--zl-border); border:0; margin:var(--zl-space-4) 0; }
+
+/* The feed grid: 2 / 3 / 4 across the official breakpoints. */
+.zl-feed{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--zl-space-4); }
+@media (min-width:640px){  .zl-feed{ grid-template-columns:repeat(3,1fr); gap:var(--zl-space-4); } }
+@media (min-width:1024px){ .zl-feed{ grid-template-columns:repeat(4,1fr); } }
+
+/* ---------- Typography ---------- */
+.zl-h1{ font-family:var(--zl-font-heading); font-size:var(--zl-text-h1); line-height:var(--zl-lh-h1); font-weight:var(--zl-weight-bold); letter-spacing:-.02em; margin:0; }
+.zl-h2{ font-family:var(--zl-font-heading); font-size:var(--zl-text-h2); line-height:var(--zl-lh-h2); font-weight:var(--zl-weight-bold); letter-spacing:-.015em; margin:0; }
+.zl-h3{ font-family:var(--zl-font-heading); font-size:var(--zl-text-h3); line-height:var(--zl-lh-h3); font-weight:var(--zl-weight-semi); margin:0; }
+.zl-body{ font-size:var(--zl-text-body); line-height:var(--zl-lh-body); margin:0; }
+.zl-muted{ color:var(--zl-text-muted); }
+.zl-caption{ font-size:var(--zl-text-caption); line-height:var(--zl-lh-caption); color:var(--zl-text-subtle); }
+.zl-label{
+  font-size:var(--zl-text-label); font-weight:var(--zl-weight-semi);
+  letter-spacing:var(--zl-tracking-label); text-transform:uppercase;
+  color:var(--zl-text-subtle);
+}
+.zl-num{ font-family:var(--zl-font-mono); font-variant-numeric:tabular-nums; }
+
+/* Links carry an underline ALWAYS. Colour is never the only
+   signal — guidelines, slide 10. */
+.zl-ui a, .zl-link{
+  color:var(--zl-link); text-decoration:underline;
+  text-underline-offset:2px; text-decoration-thickness:1px;
+}
+.zl-ui a:hover, .zl-link:hover{ color:var(--zl-link-hover); text-decoration-thickness:2px; }
+
+/* Controls that happen to be anchors are NOT prose links, and must opt out of
+   the underline above. They need `.zl-ui` in front of them: the global rule is
+   (0,1,1) and a lone component class is only (0,1,0), so without this the
+   underline silently wins — which is exactly what happened to the wordmark, the
+   chips and every button rendered as <a>.
+
+   This does not weaken the "colour is never the only signal" rule: each of these
+   carries a border, a fill, or a pill shape doing the signalling. */
+.zl-ui .zl-btn,
+.zl-ui .zl-chip,
+.zl-ui .zl-wordmark,
+.zl-ui .zl-tab,
+.zl-ui .zl-suggest__item{ text-decoration:none; }
+
+/* ---------- Disclaimer strip ----------
+   Persistent, above the header, every page. Navy 900: white on it is 15.32:1,
+   against 6.85:1 when this was Innovation Red — and it returns red to meaning
+   exactly one thing on the page again. See ../docs/decisions.md #19.
+
+   Navy on Blue 800 measures 1.51:1 as adjacent bands, and unlike the red they
+   also share a hue, so the seam is doing more work than before: without it the
+   two bands read as one dark mass. */
+.zl-disclaimer{
+  background:var(--zl-blue-900); color:var(--zl-text-on-fill);
+  box-shadow:inset 0 -1px 0 rgb(255 255 255 / .34);
+  font-size:var(--zl-text-caption); line-height:1.45;
+  padding:var(--zl-space-2) var(--zl-margin-mobile);
+  text-align:center;
+}
+.zl-disclaimer b{ font-weight:var(--zl-weight-semi); color:inherit; }
+
+/* ---------- Header ---------- */
+.zl-header{
+  position:sticky; top:0; z-index:var(--zl-z-sticky);
+  background:var(--zl-brand-surface); border-bottom:0;
+}
+/* On the blue header the palette inverts. White text is 10.16:1; the muted
+   tone is a light blue-grey at 7.77:1 — Blue 300 was tried and fails at
+   4.16:1, so it is not used here. The mark inherits this colour too. */
+.zl-ui .zl-header .zl-wordmark,
+.zl-ui .zl-header .zl-wordmark:hover{ color:var(--zl-on-brand); }
+/* Inverted primary: a red fill on this blue measures 1.48:1 and would sink
+   into the bar, so the header's one action is white-on-blue instead — which
+   also returns red to meaning exactly one thing again. */
+.zl-ui .zl-header .zl-btn--urgent{ background:var(--zl-on-brand); color:var(--zl-brand-surface); }
+.zl-header .zl-btn--urgent:hover:not(:disabled){ background:var(--zl-blue-50); }
+.zl-ui .zl-header .zl-btn--secondary{ color:var(--zl-on-brand); border-color:var(--zl-on-brand-line); background:transparent; }
+.zl-header .zl-btn--secondary:hover:not(:disabled){ background:var(--zl-on-brand-hover); color:var(--zl-on-brand); }
+.zl-ui .zl-header .zl-btn--ghost{ color:var(--zl-on-brand-muted); }
+.zl-header .zl-btn--ghost:hover:not(:disabled){ background:var(--zl-on-brand-hover); color:var(--zl-on-brand); }
+.zl-header__inner{
+  display:flex; align-items:center; gap:var(--zl-space-3);
+  min-height:72px; max-width:var(--zl-container); margin-inline:auto;
+  padding-inline:var(--zl-margin-mobile);
+}
+/* Wordmark: real text in the body face, never an image and
+   never the ZJU seal. Recolours with the theme, stays sharp at
+   any density, is selectable and screen-reader readable. */
+/* Scoped under .zl-ui for the same reason as the hover below: the wordmark is
+   an <a>, and the global `.zl-ui a` (0,1,1) outranks a bare `.zl-wordmark`. */
+.zl-ui .zl-wordmark{
+  font-weight:var(--zl-weight-black); font-size:19px; letter-spacing:-.035em;
+  color:var(--zl-text); text-decoration:none; white-space:nowrap;
+}
+/* No optical reduction on ZJU. It was right for the spaced form, where the
+   acronym read as a word of its own towering over the lowercase — but set
+   inside one word it dips below the leading W and reads as a rendering fault.
+   Camel case does the work instead: WeChat, PayPal, YouTube all keep the inner
+   capital at full height. */
+/* No hover state: it is a home link, not an action. Scoped under .zl-ui so
+   the global `.zl-ui a:hover` (0,2,1) cannot recolour it. */
+.zl-ui .zl-wordmark:hover{ color:var(--zl-text); text-decoration:none; }
+/* One colour, one weight. The old two-tone split tinted "We" a pale blue,
+   which on the blue header read as a disabled control rather than emphasis —
+   and it put the recessive tone on the half of the name that carries the
+   idea. Hierarchy now comes from the mark beside the name, not from fading
+   part of it. */
+
+.zl-search{ flex:1; min-width:0; position:relative; display:flex; }
+/* Room on the right for the submit button, which lives inside the field. */
+.zl-search .zl-input{ padding-right:calc(var(--zl-control) + var(--zl-s-2)); }   /* clears the submit button */
+.zl-search__btn{
+  position:absolute; right:2px; top:50%; transform:translateY(-50%);
+  /* Full field height: 44×44, not 44×36 — the field is already tall enough,
+     so there is no reason for the control inside it to fall short. */
+  width:var(--zl-tap-min); height:var(--zl-tap-min);
+  display:flex; align-items:center; justify-content:center;
+  padding:0; border:0; border-radius:var(--zl-radius);
+  background:transparent; color:var(--zl-text-muted); cursor:pointer;
+  transition:color var(--zl-duration) var(--zl-ease),
+             background-color var(--zl-duration) var(--zl-ease);
+}
+/* A hairline separating the field from the action, the way OLX does it. */
+.zl-search__btn::before{
+  content:''; position:absolute; left:-2px; top:10px; bottom:10px;
+  width:1px; background:var(--zl-border);
+}
+.zl-search__btn:hover{ color:var(--zl-action); background:var(--zl-bg-hover); }
+.zl-search__btn:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+.zl-search__btn svg{ display:block; }
+
+/* ============================================================
+   CONTROL SHAPE — the rule that keeps the filter row coherent
+
+     Pill,  44px  →  choose from options   (chips, sort, condition)
+     Rect,  44px  →  type a value          (search, price min/max)
+     Rect,  8px   →  perform an action     (buttons)
+
+   Everything on a filter row is 44px tall regardless of family, so
+   the row has one baseline. Before this, chips were 44 and the sort
+   select was 36 with a heavier border — same job, two appearances.
+   ============================================================ */
+
+/* ---------- Animated search hint ----------
+   A native placeholder cannot be animated or hold markup, so this is an overlay
+   sitting on top of the field: the prefix is fixed and the term rolls upward.
+
+   Three things keep it honest rather than decorative:
+     · aria-hidden — the input carries a real <label>, so a screen reader gets
+       one stable name instead of a name that changes every 2.4 seconds.
+     · pointer-events:none — clicking the hint focuses the field beneath it.
+     · The input keeps placeholder=" " so :placeholder-shown still works, which
+       is what hides the hint the moment anything is typed.                    */
+.zl-typer{
+  position:absolute; left:14px; top:50%; transform:translateY(-50%);
+  display:flex; pointer-events:none; user-select:none;
+  font-size:16px; line-height:1.6em; color:var(--zl-text-subtle);
+  transition:opacity var(--zl-duration) var(--zl-ease);
+}
+.zl-search .zl-input:focus ~ .zl-typer,
+.zl-search .zl-input:not(:placeholder-shown) ~ .zl-typer{ opacity:0; }
+
+/* The prefix ends in a space, and .zl-typer is a flex container — whitespace at
+   a flex-item boundary is discarded, so "Search for " rendered as "Search fora
+   desk". `pre` keeps the trailing space. (The Chinese prefix has none, and is
+   unaffected.) */
+.zl-typer__prefix{ white-space:pre; }
+.zl-typer__window{ height:1.6em; overflow:hidden; }
+.zl-typer__roll{
+  display:flex; flex-direction:column;
+  animation:zl-typeroll 19.2s cubic-bezier(.6,0,.2,1) infinite;
+}
+.zl-typer__roll > span{ height:1.6em; white-space:nowrap; }
+
+/* Eight terms plus a repeat of the first, so the loop closes without a jump. */
+@keyframes zl-typeroll{
+  0%,    10%   { transform:translateY(0); }
+  12.5%, 22.5% { transform:translateY(-1.6em); }
+  25%,   35%   { transform:translateY(-3.2em); }
+  37.5%, 47.5% { transform:translateY(-4.8em); }
+  50%,   60%   { transform:translateY(-6.4em); }
+  62.5%, 72.5% { transform:translateY(-8em); }
+  75%,   85%   { transform:translateY(-9.6em); }
+  87.5%, 97.5% { transform:translateY(-11.2em); }
+  100%         { transform:translateY(-12.8em); }
+}
+/* Reduced motion gets the first term, held still — not a blank field. */
+@media (prefers-reduced-motion:reduce){
+  .zl-typer__roll{ animation:none; }
+}
+
+/* ---------- Campus picker ----------
+   The browsing scope, the way OLX carries its region: a map pin, a quiet
+   "Browsing" line, and the place itself as the thing you actually read. No
+   border — on a saturated header a pill around it reads as a second button
+   competing with the real ones.
+
+   A native <select> lies invisibly on top and does the work, so this keeps the
+   OS picker, keyboard behaviour and mobile wheel for free. The visible text is
+   aria-hidden; the select carries the accessible name. */
+.zl-campus{
+  display:flex; align-items:center; gap:var(--zl-s-2); position:relative; flex:none;
+  min-height:var(--zl-tap-min); padding:0 var(--zl-s-2-5);
+  border-radius:var(--zl-radius); color:var(--zl-on-brand);
+  transition:background-color var(--zl-duration) var(--zl-ease);
+  max-width:230px;
+}
+.zl-campus:hover{ background:var(--zl-on-brand-hover); }
+.zl-campus:focus-within{ box-shadow:var(--zl-ring-on-brand); }
+.zl-campus__pin{ line-height:0; color:var(--zl-on-brand-muted); flex:none; }
+.zl-campus__text{ display:flex; flex-direction:column; min-width:0; line-height:1.2; }
+.zl-campus__eyebrow{
+  font-size:var(--zl-text-label); color:var(--zl-on-brand-muted);
+  letter-spacing:.02em;
+}
+.zl-campus__value{
+  display:flex; align-items:center; gap:var(--zl-s-1);
+  font-size:var(--zl-text-sm); font-weight:var(--zl-weight-semi);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.zl-campus__value svg{ flex:none; opacity:.85; }
+/* The real control: invisible, on top, full size. */
+.zl-campus__native{
+  position:absolute; inset:0; width:100%; height:100%;
+  opacity:0; cursor:pointer; appearance:none; border:0; font-size:16px;
+}
+/* Native option lists paint in the OS palette, so they need readable colours
+   rather than inheriting the white-on-blue of the closed control. */
+.zl-campus__native option{ color:var(--zl-text); background:var(--zl-bg-raised); }
+
+/* ---------- Price range slider ----------
+   Two overlaid <input type="range">, which is the only way to get a two-thumb
+   control out of native inputs. The track is inert; only the thumbs take
+   pointer events, so a click between them does not jump a thumb. The numeric
+   inputs below are the real form fields — the sliders drive them — so the
+   filter still works with JavaScript off. */
+.zl-slider{ position:relative; height:28px; margin:var(--zl-s-0-5) 0 var(--zl-space-2); }
+.zl-slider__track{
+  position:absolute; inset:12px 0 auto; height:4px; border-radius:2px;
+  background:var(--zl-border-strong);
+}
+.zl-slider__fill{
+  position:absolute; height:100%; border-radius:2px; background:var(--zl-action);
+}
+.zl-slider__input{
+  position:absolute; inset:0; width:100%; margin:0;
+  appearance:none; background:transparent; pointer-events:none;
+}
+.zl-slider__input::-webkit-slider-thumb{
+  appearance:none; pointer-events:auto; cursor:grab;
+  width:20px; height:20px; border-radius:50%;
+  background:var(--zl-bg-raised); border:2px solid var(--zl-action);
+  box-shadow:var(--zl-shadow-sm);
+}
+.zl-slider__input::-moz-range-thumb{
+  pointer-events:auto; cursor:grab;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--zl-bg-raised); border:2px solid var(--zl-action);
+}
+.zl-slider__input:focus-visible::-webkit-slider-thumb{ box-shadow:var(--zl-ring); }
+.zl-range-values{ display:flex; align-items:center; gap:var(--zl-space-2); }
+.zl-range-values .zl-input{ font-family:var(--zl-font-mono); text-align:right; padding-inline:var(--zl-s-2-5); }
+.zl-range-values__sep{ color:var(--zl-text-subtle); flex:none; }
+
+/* ---------- Multi-select dropdown ----------
+   Looks like a select, holds checkboxes, so several values can be chosen
+   without the misery of a native <select multiple>. */
+.zl-dropdown{ position:relative; }
+.zl-dropdown__toggle{
+  display:flex; align-items:center; gap:var(--zl-s-2); list-style:none; cursor:pointer;
+  min-height:var(--zl-tap-min); padding:0 var(--zl-s-3-5);
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border-input);
+  border-radius:var(--zl-radius); font-size:var(--zl-text-sm); color:var(--zl-text);
+}
+.zl-dropdown__toggle::-webkit-details-marker{ display:none; }
+.zl-dropdown__toggle::after{ content:'▾'; margin-left:auto; color:var(--zl-text-subtle); }
+.zl-dropdown[open] > .zl-dropdown__toggle{ border-color:var(--zl-focus); }
+.zl-dropdown[open] > .zl-dropdown__toggle::after{ content:'▴'; }
+.zl-dropdown__menu{
+  position:absolute; z-index:var(--zl-z-dropdown); left:0; right:0; top:calc(100% + 4px);
+  padding:var(--zl-s-1-5); background:var(--zl-bg-raised);
+  border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  box-shadow:var(--zl-shadow-pop); max-height:280px; overflow:auto;
+}
+
+/* ---------- Checkbox filter list ---------- */
+.zl-checklist{ list-style:none; margin:0; padding:0; }
+.zl-checklist__row{
+  display:flex; align-items:center; gap:var(--zl-s-2-5);
+  min-height:36px; padding:0 var(--zl-s-2); border-radius:var(--zl-radius-sm);
+  font-size:var(--zl-text-sm); color:var(--zl-text); cursor:pointer;
+}
+.zl-checklist__row:hover{ background:var(--zl-bg-hover); }
+.zl-checklist__row input{ width:17px; height:17px; accent-color:var(--zl-action); flex:none; cursor:pointer; }
+.zl-checklist__row .lbl{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.zl-checklist__row .n{
+  font-family:var(--zl-font-mono); font-size:var(--zl-text-caption);
+  color:var(--zl-text-subtle); flex:none;
+}
+.zl-checklist__row.is-empty{ opacity:.45; }
+
+/* ---------- Filter sidebar ----------
+   Baymard is cautious about horizontal filter toolbars past 6–8 types and
+   prefers a rail, because a rail shows the options without opening anything.
+   With campus promoted to the header we are at four here, but the rail also
+   buys the scannability the chip row was starting to lose. */
+.zl-rail{ display:flex; flex-direction:column; gap:var(--zl-space-5); }
+.zl-rail__group > h3{
+  font-size:var(--zl-text-label); font-weight:var(--zl-weight-semi);
+  letter-spacing:var(--zl-tracking-label); text-transform:uppercase;
+  color:var(--zl-text-subtle); margin:0 0 var(--zl-space-2);
+}
+.zl-rail__list{ list-style:none; margin:0; padding:0; }
+.zl-rail__list li + li{ margin-top:var(--zl-s-0-5); }
+.zl-ui .zl-rail__link{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--zl-s-2);
+  min-height:36px; padding:0 var(--zl-s-2-5); border-radius:var(--zl-radius-sm);
+  font-size:var(--zl-text-sm); color:var(--zl-text-muted); text-decoration:none;
+}
+.zl-ui .zl-rail__link:hover{ background:var(--zl-bg-hover); color:var(--zl-text); text-decoration:none; }
+.zl-ui .zl-rail__link[aria-current="true"]{
+  background:var(--zl-bg-accent); color:var(--zl-text-on-accent); font-weight:var(--zl-weight-semi);
+}
+.zl-rail__count{ font-family:var(--zl-font-mono); font-size:var(--zl-text-caption); opacity:.75; }
+
+/* The rail collapses on small screens. Rendered open so a no-JS reader still
+   gets every filter; app.js closes it below the rail breakpoint, because the
+   full rail is ~1200px tall and pushed the first result two screens down. */
+.zl-rail-wrap{ border:0; }
+.zl-rail-wrap__toggle{
+  display:flex; align-items:center; gap:var(--zl-s-2); list-style:none; cursor:pointer;
+  min-height:var(--zl-tap-min); padding:0 var(--zl-s-4);
+  border:1px solid var(--zl-border); border-radius:var(--zl-radius-pill);
+  font-size:var(--zl-text-sm); font-weight:var(--zl-weight-medium); color:var(--zl-text);
+  margin-bottom:var(--zl-space-3);
+}
+.zl-rail-wrap__toggle::-webkit-details-marker{ display:none; }
+.zl-rail-wrap__toggle::after{ content:'▾'; margin-left:auto; color:var(--zl-text-subtle); }
+.zl-rail-wrap[open] > .zl-rail-wrap__toggle::after{ content:'▴'; }
+.zl-rail-wrap__n{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:20px; height:20px; padding:0 var(--zl-s-1-5); border-radius:var(--zl-radius-pill);
+  background:var(--zl-action); color:var(--zl-text-on-fill);
+  font-size:var(--zl-text-label); font-weight:var(--zl-weight-semi);
+}
+@media (min-width:900px){
+  .zl-rail-wrap__toggle{ display:none; }
+}
+
+/* ---------- Buttons ---------- */
+.zl-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--zl-space-2);
+  min-height:var(--zl-tap-min); padding:0 var(--zl-s-5);
+  border:1px solid transparent; border-radius:var(--zl-radius);
+  font-family:inherit; font-size:var(--zl-text-body); font-weight:var(--zl-weight-semi);
+  line-height:1; text-decoration:none; cursor:pointer; white-space:nowrap;
+  transition:background-color var(--zl-duration) var(--zl-ease),
+             border-color var(--zl-duration) var(--zl-ease),
+             color var(--zl-duration) var(--zl-ease);
+}
+/* Anatomy: [icon] <span>label</span> [icon]. The icon is an inline SVG sized
+   by the button, the label is always its own element — never a bare text node
+   beside a span, which is what made buttons impossible to style consistently. */
+.zl-btn > svg{ width:var(--zl-icon-sm); height:var(--zl-icon-sm); flex:none; }
+.zl-btn > span{ min-width:0; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }   /* 1.3 so descenders survive the overflow clip */
+.zl-btn:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+.zl-btn:disabled, .zl-btn[aria-disabled="true"]{ opacity:.45; cursor:not-allowed; }
+.zl-btn:hover{ text-decoration:none; }
+
+/* Every variant is scoped under `.zl-ui` so it out-specifies the global
+   `.zl-ui a` link colour (0,1,1). Without the prefix a button rendered as an
+   <a> — which most of them are — silently took the LINK colour instead of its
+   own: a primary anchor came out Blue 500 text on a Blue 800 fill, about
+   1.96:1, and an urgent anchor was blue-on-red. Measured, not theoretical. */
+
+/* Primary — blue fill. One per view. */
+.zl-ui .zl-btn--primary{ background:var(--zl-action); color:var(--zl-text-on-fill); }
+.zl-ui .zl-btn--primary:hover:not(:disabled){ background:var(--zl-action-hover); color:var(--zl-text-on-fill); }
+.zl-ui .zl-btn--primary:active:not(:disabled){ background:var(--zl-action-active); }
+
+/* Secondary — blue outline. */
+/* Action blue, not link blue: on a tinted surface (an info alert) link blue
+   measures 4.42:1 against the fill, just under AA; action blue holds 8.6:1
+   there and 10.9:1 on white. */
+.zl-ui .zl-btn--secondary{ background:transparent; color:var(--zl-action); border-color:currentColor; }
+.zl-ui .zl-btn--secondary:hover:not(:disabled){ background:var(--zl-bg-accent); color:var(--zl-text-on-accent); }
+
+/* Tertiary — neutral fill. */
+.zl-ui .zl-btn--tertiary{ background:var(--zl-bg-sunken); color:var(--zl-text); border-color:var(--zl-border); }
+.zl-ui .zl-btn--tertiary:hover:not(:disabled){ border-color:var(--zl-border-strong); color:var(--zl-text); }
+
+/* Ghost — for icon buttons and low-priority inline actions. */
+.zl-ui .zl-btn--ghost{ background:transparent; color:var(--zl-text-muted); padding:0 var(--zl-s-3); }
+.zl-ui .zl-btn--ghost:hover:not(:disabled){ background:var(--zl-bg-hover); color:var(--zl-text); }
+
+/* CTA — the single most important action on a brand surface. On Blue 800 the
+   loudest thing available is white: 10.16:1. Innovation Red was measured here
+   and comes out at 1.48:1 against the header, so prominence is bought with
+   fill, weight and lift rather than with a hotter hue. */
+.zl-ui .zl-btn--cta{
+  background:var(--zl-on-brand); color:var(--zl-brand-surface);
+  font-weight:var(--zl-weight-bold);
+  box-shadow:0 1px 2px rgb(0 20 51 / .28), 0 2px 10px rgb(0 20 51 / .22);
+}
+.zl-ui .zl-btn--cta:hover:not(:disabled){ background:var(--zl-blue-50); color:var(--zl-brand-surface); }
+.zl-btn--cta:active:not(:disabled){ box-shadow:0 1px 2px rgb(0 20 51 / .34); }
+/* (The CTA's old '＋' text glyph needed its own span sizing; the SVG icon is
+   sized by the shared button anatomy, so that rule is gone.) */
+
+/* URGENT — red fill. Highest-priority conversion ONLY, and
+   never more than one on a screen (guidelines slide 7). In this
+   product that is "Post an item" in the header, and destructive
+   confirmation inside a modal. Nothing else earns it. */
+.zl-ui .zl-btn--urgent{ background:var(--zl-urgent); color:var(--zl-text-on-fill); }
+.zl-ui .zl-btn--urgent:hover:not(:disabled){ background:var(--zl-urgent-hover); color:var(--zl-text-on-fill); }
+
+/* Sizes — height and padding only; everything else is shared. */
+.zl-btn--sm{ min-height:var(--zl-control-sm); padding:0 var(--zl-s-3); font-size:var(--zl-text-sm); gap:var(--zl-s-1-5); }
+.zl-btn--lg{ min-height:var(--zl-control-lg); padding:0 var(--zl-s-6); font-size:var(--zl-text-body); }
+.zl-btn--block{ width:100%; }
+.zl-btn--icon{ padding:0; width:var(--zl-control); }
+.zl-btn--icon > svg{ width:var(--zl-icon); height:var(--zl-icon); }
+.zl-btn--pill{ border-radius:var(--zl-radius-pill); }
+
+/* ---------- Forms ---------- */
+.zl-field{ display:flex; flex-direction:column; gap:var(--zl-s-2); }   /* label ↔ control ↔ hint */
+.zl-field__label{ font-size:var(--zl-text-sm); font-weight:var(--zl-weight-medium); color:var(--zl-text); }
+.zl-field__label .req{ color:var(--zl-danger); margin-left:var(--zl-s-0-5); }
+
+.zl-input, .zl-select, .zl-textarea{
+  width:100%; min-height:var(--zl-tap-min); padding:var(--zl-s-2-5) var(--zl-s-3-5);
+  background:var(--zl-bg-raised); color:var(--zl-text);
+  border:1px solid var(--zl-border-input);   /* 3:1 — the field's only boundary */
+  border-radius:var(--zl-radius);
+  font-family:inherit;
+  font-size:16px;   /* NEVER below 16px: iOS Safari zooms the page on focus */
+  line-height:1.4;
+  transition:border-color var(--zl-duration) var(--zl-ease);
+}
+.zl-textarea{ min-height:120px; resize:vertical; line-height:var(--zl-lh-body); }
+.zl-input::placeholder, .zl-textarea::placeholder{ color:var(--zl-text-subtle); }
+.zl-input:focus, .zl-select:focus, .zl-textarea:focus{
+  outline:none; border-color:var(--zl-focus); box-shadow:var(--zl-ring);
+}
+.zl-select{
+  appearance:none; padding-right:var(--zl-s-10); cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
+                   linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 18px) 52%, calc(100% - 13px) 52%;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+.zl-field__hint{ margin:0; font-size:var(--zl-text-caption); line-height:var(--zl-lh-caption); color:var(--zl-text-subtle); }
+.zl-field__count{ font-size:var(--zl-text-caption); color:var(--zl-text-subtle); text-align:right; font-family:var(--zl-font-mono); }
+.zl-field.is-error .zl-input,
+.zl-field.is-error .zl-select,
+.zl-field.is-error .zl-textarea{ border-color:var(--zl-danger); }
+.zl-field.is-error .zl-field__hint{ color:var(--zl-danger); }
+
+/* Price input — the currency sits inside the field, so the
+   number is never ambiguous. */
+.zl-price-input{ position:relative; }
+.zl-price-input .prefix{
+  position:absolute; left:14px; top:50%; transform:translateY(-50%);
+  color:var(--zl-text-muted); font-family:var(--zl-font-mono); pointer-events:none;
+}
+.zl-price-input input{ padding-left:var(--zl-s-12); font-family:var(--zl-font-mono); }
+
+.zl-check, .zl-radio{
+  display:inline-flex; align-items:center; gap:var(--zl-space-2);
+  min-height:var(--zl-tap-min); cursor:pointer; font-size:var(--zl-text-body);
+}
+.zl-check input, .zl-radio input{ width:20px; height:20px; accent-color:var(--zl-action); flex:none; cursor:pointer; }
+
+.zl-switch{ display:inline-flex; align-items:center; gap:var(--zl-s-2-5); min-height:var(--zl-tap-min); cursor:pointer; }
+.zl-switch input{ position:absolute; opacity:0; width:0; height:0; }
+.zl-switch .track{
+  width:40px; height:24px; border-radius:var(--zl-radius-pill);
+  background:var(--zl-border-strong); position:relative; flex:none;
+  transition:background-color var(--zl-duration) var(--zl-ease);
+}
+.zl-switch .track::after{
+  content:''; position:absolute; top:3px; left:3px; width:18px; height:18px;
+  border-radius:50%; background:var(--zl-white);
+  transition:left var(--zl-duration) var(--zl-ease);
+}
+.zl-switch input:checked + .track{ background:var(--zl-action); }
+.zl-switch input:checked + .track::after{ left:19px; }
+.zl-switch input:focus-visible + .track{ box-shadow:var(--zl-ring); }
+
+/* A select that chooses rather than types: same pill and height as the chips
+   it sits beside. */
+.zl-select--pill{
+  border-radius:var(--zl-radius-pill); min-height:var(--zl-tap-min);
+  padding:0 var(--zl-s-10) 0 var(--zl-s-4); font-size:var(--zl-text-sm);
+  border-color:var(--zl-border); background-position:calc(100% - 20px) 52%, calc(100% - 15px) 52%;
+}
+.zl-select--pill:hover{ border-color:var(--zl-border-strong); }
+
+/* ---------- Chips ----------
+   Category and campus filters. The most-tapped things on the
+   site, so they carry the full 44px target. */
+.zl-chip{
+  display:inline-flex; align-items:center; gap:var(--zl-s-1-5);
+  min-height:var(--zl-tap-min); padding:0 var(--zl-s-4);
+  background:var(--zl-bg-raised); color:var(--zl-text);
+  border:1px solid var(--zl-border); border-radius:var(--zl-radius-pill);
+  font-size:var(--zl-text-sm); font-weight:var(--zl-weight-medium);
+  cursor:pointer; white-space:nowrap; text-decoration:none;
+  transition:background-color var(--zl-duration) var(--zl-ease),
+             border-color var(--zl-duration) var(--zl-ease);
+}
+.zl-chip:hover{ border-color:var(--zl-border-strong); text-decoration:none; }
+.zl-chip[aria-pressed="true"], .zl-chip.is-active{
+  background:var(--zl-action); color:var(--zl-text-on-fill); border-color:var(--zl-action);
+}
+/* Selected chips are <a> elements, so the global `.zl-ui a:hover` (0,2,1)
+   outranked the rule above (0,2,0) and turned the label Blue 800 — the same
+   blue as the fill, so it vanished on hover. Scoped under .zl-ui, the label
+   stays white and the fill deepens instead, like the primary button. */
+.zl-ui .zl-chip[aria-pressed="true"], .zl-ui .zl-chip.is-active,
+.zl-ui .zl-chip[aria-pressed="true"]:hover, .zl-ui .zl-chip.is-active:hover{ color:var(--zl-text-on-fill); }
+.zl-ui .zl-chip[aria-pressed="true"]:hover, .zl-ui .zl-chip.is-active:hover{
+  background:var(--zl-action-hover); border-color:var(--zl-action-hover);
+}
+.zl-chip:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+/* Static, non-interactive chip — languages on a profile. */
+/* A count inside a filter chip: "Sports 4". Tabular figures so a row of
+   chips does not shift as the numbers change. */
+.zl-chip__n{
+  margin-left:var(--zl-s-1-5); padding:0 var(--zl-s-1-5);
+  border-radius:var(--zl-radius-pill); background:var(--zl-bg-sunken);
+  font-size:var(--zl-text-caption); font-variant-numeric:tabular-nums;
+  color:var(--zl-text-subtle);
+}
+.zl-chip[aria-pressed="true"] .zl-chip__n{ background:var(--zl-on-brand-hover); color:var(--zl-text-on-fill); }
+
+.zl-chip--static{ min-height:28px; padding:0 var(--zl-s-2-5); cursor:default; font-size:var(--zl-text-caption); }
+.zl-chip--static:hover{ border-color:var(--zl-border); }
+
+.zl-chiprow{ display:flex; gap:var(--zl-space-2); overflow-x:auto; padding-bottom:var(--zl-s-1-5); scrollbar-width:none; }
+.zl-chiprow::-webkit-scrollbar{ display:none; }
+
+/* ---------- Horizontal chip scroller ----------
+   The row already scrolled; what it lacked was any sign that it did. The arrows
+   appear only when the track actually overflows, and each one only when there
+   is something in that direction — so on a wide screen they never show at all.
+
+   Swipe and trackpad scrolling are untouched: the buttons are enhancement over
+   a plain overflow container, not a replacement for it. */
+.zl-chipscroll{ position:relative; }
+.zl-chipscroll__nav{
+  position:absolute; top:0; bottom:6px; width:40px;
+  display:flex; align-items:center; z-index:2;
+  border:0; padding:0; cursor:pointer; color:var(--zl-text);
+}
+.zl-chipscroll__nav svg{ display:block; }
+/* A fade under the arrow so chips slide out of view rather than being chopped. */
+.zl-chipscroll__nav--next{
+  right:0; justify-content:flex-end;
+  background:linear-gradient(90deg, transparent, var(--zl-bg) 42%);
+}
+.zl-chipscroll__nav--prev{
+  left:0; justify-content:flex-start;
+  background:linear-gradient(270deg, transparent, var(--zl-bg) 42%);
+}
+.zl-chipscroll__nav svg{
+  width:22px; height:22px; padding:var(--zl-s-1);
+  border-radius:50%; background:var(--zl-bg-raised);
+  border:1px solid var(--zl-border); box-shadow:var(--zl-shadow-sm);
+}
+.zl-chipscroll__nav--next svg{ transform:rotate(-90deg); }
+.zl-chipscroll__nav--prev svg{ transform:rotate(90deg); }
+.zl-chipscroll__nav:hover svg{ border-color:var(--zl-border-strong); color:var(--zl-link); }
+.zl-chipscroll__nav:focus-visible{ outline:none; }
+.zl-chipscroll__nav:focus-visible svg{ box-shadow:var(--zl-ring); }
+
+/* ---------- Badges ---------- */
+.zl-badge{
+  display:inline-flex; align-items:center; gap:var(--zl-s-1);
+  padding:var(--zl-s-1) var(--zl-s-2); border-radius:var(--zl-radius-sm);
+  font-size:var(--zl-text-caption); font-weight:var(--zl-weight-medium); line-height:1.3;
+}
+.zl-badge--neutral{ background:var(--zl-bg-sunken); color:var(--zl-text-muted); }
+.zl-badge--brand{   background:var(--zl-info-bg);    color:var(--zl-text-on-accent); }
+.zl-badge--success{ background:var(--zl-success-bg); color:var(--zl-success); }
+.zl-badge--warning{ background:var(--zl-warning-bg); color:var(--zl-warning); }
+.zl-badge--danger{  background:var(--zl-danger-bg);  color:var(--zl-danger); }
+
+/* Campus — appears on every card and on every profile. */
+.zl-badge--campus{ background:var(--zl-bg-sunken); color:var(--zl-text-muted); }
+/* ZJU-verified email. A checkmark AND the word — never colour alone. */
+.zl-badge--verified{ background:var(--zl-info-bg); color:var(--zl-text-on-accent); }
+/* Sold / expired overlay state. */
+.zl-badge--sold{ background:var(--zl-text-muted); color:var(--zl-bg); }
+
+/* ---------- Icon ring ----------
+   Line icon inside a circular ring, per the guidelines' icon
+   spec. The ring is a geometric shape, not the emblem — no
+   mark is reproduced. */
+.zl-icon-ring{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; flex:none;
+  border:1px solid var(--zl-link); border-radius:50%;
+  color:var(--zl-link);
+}
+.zl-icon-ring--lg{ width:56px; height:56px; }
+.zl-icon-ring--alert{ border-color:var(--zl-danger); color:var(--zl-danger); }
+
+/* ---------- Listing card ----------
+   ONE unified hit area per card, and one hover state covering all of it.
+   Baymard's product-list testing found 76% of sites leave it unclear what is
+   clickable inside a list item; the fix is a single stretched link plus a
+   synchronised hover on the whole card.
+
+   The link is an overlay (.zl-card__link::after), NOT a wrapper — nesting the
+   favourite <button> inside an <a> is invalid HTML and makes the two controls
+   fight for the same click. */
+.zl-card{
+  display:flex; flex-direction:column;
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); overflow:hidden;
+  color:inherit; position:relative; isolation:isolate;
+  transition:border-color var(--zl-duration) var(--zl-ease),
+             box-shadow var(--zl-duration) var(--zl-ease);
+}
+/* Stretched hit area: covers the card, sits under the favourite button.
+   Scoped under .zl-ui to out-specify the global `.zl-ui a` underline: on a card
+   the affordance is the whole card, not a coloured word, so the rule that
+   underlines links (colour must never be the only signal) is already satisfied
+   by the card itself. The underline arrives on hover, with the card's own. */
+.zl-ui .zl-card__link{ text-decoration:none; color:inherit; }
+.zl-card__link::after{ content:''; position:absolute; inset:0; z-index:1; }
+.zl-ui .zl-card:hover .zl-card__link{ text-decoration:underline; text-underline-offset:2px; }
+.zl-card:hover{ border-color:var(--zl-border-strong); box-shadow:var(--zl-shadow-card); text-decoration:none; }
+.zl-card:focus-within{ box-shadow:var(--zl-ring); }
+
+/* Fixed 4:3 box so the feed never reflows as photos arrive —
+   this is the whole of the CLS budget. Listing photos are NEVER
+   duotoned: the buyer has to see the item's real colour. The
+   guidelines' blue overlay is for editorial imagery only. */
+.zl-card__media{
+  aspect-ratio:4/3; background:var(--zl-bg-sunken);
+  position:relative; overflow:hidden;
+}
+.zl-card__media img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Card carousel. Scroll-snap, so swipe works on touch with no JavaScript; the
+   arrows and dots are enhancement. Everything interactive here sits ABOVE the
+   card's stretched link (z-index 1) so it keeps its own hit area — the same
+   rule the favourite button follows. */
+.zl-card__slides{
+  display:flex; height:100%; overflow-x:auto;
+  scroll-snap-type:x mandatory; scroll-behavior:smooth;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.zl-card__slides::-webkit-scrollbar{ display:none; }
+.zl-card__slides > img{ flex:0 0 100%; scroll-snap-align:center; }
+
+.zl-card__nav{
+  position:absolute; top:50%; transform:translateY(-50%); z-index:2;
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+  border:0; border-radius:50%; cursor:pointer;
+  background:rgb(255 255 255 / .92); color:var(--zl-text);
+  font-size:15px; line-height:1; padding:0;
+  opacity:0; transition:opacity var(--zl-duration) var(--zl-ease);
+  box-shadow:0 1px 3px rgb(0 20 51 / .25);
+}
+.zl-card__nav--prev{ left:6px; }
+.zl-card__nav--next{ right:6px; }
+/* Revealed on hover or keyboard focus; on touch there is no hover, and swipe
+   already does the job. */
+.zl-card:hover .zl-card__nav,
+.zl-card__nav:focus-visible{ opacity:1; }
+.zl-card__nav:focus-visible{ box-shadow:var(--zl-ring); }
+@media (hover:none){ .zl-card__nav{ display:none; } }
+
+.zl-card__dots{
+  position:absolute; z-index:2; left:0; right:0; bottom:8px;
+  display:flex; justify-content:center; gap:var(--zl-s-1); pointer-events:none;
+}
+.zl-card__dot{
+  width:5px; height:5px; border-radius:50%;
+  background:rgb(255 255 255 / .55); box-shadow:0 0 2px rgb(0 20 51 / .5);
+  transition:background-color var(--zl-duration) var(--zl-ease);
+}
+.zl-card__dot.is-on{ background:var(--zl-on-scrim); }
+.zl-card__badges{ position:absolute; top:8px; left:8px; display:flex; gap:var(--zl-s-1); }
+.zl-card__fav{
+  position:absolute; top:4px; right:4px;
+  width:var(--zl-tap-min); height:var(--zl-tap-min);
+  display:flex; align-items:center; justify-content:center;
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border);
+  border-radius:50%; cursor:pointer; color:var(--zl-text-muted);
+  z-index:2;   /* above the stretched link, so it stays its own hit area */
+}
+.zl-card__fav svg{ display:block; }
+/* Filled by state rather than by swapping a glyph — the stroke weight is set
+   on the path, so it no longer depends on whatever the font felt like. */
+.zl-card__fav[aria-pressed="true"]{ color:var(--zl-urgent); }
+.zl-card__fav[aria-pressed="true"] svg path{ fill:currentColor; }
+
+.zl-card__body{ padding:var(--zl-space-3) var(--zl-space-3) var(--zl-s-4); display:flex; flex-direction:column; gap:var(--zl-s-2); flex:1; }
+.zl-card__title{
+  font-size:var(--zl-text-sm); font-weight:var(--zl-weight-medium); line-height:1.4; margin:0;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.zl-card__meta{ display:flex; align-items:center; gap:var(--zl-s-1-5); margin-top:auto; padding-top:var(--zl-s-1); flex-wrap:wrap; }
+
+/* ---------- Gallery / carousel ----------
+   A scroll-snapping track, so swipe on touch and trackpad works natively with
+   no JavaScript at all; the arrows, thumbnails and counter are progressive
+   enhancement layered on top. Fixed 4:3 frame so paging never reflows the page.
+
+   Baymard's product-list work applies here too: thumbnails must be visible
+   rather than hidden behind dots, because a buyer decides whether to keep
+   looking based on what else is in the set. */
+.zl-gallery{ position:relative; }
+.zl-gallery__frame{
+  position:relative; border-radius:var(--zl-radius); overflow:hidden;
+  border:1px solid var(--zl-border); background:var(--zl-bg-sunken);
+}
+.zl-gallery__track{
+  display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
+  scroll-behavior:smooth; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.zl-gallery__track::-webkit-scrollbar{ display:none; }
+.zl-gallery__slide{
+  flex:0 0 100%; scroll-snap-align:center; aspect-ratio:4/3;
+  display:block; min-width:0;
+}
+.zl-gallery__slide img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.zl-gallery__nav{
+  position:absolute; top:50%; transform:translateY(-50%); z-index:2;
+  width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; border:1px solid var(--zl-border);
+  background:var(--zl-bg-raised); color:var(--zl-text);
+  cursor:pointer; font-size:18px; line-height:1; opacity:.92;
+}
+.zl-gallery__nav:hover{ opacity:1; border-color:var(--zl-border-strong); }
+.zl-gallery__nav:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+/* No [disabled] rule: both carousels wrap, so an arrow is never a dead end. */
+.zl-gallery__nav--prev{ left:10px; }
+.zl-gallery__nav--next{ right:10px; }
+
+.zl-gallery__count{
+  position:absolute; right:10px; bottom:10px; z-index:2;
+  padding:var(--zl-s-1) var(--zl-s-2); border-radius:var(--zl-radius-pill);
+  background:var(--zl-scrim); color:var(--zl-on-scrim);
+  font-family:var(--zl-font-mono); font-size:var(--zl-text-caption); line-height:1.5;
+}
+
+.zl-gallery__thumbs{
+  display:flex; gap:var(--zl-space-2); margin-top:var(--zl-space-2);
+  overflow-x:auto; scrollbar-width:none; padding-bottom:var(--zl-s-0-5);
+}
+.zl-gallery__thumbs::-webkit-scrollbar{ display:none; }
+.zl-gallery__thumb{
+  flex:0 0 auto; width:72px; aspect-ratio:4/3; padding:0; cursor:pointer;
+  border:2px solid transparent; border-radius:var(--zl-radius-sm);
+  overflow:hidden; background:var(--zl-bg-sunken);
+}
+.zl-gallery__thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.zl-gallery__thumb[aria-current="true"]{ border-color:var(--zl-action); }
+.zl-gallery__thumb:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+
+/* Photographer credit — required by Unsplash's API terms, and good manners
+   regardless. Quiet: it is provenance, not content. */
+.zl-gallery__credit{
+  margin:var(--zl-space-2) 0 0; font-size:var(--zl-text-caption);
+  color:var(--zl-text-subtle);
+}
+.zl-gallery__credit a{ color:inherit; }
+
+/* Single-image listings get no chrome at all. */
+.zl-gallery--single .zl-gallery__nav,
+.zl-gallery--single .zl-gallery__count,
+.zl-gallery--single .zl-gallery__thumbs{ display:none; }
+
+/* Photo-count marker on a feed card — tells a buyer there is more to see. */
+.zl-card__count{
+  position:absolute; left:8px; bottom:8px; z-index:2;
+  display:inline-flex; align-items:center; gap:var(--zl-s-1);
+  padding:var(--zl-s-1) var(--zl-s-2); border-radius:var(--zl-radius-sm);
+  background:var(--zl-scrim-soft); color:var(--zl-on-scrim);
+  font-family:var(--zl-font-mono); font-size:var(--zl-text-label); line-height:1.5;
+}
+.zl-card__count svg{ display:block; }
+
+/* ---------- Price ---------- */
+.zl-price{
+  font-family:var(--zl-font-mono); font-variant-numeric:tabular-nums;
+  font-size:var(--zl-text-body-lg); font-weight:var(--zl-weight-semi);
+  color:var(--zl-text); letter-spacing:-.01em;
+}
+.zl-price--negotiable{ font-size:var(--zl-text-body); color:var(--zl-text-muted); font-family:var(--zl-font-sans); }
+/* Free is a status, not a price of zero — it gets the success
+   token, which is exactly the reserved-meaning case: an item
+   that costs nothing is good news, and it is labelled in words. */
+.zl-price--free{
+  font-family:var(--zl-font-sans); color:var(--zl-success);
+  background:var(--zl-success-bg); padding:var(--zl-s-0-5) var(--zl-s-2); border-radius:var(--zl-radius-sm);
+  font-size:var(--zl-text-sm);
+}
+
+/* ---------- Avatar & seller ---------- */
+.zl-avatar{
+  width:40px; height:40px; flex:none; border-radius:50%;
+  background:var(--zl-action); color:var(--zl-text-on-fill);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-weight:var(--zl-weight-semi); font-size:var(--zl-text-sm);
+  overflow:hidden; object-fit:cover;
+}
+.zl-avatar--lg{ width:64px; height:64px; font-size:var(--zl-text-h3); }
+.zl-avatar--sm{ width:28px; height:28px; font-size:var(--zl-text-caption); }
+
+.zl-seller{
+  display:flex; gap:var(--zl-space-3); align-items:flex-start;
+  padding:var(--zl-space-4); background:var(--zl-bg-sunken);
+  border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+}
+.zl-seller__name{ font-weight:var(--zl-weight-semi); }
+.zl-seller__langs{ display:flex; gap:var(--zl-s-1); flex-wrap:wrap; margin-top:var(--zl-s-1-5); }
+
+/* ---------- Applied filters ----------
+   Baymard: 28% of sites give no overview of what is filtered. Users lose the
+   confirmation that a filter took, a fast way to undo it, and the context for
+   what they are looking at. This bar is all three. */
+.zl-applied{
+  display:flex; align-items:center; gap:var(--zl-space-2); flex-wrap:wrap;
+  padding:var(--zl-space-2) 0;
+}
+.zl-applied__label{
+  font-size:var(--zl-text-caption); font-weight:var(--zl-weight-semi);
+  color:var(--zl-text-muted); margin-right:var(--zl-s-0-5);
+}
+.zl-chip--applied{
+  min-height:32px; padding:0 var(--zl-s-1-5) 0 var(--zl-s-3); font-size:var(--zl-text-caption);
+  background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
+  border-color:transparent;
+}
+.zl-chip--applied .x{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:20px; height:20px; border-radius:50%; margin-left:var(--zl-s-0-5);
+  font-size:var(--zl-text-sm); line-height:1;
+}
+.zl-chip--applied:hover .x{ background:var(--zl-bg-hover); }
+.zl-applied__clear{
+  background:none; border:0; padding:0 var(--zl-s-1); min-height:32px;
+  font-family:inherit; font-size:var(--zl-text-caption); color:var(--zl-link);
+  text-decoration:underline; text-underline-offset:2px; cursor:pointer;
+}
+
+/* ---------- Result count + sort ---------- */
+/* The count and sort control the grid below, so they need to read as a strip
+   above it rather than as its first row. The padding was 8px top and bottom,
+   which left the sort control sitting 0px clear of the first row of cards
+   while the page header above it had 24. Now 24 below as well: the same
+   measure as the gap between the header and this bar, and as the gap between
+   the rows of the feed itself. */
+.zl-resultbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:var(--zl-space-3); flex-wrap:wrap;
+  padding:var(--zl-s-2) 0 var(--zl-s-6);
+}
+.zl-resultbar__count{ font-size:var(--zl-text-sm); color:var(--zl-text-muted); }
+.zl-resultbar__count b{ color:var(--zl-text); font-weight:var(--zl-weight-semi); }
+.zl-sort{ display:flex; align-items:center; gap:var(--zl-space-2); }
+/* 44px to match the chips above it — this pairing was the visible mismatch.
+   Font stays 16px on small screens: iOS Safari zooms on focus for ANY control
+   under 16px, <select> included; it may shrink on desktop, where it doesn't. */
+.zl-sort .zl-select{ width:auto; font-size:16px; }
+@media (min-width:1024px){ .zl-sort .zl-select{ font-size:var(--zl-text-sm); } }
+
+/* ---------- Price range ---------- */
+.zl-range{ display:flex; align-items:center; gap:var(--zl-space-2); }
+.zl-range .zl-input{ font-family:var(--zl-font-mono); text-align:right; }
+.zl-range .sep{ color:var(--zl-text-subtle); flex:none; }
+
+/* ---------- Search suggestions ----------
+   Kept short on purpose: Baymard found long suggestion lists overwhelm rather
+   than help. Cap at 6–8, and never let a suggestion look like a result. */
+.zl-suggest{
+  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:var(--zl-z-dropdown);
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); box-shadow:var(--zl-shadow-pop);
+  overflow:hidden; padding:var(--zl-s-1);
+}
+.zl-suggest__item{
+  display:flex; align-items:center; gap:var(--zl-space-2);
+  width:100%; min-height:var(--zl-tap-min); padding:0 var(--zl-s-2-5); border:0; border-radius:var(--zl-radius-sm);
+  background:none; font-family:inherit; font-size:var(--zl-text-sm); color:var(--zl-text);
+  text-align:left; cursor:pointer; text-decoration:none;
+}
+.zl-suggest__item:hover, .zl-suggest__item[aria-selected="true"]{ background:var(--zl-bg-hover); text-decoration:none; }
+.zl-suggest__item b{ font-weight:var(--zl-weight-semi); }   /* the matched part */
+.zl-suggest__scope{ margin-left:auto; font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+
+/* ---------- Load more ----------
+   Baymard tested pagination vs infinite scroll vs "load more": the button wins,
+   provided the URL keeps up so Back returns you to where you were. */
+.zl-loadmore{ display:flex; flex-direction:column; align-items:center; gap:var(--zl-space-2); padding:var(--zl-space-4) 0; }
+.zl-loadmore__progress{ font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+
+/* ---------- Spec table ----------
+   A labelled key/value block for the facts of a listing. Borrowed in structure
+   from OLX's "Detalhes", which is where that page puts its substance — but set
+   in the ZJU type scale and rules, not their styling. Mono for values keeps
+   figures aligned down the column. */
+.zl-specs{ margin:0; border-top:1px solid var(--zl-border); }
+.zl-specs__row{
+  display:flex; gap:var(--zl-space-3); align-items:baseline;
+  padding:var(--zl-s-2-5) 0; border-bottom:1px solid var(--zl-border);
+}
+.zl-specs__key{
+  flex:0 0 40%; max-width:180px; margin:0;
+  font-size:var(--zl-text-caption); color:var(--zl-text-subtle);
+}
+.zl-specs__val{ flex:1; margin:0; font-size:var(--zl-text-sm); color:var(--zl-text); }
+.zl-specs__val--num{ font-family:var(--zl-font-mono); font-variant-numeric:tabular-nums; }
+
+/* ---------- Minor actions: share and report ----------
+   A matched pair under the listing. Both are quiet — one is a courtesy, the
+   other a safety valve — so neither competes with "Message seller". They share
+   one style so they read as a set rather than two unrelated controls. */
+.zl-listing-actions{
+  display:flex; align-items:flex-start; gap:var(--zl-s-6); flex-wrap:wrap;   /* no outer margin: the parent stack spaces it */
+}
+.zl-minor-action{
+  list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:var(--zl-s-1-5);
+  min-height:var(--zl-tap-min); padding:0;
+  background:none; border:0; font-family:inherit;
+  font-size:var(--zl-text-caption); color:var(--zl-text-subtle);
+}
+.zl-minor-action::-webkit-details-marker{ display:none; }
+.zl-minor-action svg{ display:block; }
+.zl-ui .js-share:hover{ color:var(--zl-link); text-decoration:underline; }
+.zl-report{ margin-top:0; }
+.zl-report > summary:hover{ color:var(--zl-danger); text-decoration:underline; }
+.zl-report__body{
+  display:flex; gap:var(--zl-space-2); align-items:flex-end; flex-wrap:wrap;
+  padding:var(--zl-space-3); margin-top:var(--zl-space-2);
+  background:var(--zl-bg-sunken); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius);
+}
+
+/* ---------- Alerts ---------- */
+.zl-alert{
+  display:flex; gap:var(--zl-space-3); align-items:flex-start;
+  padding:var(--zl-space-4); border-radius:var(--zl-radius);
+  border-left:3px solid; font-size:var(--zl-text-sm);
+}
+.zl-alert b{ display:block; margin-bottom:var(--zl-s-0-5); font-weight:var(--zl-weight-semi); }
+.zl-alert--info{    background:var(--zl-info-bg);    border-color:var(--zl-info);    color:var(--zl-text); }
+.zl-alert--success{ background:var(--zl-success-bg); border-color:var(--zl-success); color:var(--zl-text); }
+.zl-alert--warning{ background:var(--zl-warning-bg); border-color:var(--zl-warning); color:var(--zl-text); }
+.zl-alert--danger{  background:var(--zl-danger-bg);  border-color:var(--zl-danger);  color:var(--zl-text); }
+/* Scoped under .zl-ui so it beats the global `.zl-ui a` (0,1,1), the same way
+   every other link override in this file has to be. An alert is the one place
+   a link reliably lands on a tint, and the gate link ("Sign in to see who is
+   going") is a conversion step, not decoration — it has to be readable. */
+.zl-ui .zl-alert a:not(.zl-btn){ color:var(--zl-link-on-tint); }
+.zl-ui .zl-alert a:not(.zl-btn):hover{ color:var(--zl-link-hover); }
+
+/* ---------- Tabs ----------
+   overflow-y:hidden: the active tab's -1px margin overhangs the border by a
+   pixel, which with overflow-x:auto alone gave the row a stray scrollbar. */
+.zl-tabs{ display:flex; gap:var(--zl-space-4); border-bottom:1px solid var(--zl-border); overflow-x:auto; overflow-y:hidden; }
+.zl-tab{
+  display:inline-flex; align-items:center;
+  min-height:var(--zl-tap-min); padding:0 var(--zl-s-0-5); background:none; border:0;
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+  font-family:inherit; font-size:var(--zl-text-body); font-weight:var(--zl-weight-medium);
+  color:var(--zl-text-muted); cursor:pointer; white-space:nowrap; text-decoration:none;
+}
+/* Scoped under .zl-ui: tabs rendered as <a> otherwise take the global link
+   colour, and every tab looked selected. */
+.zl-ui .zl-tab{ color:var(--zl-text-muted); }
+.zl-ui .zl-tab:hover{ color:var(--zl-text); text-decoration:none; }
+.zl-ui .zl-tab.is-active{ color:var(--zl-link); border-bottom-color:var(--zl-link); }
+
+/* ---------- Messages ---------- */
+.zl-thread{ display:flex; flex-direction:column; gap:var(--zl-space-2); }
+.zl-msg{
+  max-width:min(78%,520px); padding:var(--zl-s-2-5) var(--zl-s-3-5); border-radius:var(--zl-radius-lg);
+  font-size:var(--zl-text-sm); line-height:1.5; word-wrap:break-word;
+}
+.zl-msg--them{ align-self:flex-start; background:var(--zl-bg-sunken); color:var(--zl-text); border-bottom-left-radius:var(--zl-radius-sm); }
+.zl-msg--me{   align-self:flex-end;   background:var(--zl-action); color:var(--zl-text-on-fill); border-bottom-right-radius:var(--zl-radius-sm); }
+.zl-msg__time{ font-size:var(--zl-text-label); opacity:.75; margin-top:var(--zl-s-1); display:block; }
+
+/* ---------- Empty state ----------
+   A marketplace is empty before it is full. This component
+   carries the first month. */
+.zl-empty{
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  gap:var(--zl-space-3); padding:var(--zl-space-5) var(--zl-space-3);
+  color:var(--zl-text-muted);
+}
+.zl-empty__title{ font-size:var(--zl-text-h3); font-weight:var(--zl-weight-semi); color:var(--zl-text); }
+
+/* ---------- No results ----------
+   Distinct from .zl-empty. An empty category is a state; a failed search is a
+   dead end, and Baymard found ~50% of sites offer no way out of one. On a small
+   campus board a zero-result search is the COMMON case, so this component gets
+   real design attention: say what was searched, say what was relaxed, and always
+   put something browsable underneath. */
+.zl-noresults{ padding:var(--zl-space-5) 0 var(--zl-space-3); text-align:center; }
+.zl-noresults__title{ font-size:var(--zl-text-h3); font-weight:var(--zl-weight-semi); margin:0 0 var(--zl-space-2); }
+.zl-noresults__query{ font-weight:var(--zl-weight-semi); color:var(--zl-text); }
+.zl-noresults__paths{
+  display:flex; flex-direction:column; gap:var(--zl-space-2);
+  align-items:center; margin-top:var(--zl-space-3);
+}
+.zl-noresults__fallback{ margin-top:var(--zl-space-5); text-align:left; }
+.zl-noresults__fallback h4{
+  font-size:var(--zl-text-label); font-weight:var(--zl-weight-semi);
+  letter-spacing:var(--zl-tracking-label); text-transform:uppercase;
+  color:var(--zl-text-subtle); margin:0 0 var(--zl-space-3);
+}
+
+/* ---------- Skeleton ---------- */
+.zl-skeleton{
+  background:linear-gradient(90deg,var(--zl-bg-sunken) 25%,var(--zl-bg-hover) 37%,var(--zl-bg-sunken) 63%);
+  background-size:400% 100%; animation:zl-shimmer 1.4s ease infinite;
+  border-radius:var(--zl-radius-sm);
+}
+.zl-skeleton--card{ aspect-ratio:4/3; border-radius:var(--zl-radius); }
+.zl-skeleton--line{ height:12px; margin-bottom:var(--zl-s-2); }
+@keyframes zl-shimmer{ from{ background-position:100% 50%; } to{ background-position:0 50%; } }
+
+/* ---------- Modal & bottom sheet ----------
+   On mobile, filters open as a bottom sheet, not a centred
+   modal — it has to be reachable with a thumb. */
+.zl-overlay{ position:fixed; inset:0; background:var(--zl-bg-overlay); z-index:var(--zl-z-modal); }
+.zl-modal{
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius-lg); box-shadow:var(--zl-shadow-modal);
+  width:min(520px,calc(100vw - 32px)); max-height:85vh; overflow:auto;
+}
+.zl-modal__header{ padding:var(--zl-space-4) var(--zl-space-4) 0; }
+.zl-modal__title{ font-size:var(--zl-text-h3); font-weight:var(--zl-weight-semi); margin:0; }
+.zl-modal__body{ padding:var(--zl-space-3) var(--zl-space-4); color:var(--zl-text-muted); }
+.zl-modal__footer{
+  padding:var(--zl-space-3) var(--zl-space-4); border-top:1px solid var(--zl-border);
+  display:flex; justify-content:flex-end; gap:var(--zl-space-2);
+}
+.zl-sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:var(--zl-z-sheet);
+  background:var(--zl-bg-raised); border-top:1px solid var(--zl-border);
+  border-radius:var(--zl-radius-lg) var(--zl-radius-lg) 0 0;
+  box-shadow:var(--zl-shadow-modal); max-height:85vh; overflow:auto;
+  padding:var(--zl-space-3) var(--zl-space-3) max(var(--zl-space-4),env(safe-area-inset-bottom));
+}
+.zl-sheet__grip{ width:36px; height:4px; border-radius:2px; background:var(--zl-border-strong); margin:0 auto var(--zl-space-3); }
+
+/* ---------- Utilities ---------- */
+.zl-sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+/* A skip link that stays invisible while focused is no skip link: the header
+   is 15 tab stops deep, and a sighted keyboard user pressing Tab saw focus
+   land on a 1x1 clipped box and vanish (WCAG 2.4.7). Un-clip it on focus.
+   Only an element that can take focus itself matches this — the sr-only
+   spans sitting inside links and buttons never do, so they stay hidden. */
+.zl-sr-only:focus{
+  position:fixed; top:var(--zl-s-2); left:var(--zl-s-2); z-index:1000;
+  width:auto; height:auto; margin:0; clip:auto; overflow:visible;
+  padding:var(--zl-s-2) var(--zl-s-4); border-radius:var(--zl-radius);
+  background:var(--zl-bg); color:var(--zl-text);
+  font-size:var(--zl-text-body); font-weight:var(--zl-weight-semi);
+  text-decoration:none; box-shadow:var(--zl-shadow-pop), var(--zl-ring);
+}
+.zl-truncate{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

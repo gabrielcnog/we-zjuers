@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WeZJUers — Design System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  /* Theme before first paint — a dark-mode user must never see a white flash. */
+  (function(){ try{ var t=localStorage.getItem('zl-theme');
+    if(t==='dark'||t==='light') document.documentElement.setAttribute('data-theme',t);
+  }catch(e){} })();
+</script>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  .doc-steps{ display:flex; align-items:flex-end; gap:var(--zl-s-4); flex-wrap:wrap; }
+  .doc-step{ display:grid; justify-items:start; gap:var(--zl-s-1); }
+  .doc-step__bar{ background:var(--zl-action); border-radius:2px; }
+  .doc-table{ width:100%; border-collapse:collapse; margin:var(--zl-s-4) 0; font-size:var(--zl-text-sm); }
+  .doc-table th, .doc-table td{ text-align:left; vertical-align:top; padding:var(--zl-s-2) var(--zl-s-3); border-top:1px solid var(--zl-border); }
+  .doc-table th{ font-size:var(--zl-text-caption); color:var(--zl-text-muted); border-top:0; }
+  .doc-sub{ margin:var(--zl-s-8) 0 var(--zl-s-3); }
+  .doc-row-gap{ margin-top:var(--zl-s-4); }
+  .doc-demo--brand{ background:var(--zl-brand-surface); }
+  .doc-code{ margin:0; padding:var(--zl-s-4); overflow-x:auto; background:var(--zl-bg-sunken); border-radius:var(--zl-radius); font-size:var(--zl-text-caption); }
+
+  /* Document chrome — not part of the kit. */
+  html{ scroll-behavior:smooth; }
+  body{ display:flex; min-height:100vh; }
+  .doc-side{
+    width:250px; flex:none; position:fixed; inset:0 auto 0 0;
+    background:var(--zl-bg-sunken); border-right:1px solid var(--zl-border);
+    display:flex; flex-direction:column; z-index:40;
+  }
+  .doc-brand{ padding:22px 20px 16px; border-bottom:1px solid var(--zl-border); }
+  .doc-brand .name{ font-size:17px; font-weight:700; letter-spacing:-.03em; }
+  .doc-brand .sub{
+    display:block; margin-top:3px; font-family:var(--zl-font-mono); font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--zl-text-subtle);
+  }
+  .doc-nav{ padding:14px 12px; flex:1; overflow-y:auto; }
+  .doc-nav a{
+    display:block; padding:7px 12px; border-radius:6px; margin-bottom:1px;
+    font-size:14px; color:var(--zl-text-muted); text-decoration:none;
+  }
+  .doc-nav a:hover{ background:var(--zl-bg-hover); color:var(--zl-text); text-decoration:none; }
+  .doc-foot{ padding:14px 20px; border-top:1px solid var(--zl-border); display:flex; gap:8px; }
+  .doc-main{ margin-left:250px; flex:1; padding:56px 48px 120px; max-width:1000px; }
+  .doc-sec{ margin-bottom:72px; scroll-margin-top:24px; }
+  .doc-eyebrow{
+    font-family:var(--zl-font-mono); font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--zl-text-subtle); margin-bottom:8px;
+  }
+  .doc-lede{ color:var(--zl-text-muted); max-width:62ch; margin:12px 0 28px; }
+  .doc-demo{
+    border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+    padding:24px; background:var(--zl-bg-raised); margin-bottom:12px;
+  }
+  .doc-demo + .doc-note{ margin:0 0 28px; }
+  .doc-note{ font-size:13px; color:var(--zl-text-subtle); max-width:70ch; line-height:1.6; }
+  .doc-note code{ font-family:var(--zl-font-mono); font-size:12px; color:var(--zl-text-muted); }
+  .sw-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:12px; }
+  .sw{ border:1px solid var(--zl-border); border-radius:var(--zl-radius); overflow:hidden; }
+  .sw .chip{ height:60px; }
+  .sw .meta{ padding:8px 10px; font-size:11.5px; line-height:1.5; }
+  .sw .meta b{ display:block; font-weight:600; }
+  .sw .meta span{ font-family:var(--zl-font-mono); color:var(--zl-text-subtle); }
+  .sw .meta em{ font-style:normal; font-family:var(--zl-font-mono); color:var(--zl-success); }
+  .doc-table{ width:100%; border-collapse:collapse; font-size:14px; }
+  .doc-table th{
+    text-align:left; padding:8px 12px; border-bottom:1px solid var(--zl-border);
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--zl-text-subtle); font-weight:600;
+  }
+  .doc-table td{ padding:10px 12px; border-bottom:1px solid var(--zl-border); vertical-align:top; }
+  .doc-table td.n{ font-family:var(--zl-font-mono); font-size:12.5px; color:var(--zl-text-muted); white-space:nowrap; }
+  .do-dont{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .dd{ border:1px solid var(--zl-border); border-radius:var(--zl-radius); padding:16px; }
+  .dd h4{ margin:0 0 8px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
+  .dd--do h4{ color:var(--zl-success); }
+  .dd--dont h4{ color:var(--zl-danger); }
+  .dd p{ margin:0; font-size:13.5px; color:var(--zl-text-muted); line-height:1.6; }
+  @media (max-width:900px){
+    .doc-side{ position:static; width:auto; }
+    body{ flex-direction:column; }
+    .doc-main{ margin-left:0; padding:32px 20px 80px; }
+    .do-dont{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body class="zl-ui">
+
+<aside class="doc-side">
+  <div class="doc-brand">
+    <div class="name zl-wordmark">WeZJUers</div>
+    <span class="sub">Design System v1.0</span>
+  </div>
+  <nav class="doc-nav">
+    <a href="#intro">00 — How to use</a>
+    <a href="#colour">01 — Colour</a>
+    <a href="#type">02 — Typography</a>
+    <a href="#space">03 — Spacing &amp; layout</a>
+    <a href="#buttons">04 — Buttons</a>
+    <a href="#forms">05 — Forms</a>
+    <a href="#chips">06 — Chips &amp; badges</a>
+    <a href="#cards">07 — Listing card</a>
+    <a href="#finding">07b — Finding things</a>
+    <a href="#facts">07c — Listing facts</a>
+    <a href="#seller">08 — Seller &amp; avatar</a>
+    <a href="#messages">09 — Messages</a>
+    <a href="#feedback">10 — Alerts, empty, loading</a>
+    <a href="#overlays">11 — Modal &amp; sheet</a>
+    <a href="#rules">12 — The rules</a>
+    <a href="#brand">13 — Brand</a>
+  </nav>
+  <div class="doc-foot">
+    <button class="zl-btn zl-btn--tertiary zl-btn--sm" id="themeBtn" type="button">Theme: system</button>
+    <button class="zl-btn zl-btn--tertiary zl-btn--sm" id="langBtn" type="button">EN</button>
+  </div>
+</aside>
+
+<main class="doc-main">
+
+  <section class="doc-sec" id="intro">
+    <div class="doc-eyebrow">00 — How to use</div>
+    <h1 class="zl-h1">A design system for a campus marketplace.</h1>
+    <p class="doc-lede">
+      Two files. <code>tokens.css</code> holds every value; <code>components.css</code>
+      holds the kit. Set <code>class="zl-ui"</code> on <code>&lt;body&gt;</code> and compose
+      from the semantic tokens. This page is the living specimen — switch the theme
+      and the language in the sidebar and watch every component below follow.
+    </p>
+    <div class="zl-alert zl-alert--warning" style="margin-bottom:16px">
+      <div class="zl-icon-ring zl-icon-ring--alert" aria-hidden="true">!</div>
+      <div>
+        <b>What is official here, and what is not</b>
+        The colour values and the 60/30/10 balance come from Zhejiang University's
+        published visual identity. The type families, the scale, the grid, the
+        components and the entire dark theme are proposed extensions — not official
+        ZJU specification. No seal, eagle or 浙江大学 wordmark is used anywhere in this
+        system, and none may be added without written permission from the university.
+      </div>
+    </div>
+    <div class="doc-demo">
+      <div class="zl-disclaimer" data-en="<b>A project from students to students</b> · Not an official ZJU platform"
+           data-zh="<b>学生做给学生的项目</b> · 非浙江大学官方平台">
+        <b>A project from students to students</b> · Not an official ZJU platform
+      </div>
+    </div>
+    <div class="doc-demo" style="padding:0; overflow:hidden">
+      <div class="zl-disclaimer" data-en="<b>A project from students to students</b> · Not an official ZJU platform"
+           data-zh="<b>学生做给学生的项目</b> · 非浙江大学官方平台">
+        <b>A project from students to students</b> · Not an official ZJU platform
+      </div>
+      <div class="zl-header" style="position:static">
+        <div class="zl-header__inner">
+          <a class="zl-wordmark" href="#intro">WeZJUers</a>
+          <div class="zl-search">
+            <label class="zl-sr-only" for="hsearch">Search listings</label>
+            <input class="zl-input" id="hsearch" type="search" placeholder=" ">
+            <span class="zl-typer" aria-hidden="true">
+              <span class="zl-typer__prefix">Search for </span>
+              <span class="zl-typer__window"><span class="zl-typer__roll">
+                <span>a desk</span><span>a bike</span><span>a kettle</span><span>a book</span><span>an office chair</span><span>a winter coat</span><span>an extension cord</span><span>a rice cooker</span><span>a desk</span>
+              </span></span>
+            </span>
+            <button class="zl-search__btn" type="button" aria-label="Search listings"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="2.1"/><path d="m15.7 15.7 4.1 4.1" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
+          </div>
+          <button class="zl-btn zl-btn--urgent" data-en="Post an item" data-zh="发布物品">Post an item</button>
+          <button class="zl-btn zl-btn--ghost zl-btn--icon" aria-label="Switch language">文</button>
+          <span class="zl-avatar zl-avatar--sm">GN</span>
+        </div>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      <b>The search action sits on the right.</b> It is a real
+      <code>type="submit"</code> button inside the field, not a decorative glyph — so the search
+      runs on click as well as on Enter — separated from the input by a hairline, and filling the
+      field's full 44×44 rather than floating at 36 inside it.
+      <br><br>
+      <b>The search hint rolls.</b> A native <code>placeholder</code> cannot be animated or hold
+      markup, so this is an overlay: the prefix is fixed and the term cycles through eight values,
+      two of them taking <em>an</em> so the article varies. Three things keep it from being a
+      liability — it is <code>aria-hidden</code>, so a screen reader gets the field's real label
+      instead of a name that changes every 2.4 seconds; it is
+      <code>pointer-events:none</code>, so clicking it focuses the field beneath; and the input
+      keeps <code>placeholder=" "</code> so <code>:placeholder-shown</code> still works, which is
+      what hides the hint the instant anything is typed. <code>prefers-reduced-motion</code> stops
+      the roll on the first term rather than blanking the field.
+      The keyframes have one step per term, so the list length is load-bearing — a
+      <code>termCountProblems()</code> guard in <code>i18n.mjs</code> fails loudly if a locale
+      drifts to a different count.
+    </p>
+    <p class="doc-note" style="margin-bottom:28px">
+      The top of every page. <b>The wordmark is real text</b> set in the body typeface with an
+      accent full stop — not an image, and emphatically not the ZJU seal. It stays sharp at any
+      density, recolours with the theme, is selectable, and a screen reader simply reads it.
+      This is the one component with a legal constraint attached, so it is specified here rather
+      than left to a logo file someone might swap.
+    </p>
+    <p class="doc-note">The disclaimer strip, in place. <b>Navy 900 with white text — 15.32:1</b>
+      — persistent on every page. It went neutral → Innovation Red → Navy 900; navy reads as
+      institutional rather than as an alert, which is what a standing notice should do, and it
+      leaves Innovation Red marking exactly one thing again. Note the hairline on its lower edge:
+      navy against the Blue 800 header is only <b>1.51:1</b> and shares its hue, so without the
+      seam the two bands merge into one dark mass.</p>
+  </section>
+
+  <section class="doc-sec" id="colour">
+    <div class="doc-eyebrow">01 — Colour</div>
+    <h2 class="zl-h2">Two brand colours, and a lot of restraint.</h2>
+    <p class="doc-lede">
+      <b>60% neutral surfaces · 30% Truth-Seeking Blue · 10% Innovation Red.</b>
+      Blue is structural — navigation, primary buttons, links, active states. Red is
+      one call to attention per view. Neutrals carry everything else.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Brand ramp</h3>
+    <div class="sw-grid" style="margin-bottom:28px">
+      <div class="sw"><div class="chip" style="background:#003F88"></div><div class="meta"><b>Blue 800</b><span>#003F88</span><em>official</em></div></div>
+      <div class="sw"><div class="chip" style="background:#002451"></div><div class="meta"><b>Navy 900</b><span>#002451</span><em>official</em></div></div>
+      <div class="sw"><div class="chip" style="background:#0A6BD1"></div><div class="meta"><b>Blue 500</b><span>#0A6BD1</span><em>official</em></div></div>
+      <div class="sw"><div class="chip" style="background:#6FA8F5"></div><div class="meta"><b>Blue 300</b><span>#6FA8F5</span><span>derived · dark</span></div></div>
+      <div class="sw"><div class="chip" style="background:#E7EDF6"></div><div class="meta"><b>Blue 50</b><span>#E7EDF6</span><em>official</em></div></div>
+      <div class="sw"><div class="chip" style="background:#B01F24"></div><div class="meta"><b>Red 500</b><span>#B01F24</span><em>official</em></div></div>
+      <div class="sw"><div class="chip" style="background:#EF7C81"></div><div class="meta"><b>Red 300</b><span>#EF7C81</span><span>derived · dark</span></div></div>
+    </div>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Measured pairs</h3>
+    <p class="doc-note" style="margin-bottom:12px">
+      Every pair the kit actually renders, measured with the WCAG formula in both themes.
+      If you add a colour, measure it before you ship it.
+    </p>
+    <table class="doc-table" style="margin-bottom:16px">
+      <thead><tr><th>Pair</th><th>Light</th><th>Dark</th><th>Needs</th></tr></thead>
+      <tbody>
+        <tr><td>Body text on background</td><td class="n">17.40</td><td class="n">15.72</td><td class="n">4.5</td></tr>
+        <tr><td>Muted text on background</td><td class="n">5.92</td><td class="n">8.19</td><td class="n">4.5</td></tr>
+        <tr><td>Subtle text on sunken surface</td><td class="n">3.74</td><td class="n">3.97</td><td class="n">3.0</td></tr>
+        <tr><td>Link on background</td><td class="n">5.20</td><td class="n">7.63</td><td class="n">4.5</td></tr>
+        <tr><td>White on primary fill</td><td class="n">10.16</td><td class="n">5.20</td><td class="n">4.5</td></tr>
+        <tr><td>White on urgent (red) fill</td><td class="n">6.85</td><td class="n">6.85</td><td class="n">4.5</td></tr>
+        <tr><td>Brand text on tinted surface</td><td class="n">8.63</td><td class="n">6.44</td><td class="n">4.5</td></tr>
+        <tr><td>Input border (sole boundary)</td><td class="n">3.47</td><td class="n">3.38</td><td class="n">3.0</td></tr>
+        <tr><td>Focus ring</td><td class="n">5.20</td><td class="n">7.63</td><td class="n">3.0</td></tr>
+      </tbody>
+    </table>
+    <p class="doc-note">
+      Three failures were found and fixed while building this, and they are worth
+      knowing because they will recur: <b>(1)</b> Mist <code>#8A93A0</code> measures
+      2.87 on the sunken surface, so <code>--zl-text-subtle</code> is a darker derived
+      value. <b>(2)</b> Blue 500 on Blue 50 is 4.42 — inside any tinted surface, brand
+      text uses Blue 800 instead. <b>(3)</b> Blue 300 as a fill needs <em>dark</em> text,
+      not white — white on it is 2.44.
+    </p>
+  </section>
+
+  <section class="doc-sec" id="type">
+    <div class="doc-eyebrow">02 — Typography</div>
+    <h2 class="zl-h2">One family, a fluid scale.</h2>
+    <p class="doc-lede">
+      The guidelines' desktop scale is kept exactly. The mobile lower bounds are an
+      extension: 40px H1 on a 320px screen is unusable. No CJK webfont is ever
+      downloaded — Chinese renders in the system face, instantly, and looks native.
+    </p>
+    <div class="doc-demo">
+      <div class="zl-h1" style="margin-bottom:8px" data-en="Desk lamp, barely used" data-zh="台灯，几乎全新">Desk lamp, barely used</div>
+      <div class="zl-h2" style="margin-bottom:8px" data-en="Latest on Zijingang" data-zh="紫金港最新发布">Latest on Zijingang</div>
+      <div class="zl-h3" style="margin-bottom:12px" data-en="Seller details" data-zh="卖家信息">Seller details</div>
+      <p class="zl-body" style="margin-bottom:8px" data-en="Body copy is 16px on a 26px line — the guidelines' spec, and the floor for inputs on iOS." data-zh="正文 16px，行高 26px — 指南规定的数值，也是 iOS 输入框不触发缩放的下限。">Body copy is 16px on a 26px line — the guidelines' spec, and the floor for inputs on iOS.</p>
+      <p class="zl-caption" style="margin-bottom:12px">Caption 13/18 — timestamps, hints, counts.</p>
+      <div class="zl-label">Label · 11px tracked uppercase</div>
+      <div class="zl-num" style="margin-top:12px; font-size:20px">¥ 1,280.00</div>
+    </div>
+    <p class="doc-note">
+      Prices and any figure that gets compared use the mono face with
+      <code>tabular-nums</code>, so digits line up column to column. Serif is Latin-only
+      and currently unused: 宋体 headings read as dated in Chinese web UI, and shipping a
+      serif that half the audience never sees is bytes for nothing.
+    </p>
+  </section>
+
+  <section class="doc-sec" id="space">
+    <div class="doc-eyebrow">03 — Spacing &amp; layout</div>
+    <h2 class="zl-h2">One 4px scale. Parents own the gaps.</h2>
+    <p class="doc-lede">
+      Tokens follow Tailwind/shadcn numbering — the number is the multiple of 4px, so
+      <code>--zl-s-4</code> is 16px and <code>--zl-s-6</code> is 24px. Every margin, padding and gap
+      in the system is a token; there are no raw pixel values and no inline <code>style=""</code>
+      in any view. Half steps (<code>s-0-5</code>, <code>s-1-5</code>, <code>s-2-5</code>,
+      <code>s-3-5</code>) exist only for the insides of small controls.
+    </p>
+    <div class="doc-demo"><div class="doc-steps"><div class="doc-step"><div class="doc-step__bar" style="width:4px;height:4px"></div><code>s-1</code><span class="zl-caption">4</span></div><div class="doc-step"><div class="doc-step__bar" style="width:8px;height:8px"></div><code>s-2</code><span class="zl-caption">8</span></div><div class="doc-step"><div class="doc-step__bar" style="width:12px;height:12px"></div><code>s-3</code><span class="zl-caption">12</span></div><div class="doc-step"><div class="doc-step__bar" style="width:16px;height:16px"></div><code>s-4</code><span class="zl-caption">16</span></div><div class="doc-step"><div class="doc-step__bar" style="width:20px;height:20px"></div><code>s-5</code><span class="zl-caption">20</span></div><div class="doc-step"><div class="doc-step__bar" style="width:24px;height:24px"></div><code>s-6</code><span class="zl-caption">24</span></div><div class="doc-step"><div class="doc-step__bar" style="width:32px;height:32px"></div><code>s-8</code><span class="zl-caption">32</span></div><div class="doc-step"><div class="doc-step__bar" style="width:40px;height:40px"></div><code>s-10</code><span class="zl-caption">40</span></div><div class="doc-step"><div class="doc-step__bar" style="width:48px;height:48px"></div><code>s-12</code><span class="zl-caption">48</span></div><div class="doc-step"><div class="doc-step__bar" style="width:64px;height:64px"></div><code>s-16</code><span class="zl-caption">64</span></div><div class="doc-step"><div class="doc-step__bar" style="width:96px;height:96px"></div><code>s-24</code><span class="zl-caption">96</span></div></div></div>
+    <table class="doc-table">
+      <thead><tr><th>Where</th><th>Token</th></tr></thead>
+      <tbody>
+        <tr><td>Inside a control — icon ↔ label, label ↔ input</td><td><code>s-1</code> · <code>s-2</code></td></tr>
+        <tr><td>Related items — list rows, fields in a group</td><td><code>s-3</code> · <code>s-4</code></td></tr>
+        <tr><td>Panel padding — phone · desktop; field ↔ field</td><td><code>s-4</code> · <code>s-6</code> · <code>s-5</code></td></tr>
+        <tr><td>Page header ↔ content; between panels in a stack</td><td><code>s-6</code></td></tr>
+        <tr><td>Between page sections</td><td><code>s-12</code></td></tr>
+      </tbody>
+    </table>
+    <p class="doc-note">
+      <b>The rule that keeps pages consistent:</b> a component carries no outer margin. The
+      container it sits in — <code>.zl-stack</code>, <code>.zl-form</code>,
+      <code>.zl-page-header</code>, <code>.zl-section</code> — decides the gap. Two components
+      that both brought their own margins is exactly how the listing page ended up with 64px
+      between an alert and the Share row.
+    </p>
+    <h3 class="zl-h3 doc-sub">Layout primitives</h3>
+    <table class="doc-table">
+      <tbody>
+        <tr><td><code>.zl-page-header</code></td><td>Title · description · meta · actions, 8px apart, 24px above the content. Every page's single <code>&lt;h1&gt;</code> lives here.</td></tr>
+        <tr><td><code>.zl-stack</code> <code>--sm</code> <code>--md</code> <code>--lg</code></td><td>Vertical gap 24 · 8 · 16 · 32.</td></tr>
+        <tr><td><code>.zl-row</code> <code>--md</code> <code>--center</code></td><td>Horizontal wrap, gap 8 · 16.</td></tr>
+        <tr><td><code>.zl-narrow</code></td><td>Single-column pages (sign-in, post a listing): 560px max, full width on a phone. Forms fill it — no fixed form widths.</td></tr>
+        <tr><td><code>.zl-form</code> · <code>.zl-field</code></td><td>Fields 20px apart; label ↔ control ↔ hint 8px. Actions go full width on a phone.</td></tr>
+        <tr><td><code>.zl-panel</code></td><td>The one grouped-content surface (shadcn's Card): 16px padding on a phone, 24px from 640px.</td></tr>
+        <tr><td><code>.zl-section</code></td><td>48px between consecutive page sections; <code>__title</code> 16px above its content.</td></tr>
+      </tbody>
+    </table>
+    <h3 class="zl-h3 doc-sub">Page header</h3>
+    <div class="doc-demo">
+      <header class="zl-page-header">
+        <h1 class="zl-page-header__title zl-h2">Sign in</h1>
+        <p class="zl-page-header__description">We email you a 6-digit code. No password to remember.</p>
+        <p class="zl-page-header__meta">An account lets you post, reply, save items and message sellers.</p>
+      </header>
+    </div>
+    <h3 class="zl-h3 doc-sub">Breadcrumbs</h3>
+    <div class="doc-demo">
+      <nav class="zl-crumbs" aria-label="Breadcrumb"><ol>
+        <li><a href="#space">Community</a></li>
+        <li><span class="zl-crumbs__sep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span><a href="#space">Visas &amp; paperwork</a></li>
+        <li><span class="zl-crumbs__sep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span><span aria-current="page">Residence permit renewal — how early did you start?</span></li>
+      </ol></nav>
+    </div>
+  </section>
+
+  <section class="doc-sec" id="buttons">
+    <div class="doc-eyebrow">04 — Buttons</div>
+    <h2 class="zl-h2">One anatomy, three sizes, and red is rationed.</h2>
+    <p class="doc-lede">
+      Blue fill, blue outline, neutral fill, ghost — plus red, which is the highest-priority
+      conversion and appears <b>once per view at most</b>.
+    </p>
+    <div class="doc-demo">
+      <div class="zl-row">
+        <button type="button" class="zl-btn zl-btn--primary"><span>Message seller</span></button>
+        <button type="button" class="zl-btn zl-btn--secondary"><span>Save</span></button>
+        <button type="button" class="zl-btn zl-btn--tertiary"><span>Share</span></button>
+        <button type="button" class="zl-btn zl-btn--ghost"><span>Report</span></button>
+        <button type="button" class="zl-btn zl-btn--urgent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Post an item</span></button>
+        <button type="button" class="zl-btn zl-btn--primary" disabled><span>Sold</span></button>
+      </div>
+      <div class="zl-row doc-row-gap">
+        <button type="button" class="zl-btn zl-btn--primary zl-btn--sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Small · 36</span></button>
+        <button type="button" class="zl-btn zl-btn--primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Default · 44</span></button>
+        <button type="button" class="zl-btn zl-btn--primary zl-btn--lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Large · 52</span></button>
+        <button type="button" class="zl-btn zl-btn--primary zl-btn--lg zl-btn--pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Pill — the floating button</span></button>
+        <a class="zl-btn zl-btn--secondary" href="#buttons"><span>Browse the marketplace</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+    <h3 class="zl-h3 doc-sub">Anatomy</h3>
+<pre class="doc-code">&lt;a class="zl-btn zl-btn--primary zl-btn--lg zl-btn--pill"&gt;
+  &lt;svg aria-hidden="true"&gt;…&lt;/svg&gt;   &lt;!-- sized by the button: 16px --&gt;
+  &lt;span&gt;Add listing&lt;/span&gt;          &lt;!-- the label is always its own element --&gt;
+&lt;/a&gt;</pre>
+    <p class="doc-note">
+      Never a bare text node beside an icon, and never a text character standing in for an icon
+      (＋ ‹ › ✓ ↗ →): those render differently on every font and phone. Icons are inline SVG from
+      one set (24px grid, 2px stroke) in <code>views/layout.mjs</code> — <code>ICONS.plus</code>,
+      <code>check</code>, <code>x</code>, <code>alert</code>, <code>info</code>,
+      <code>chevronLeft/Right</code>, <code>arrowRight</code>, <code>external</code>,
+      <code>grid</code>. Every <code>&lt;button&gt;</code> declares its <code>type</code>.
+    </p>
+    <h3 class="zl-h3 doc-sub">CTA, on the brand surface</h3>
+    <div class="doc-demo doc-demo--brand">
+      <div class="zl-row">
+        <a class="zl-btn zl-btn--cta zl-btn--sm" href="#buttons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add listing</span></a>
+      </div>
+    </div>
+    <p class="doc-note">
+      On Blue 800 the loudest thing available is <b>white at 10.16:1</b>; Innovation Red measures
+      <b>1.48:1</b> there, so prominence comes from fill, weight and lift rather than a hotter hue.
+      Default buttons clear the 44px touch minimum; the 36px small size is for dense desktop rows only.
+    </p>
+    <h3 class="zl-h3 doc-sub">Alert</h3>
+    <div class="doc-demo">
+      <div class="zl-alert zl-alert--info" role="note">
+        <span class="zl-icon-ring zl-icon-ring--info" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 11v5.5M12 7.5v.01"/><circle cx="12" cy="12" r="9"/></svg></span>
+        <div class="zl-alert__content">
+          <p class="zl-alert__title">About Services</p>
+          <p class="zl-alert__body">Teaching someone is fine; doing it for them is not.</p>
+          <a class="zl-link-arrow" href="#buttons"><span>Read the rules</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-sec" id="forms">
+    <div class="doc-eyebrow">05 — Forms</div>
+    <h2 class="zl-h2">The post-an-item form is the product.</h2>
+    <p class="doc-lede">Completable on a phone in under 90 seconds, or people don't list.</p>
+    <div class="doc-demo">
+      <div class="zl-stack" style="max-width:440px">
+        <div class="zl-field">
+          <label class="zl-field__label" for="f1" data-en="Title" data-zh="标题">Title<span class="req">*</span></label>
+          <input class="zl-input" id="f1" placeholder="IKEA desk lamp, white">
+          <div class="zl-field__count">24 / 80</div>
+        </div>
+        <div class="zl-field">
+          <label class="zl-field__label" for="f2" data-en="Price" data-zh="价格">Price</label>
+          <div class="zl-price-input">
+            <span class="prefix">¥</span>
+            <input class="zl-input" id="f2" inputmode="numeric" placeholder="80">
+          </div>
+          <div class="zl-field__hint" data-en="Leave empty for negotiable, or choose Free below." data-zh="留空表示面议，或在下方选择免费赠送。">Leave empty for negotiable, or choose Free below.</div>
+        </div>
+        <div class="zl-field">
+          <label class="zl-field__label" for="f3" data-en="Campus" data-zh="校区">Campus<span class="req">*</span></label>
+          <select class="zl-select" id="f3">
+            <option>Zijingang 紫金港</option><option>Yuquan 玉泉</option>
+            <option>Xixi 西溪</option><option>Haining International 海宁国际</option>
+          </select>
+          <div class="zl-field__hint" data-en="Where the item is — not where you live. Pre-filled from your profile." data-zh="物品所在地，而非你的常住校区。已根据资料预填。">Where the item is — not where you live. Pre-filled from your profile.</div>
+        </div>
+        <div class="zl-field is-error">
+          <label class="zl-field__label" for="f4" data-en="Photos" data-zh="照片">Photos<span class="req">*</span></label>
+          <input class="zl-input" id="f4" type="text" placeholder="Add at least one photo">
+          <div class="zl-field__hint" data-en="At least one photo is required. Up to six." data-zh="至少需要一张照片，最多六张。">At least one photo is required. Up to six.</div>
+        </div>
+        <div class="zl-field">
+          <label class="zl-field__label" for="f5" data-en="Description" data-zh="描述">Description</label>
+          <textarea class="zl-textarea" id="f5" placeholder="Bought it last September, works perfectly. Collection from the east gate."></textarea>
+          <div class="zl-field__count">0 / 2000</div>
+        </div>
+        <div class="zl-field">
+          <span class="zl-field__label" data-en="Condition" data-zh="成色">Condition</span>
+          <div class="zl-row" style="gap:16px">
+            <label class="zl-radio"><input type="radio" name="cond" checked> <span data-en="Like new" data-zh="几乎全新">Like new</span></label>
+            <label class="zl-radio"><input type="radio" name="cond"> <span data-en="Good" data-zh="良好">Good</span></label>
+            <label class="zl-radio"><input type="radio" name="cond"> <span data-en="Fair" data-zh="一般">Fair</span></label>
+          </div>
+        </div>
+        <label class="zl-check"><input type="checkbox"> <span data-en="Give this away for free" data-zh="免费赠送">Give this away for free</span></label>
+        <label class="zl-switch"><input type="checkbox" checked><span class="track"></span> <span data-en="Show my WeChat after we start talking" data-zh="开始沟通后显示我的微信">Show my WeChat after we start talking</span></label>
+      </div>
+    </div>
+    <p class="doc-note">Inputs are locked to 16px. Below that, iOS Safari zooms the page
+      on focus and the user is left scrolled sideways in the middle of a form — the single
+      most common mobile form bug, and it is a one-line fix.</p>
+  </section>
+
+  <section class="doc-sec" id="chips">
+    <div class="doc-eyebrow">06 — Chips &amp; badges</div>
+    <h2 class="zl-h2">Filters you tap, facts you read.</h2>
+    <p class="doc-lede">Chips are interactive and carry the full 44px target. Badges are labels and never clickable.</p>
+    <div class="doc-demo">
+      <div class="zl-chipscroll" style="margin-bottom:20px">
+      <div class="zl-chiprow">
+        <button class="zl-chip" aria-pressed="true" data-en="All" data-zh="全部">All</button>
+        <button class="zl-chip" aria-pressed="false" data-en="Electronics" data-zh="电子产品">Electronics</button>
+        <button class="zl-chip" aria-pressed="false" data-en="Furniture" data-zh="家具">Furniture</button>
+        <button class="zl-chip" aria-pressed="false" data-en="Bicycles" data-zh="自行车">Bicycles</button>
+        <button class="zl-chip" aria-pressed="false" data-en="Free" data-zh="免费赠送">Free</button>
+      </div>
+        <button class="zl-chipscroll__nav zl-chipscroll__nav--prev" type="button" aria-label="Previous categories"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 6.2 8 10l4-3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="zl-chipscroll__nav zl-chipscroll__nav--next" type="button" aria-label="More categories"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 6.2 8 10l4-3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="zl-row" style="gap:8px">
+        <span class="zl-badge zl-badge--campus">📍 Zijingang 紫金港</span>
+        <span class="zl-badge zl-badge--verified">✓ <span data-en="ZJU verified" data-zh="浙大邮箱已验证">ZJU verified</span></span>
+        <span class="zl-badge zl-badge--neutral" data-en="Like new" data-zh="几乎全新">Like new</span>
+        <span class="zl-badge zl-badge--success" data-en="Free" data-zh="免费">Free</span>
+        <span class="zl-badge zl-badge--warning" data-en="Expires in 3 days" data-zh="3 天后过期">Expires in 3 days</span>
+        <span class="zl-badge zl-badge--sold" data-en="Sold" data-zh="已售出">Sold</span>
+      </div>
+      <div class="zl-row" style="gap:8px; margin-top:20px">
+        <span class="zl-chip zl-chip--static">English</span>
+        <span class="zl-chip zl-chip--static">中文</span>
+        <span class="zl-chip zl-chip--static">Português</span>
+      </div>
+    </div>
+    <h3 class="zl-h3" style="margin:28px 0 12px">Tabs</h3>
+    <div class="doc-demo">
+      <div class="zl-tabs">
+        <button class="zl-tab is-active" data-en="Active · 4" data-zh="在售 · 4">Active · 4</button>
+        <button class="zl-tab" data-en="Sold · 11" data-zh="已售出 · 11">Sold · 11</button>
+        <button class="zl-tab" data-en="Expired · 2" data-zh="已过期 · 2">Expired · 2</button>
+      </div>
+      <div class="zl-row" style="gap:8px; margin-top:16px">
+        <span class="zl-badge zl-badge--brand" data-en="Renewed" data-zh="已续期">Renewed</span>
+        <span class="zl-badge zl-badge--danger" data-en="Removed by moderator" data-zh="已被管理员下架">Removed by moderator</span>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">Tabs carry counts. On <em>My listings</em> the
+      count is the whole point — you open the page to find out whether anything expired.</p>
+    <p class="doc-note" style="margin-bottom:28px">
+      <b>The chip row scrolls, and now says so.</b> An arrow appears at each edge only when the
+      track actually overflows in that direction — so on a short row neither shows, and at the
+      start only the right one does. Each sits over a fade so chips slide out of view rather than
+      being chopped. Swipe and trackpad scrolling are untouched: the buttons are enhancement over
+      a plain overflow container, and they are rendered <code>hidden</code> so a reader without
+      JavaScript gets exactly the behaviour that existed before.
+      <br><br>
+      Worth knowing: the <code>hidden</code> attribute only gets its
+      <code>display:none</code> from the UA stylesheet, so <em>any</em> component rule that sets
+      its own <code>display</code> silently defeats it. A base
+      <code>.zl-ui [hidden]{ display:none !important }</code> makes the attribute mean what it
+      says — three controls here had been staying visible because of it.
+    </p>
+    <p class="doc-note">Every status badge carries a word or a mark as well as its colour.
+      The verified badge is a tick <em>and</em> the words — colour alone is never the signal.</p>
+  </section>
+
+  <section class="doc-sec" id="cards">
+    <div class="doc-eyebrow">07 — Listing card</div>
+    <h2 class="zl-h2">The one component that matters.</h2>
+    <p class="doc-lede">Image, title, price, campus. Nothing else — a card that tries to say everything says nothing at 2-up on a phone.</p>
+    <div class="doc-demo">
+      <div class="zl-feed">
+        <article class="zl-card">
+          <div class="zl-card__media">
+            <div class="zl-card__slides">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A6BD1'/%3E%3C/svg%3E" alt="" width="400" height="300">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%236FA8F5'/%3E%3C/svg%3E" alt="" width="400" height="300">
+            </div>
+            <button class="zl-card__nav zl-card__nav--prev" type="button" aria-label="Previous photo">‹</button>
+            <button class="zl-card__nav zl-card__nav--next" type="button" aria-label="Next photo">›</button>
+            <div class="zl-card__dots" aria-hidden="true"><span class="zl-card__dot is-on"></span><span class="zl-card__dot"></span></div>
+            <span class="zl-card__count" aria-label="4 photos"><svg viewBox="0 0 20 20" width="13" height="13" fill="none" aria-hidden="true"><rect x="5.5" y="2.5" width="12" height="9.5" rx="1.6" stroke="currentColor" stroke-width="1.7"/><path d="M14.5 15.5H4a1.5 1.5 0 0 1-1.5-1.5V5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="9.2" cy="6" r="1.15" fill="currentColor"/><path d="M6 11.4l3.1-3a1 1 0 0 1 1.4 0l3.4 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> 4</span>
+          </div>
+          <button class="zl-card__fav" aria-pressed="false" aria-label="Save this listing"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 20.3s-7.2-4.4-7.2-9.4A4.1 4.1 0 0 1 12 8.1a4.1 4.1 0 0 1 7.2 2.8c0 5-7.2 9.4-7.2 9.4Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/></svg></button>
+          <div class="zl-card__body">
+            <h3 class="zl-card__title" style="font-size:var(--zl-text-sm); font-weight:500">
+              <a class="zl-card__link" href="#cards" data-en="IKEA desk lamp, white, barely used" data-zh="宜家台灯 白色 几乎全新">IKEA desk lamp, white, barely used</a>
+            </h3>
+            <div class="zl-card__meta">
+              <span class="zl-price">¥80</span>
+              <span class="zl-badge zl-badge--campus">紫金港</span>
+            </div>
+          </div>
+        </article>
+        <article class="zl-card">
+          <div class="zl-card__media" style="background:linear-gradient(135deg,#6FA8F5,#0A5AAF)">
+            <div class="zl-card__badges"><span class="zl-badge zl-badge--success" data-en="Free" data-zh="免费">Free</span></div>
+          </div>
+          <button class="zl-card__fav" aria-pressed="true" aria-label="Saved">♥</button>
+          <div class="zl-card__body">
+            <h3 class="zl-card__title" style="font-size:var(--zl-text-sm); font-weight:500">
+              <a class="zl-card__link" href="#cards" data-en="Moving out — kitchen things, all must go" data-zh="搬家清仓 — 厨房用品全部送出">Moving out — kitchen things, all must go</a>
+            </h3>
+            <div class="zl-card__meta">
+              <span class="zl-price zl-price--free" data-en="Free" data-zh="免费赠送">Free</span>
+              <span class="zl-badge zl-badge--campus">玉泉</span>
+            </div>
+          </div>
+        </article>
+        <article class="zl-card">
+          <div class="zl-card__media" style="background:linear-gradient(135deg,#8A93A0,#5B6572)">
+            <div class="zl-card__badges"><span class="zl-badge zl-badge--sold" data-en="Sold" data-zh="已售出">Sold</span></div>
+          </div>
+          <div class="zl-card__body">
+            <h3 class="zl-card__title" style="font-size:var(--zl-text-sm); font-weight:500">
+              <a class="zl-card__link" href="#cards" data-en="Giant bicycle, 26 inch · good condition" data-zh="捷安特自行车 26 寸 · 成色良好">Giant bicycle, 26 inch · good condition</a>
+            </h3>
+            <div class="zl-card__meta">
+              <span class="zl-price">¥350</span>
+              <span class="zl-badge zl-badge--campus">西溪</span>
+            </div>
+          </div>
+        </article>
+        <div class="zl-card">
+          <div class="zl-skeleton zl-skeleton--card"></div>
+          <div class="zl-card__body">
+            <div class="zl-skeleton zl-skeleton--line" style="width:90%"></div>
+            <div class="zl-skeleton zl-skeleton--line" style="width:45%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="doc-demo">
+      <div class="zl-row" style="gap:24px">
+        <span class="zl-price">¥80</span>
+        <span class="zl-price zl-price--negotiable" data-en="Negotiable" data-zh="面议">Negotiable</span>
+        <span class="zl-price zl-price--free" data-en="Free" data-zh="免费赠送">Free</span>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Three price states, and only one of them is a number. <em>Free</em> is a status rather than a
+      price of zero, so it takes the success token — the reserved-meaning case earns it: an item
+      that costs nothing is good news, and it is labelled in words either way.
+    </p>
+    <h3 class="zl-h3" style="margin:28px 0 12px">Gallery / carousel</h3>
+    <div class="doc-demo">
+      <div class="zl-gallery" style="max-width:420px">
+        <div class="zl-gallery__frame">
+          <div class="zl-gallery__track">
+            <div class="zl-gallery__slide" style="background:linear-gradient(135deg,#0A6BD1,#003F88)"></div>
+            <div class="zl-gallery__slide" style="background:linear-gradient(135deg,#6FA8F5,#0A5AAF)"></div>
+            <div class="zl-gallery__slide" style="background:linear-gradient(135deg,#8A93A0,#5B6572)"></div>
+          </div>
+          <button class="zl-gallery__nav zl-gallery__nav--prev" type="button" aria-label="Previous photo">‹</button>
+          <button class="zl-gallery__nav zl-gallery__nav--next" type="button" aria-label="Next photo">›</button>
+          <span class="zl-gallery__count">1 / 3</span>
+        </div>
+        <p class="zl-gallery__credit">Photo: A. Photographer / Unsplash</p>
+        <div class="zl-gallery__thumbs">
+          <button class="zl-gallery__thumb" type="button" aria-current="true" aria-label="Photo 1"><span style="display:block;width:100%;height:100%;background:linear-gradient(135deg,#0A6BD1,#003F88)"></span></button>
+          <button class="zl-gallery__thumb" type="button" aria-current="false" aria-label="Photo 2"><span style="display:block;width:100%;height:100%;background:linear-gradient(135deg,#6FA8F5,#0A5AAF)"></span></button>
+          <button class="zl-gallery__thumb" type="button" aria-current="false" aria-label="Photo 3"><span style="display:block;width:100%;height:100%;background:linear-gradient(135deg,#8A93A0,#5B6572)"></span></button>
+        </div>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      The track scroll-snaps, so <b>swipe works with no JavaScript at all</b> — the arrows,
+      thumbnails and counter are enhancement layered on top. Thumbnails stay visible rather than
+      collapsing to dots, because what else is in the set is part of how a buyer decides whether
+      to keep looking. A single-photo listing gets <code>.zl-gallery--single</code> and no chrome.
+      <br><br>
+      <b>It wraps.</b> Past the last photo the next arrow returns to the first, and back past the
+      first goes to the last, so an arrow is never a dead end — there is no disabled state on
+      either carousel. Crossing that seam <em>jumps</em> rather than scrolling smoothly: animating
+      back across every photo reads as a rewind, not as a wrap. Steps inside the run stay smooth.
+    </p>
+    <p class="doc-note" style="margin-bottom:28px">
+      <b>Cards carry their photos.</b> The media box is a scroll-snapping track, so swipe works
+      on touch with no JavaScript; arrows appear on hover (hidden entirely on touch, where swipe
+      already does the job) and dots mark position. Every control sits above the card's stretched
+      link and calls <code>stopPropagation</code>, so paging a photo never navigates to the
+      listing. Both carousels <b>hold their index in a variable</b> rather than re-reading
+      <code>scrollLeft</code>: mid-smooth-scroll that value still reports the old position, so two
+      quick clicks would compute the same index and stall.
+      The count badge and the favourite are <b>inline SVG, not text glyphs</b> — <code>▤</code>
+      was a table character standing in for a photo icon, and <code>♡</code> has no weight
+      control. The heart is stroked at 2.1 and fills from <code>aria-pressed</code>, so state no
+      longer means swapping one character for another.
+    </p>
+    <p class="doc-note" style="margin-bottom:28px">
+      <b>One hit area, one hover state.</b> The card is an <code>&lt;article&gt;</code>; the title
+      link stretches over the whole card with <code>::after</code>, and the favourite button sits
+      above it on its own layer. Baymard's product-list testing found 76% of sites leave users
+      unsure what is clickable inside a list item — and the obvious shortcut, wrapping the card in
+      an <code>&lt;a&gt;</code>, is invalid HTML the moment there is a button inside it, which is
+      exactly what a favourite control is.
+    </p>
+    <p class="doc-note">
+      The media box is a fixed 4:3 with a placeholder colour, so the grid never reflows as
+      photos load — that is the entire CLS budget spent in one decision.
+      <b>Listing photos are never duotoned.</b> The guidelines' 15–20% blue overlay is for
+      campus and editorial imagery; a buyer has to see the real colour of the thing they are
+      buying, so the overlay stops at the marketing pages.
+    </p>
+  </section>
+
+  <section class="doc-sec" id="finding">
+    <div class="doc-eyebrow">07b — Finding things</div>
+    <h2 class="zl-h2">Search, filters, and the empty search.</h2>
+    <p class="doc-lede">
+      The parts of the product that decide whether anyone finds anything. Every rule here comes
+      from Baymard's product-list, search and mobile studies — see
+      <a href="../docs/ux-guidelines.md">docs/ux-guidelines.md</a> for the findings and how they
+      were translated to a campus board.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Autocomplete</h3>
+    <div class="doc-demo">
+      <div class="zl-search" style="max-width:420px; position:relative">
+        <input class="zl-input" value="desk" aria-label="Search listings">
+        <button class="zl-search__btn" type="button" aria-label="Search listings"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="2.1"/><path d="m15.7 15.7 4.1 4.1" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
+        <div class="zl-suggest">
+          <a class="zl-suggest__item" href="#finding"><b>desk</b> lamp</a>
+          <a class="zl-suggest__item" href="#finding"><b>desk</b> chair <span class="zl-suggest__scope">in Furniture</span></a>
+          <a class="zl-suggest__item" href="#finding"><b>desk</b> organiser</a>
+          <a class="zl-suggest__item" href="#finding"><b>desk</b>top monitor <span class="zl-suggest__scope">in Electronics</span></a>
+        </div>
+      </div>
+      <div style="height:120px"></div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Six to eight suggestions, never twenty — long lists were found to overwhelm rather than help.
+      The typed portion is bolded, category scoping is a quiet suffix, and a suggestion never
+      styles itself like a result.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Campus picker &amp; filter rail</h3>
+    <div class="doc-demo" style="padding:0;overflow:hidden">
+      <div style="background:var(--zl-brand-surface);padding:14px 16px">
+        <form class="zl-campus" onsubmit="return false">
+          <span class="zl-campus__pin"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true"><path d="M12 21.5s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10.2" r="2.6" stroke="currentColor" stroke-width="1.8"/></svg></span>
+          <span class="zl-campus__text" aria-hidden="true">
+            <span class="zl-campus__eyebrow">Browsing</span>
+            <span class="zl-campus__value">All campuses<svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 6.2 8 10l4-3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </span>
+          <label class="zl-sr-only" for="dscampus">Browsing</label>
+          <select class="zl-campus__native" id="dscampus">
+            <option>All campuses</option><option>Zijingang</option><option>Yuquan</option>
+          </select>
+        </form>
+      </div>
+      <div style="padding:20px">
+        <details class="zl-rail-wrap" open style="max-width:240px">
+          <summary class="zl-rail-wrap__toggle">Filter <span class="zl-rail-wrap__n">1</span></summary>
+          <div class="zl-rail">
+            <div class="zl-rail__group">
+              <h3>Campus</h3>
+              <ul class="zl-rail__list">
+                <li><a class="zl-rail__link" href="#finding" aria-current="true">All campuses <span class="zl-rail__count">38</span></a></li>
+                <li><a class="zl-rail__link" href="#finding" aria-current="false">Zijingang</a></li>
+                <li><a class="zl-rail__link" href="#finding" aria-current="false">Yuquan</a></li>
+              </ul>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Campus is a <b>persistent browsing scope</b>, carried in the header the way OLX carries its
+      region: a map pin, a quiet <em>Browsing</em> line, and the place itself as the thing you
+      read. No border — on a saturated header a pill around it competes with the real buttons.
+      A native <code>&lt;select&gt;</code> lies invisibly on top, so the OS picker, keyboard
+      behaviour and mobile wheel all come for free; the visible text is <code>aria-hidden</code>
+      so the field is announced once, not twice.
+      <br><br>
+      <b>Precedence.</b> The header scope filters every page <em>except</em> search results. Search
+      is <em>seeded</em> from it on arrival, but the moment the rail is used it wins — including
+      when the user unticks every campus, which means "all", not "fall back to the header". The
+      rail stamps <code>f=1</code> on submit and that marker, rather than the presence of a value,
+      is what signals it. Changing the header while on search clears the rail's campus state so
+      the new scope visibly applies. Below 900px the rail collapses behind the <code>Filter</code>
+      pill with its active count.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Multi-select facets</h3>
+    <div class="doc-demo">
+      <div style="max-width:240px">
+        <div class="zl-rail__group" style="margin-bottom:24px">
+          <h3>Price range</h3>
+          <div class="zl-slider"><div class="zl-slider__track"><div class="zl-slider__fill" style="left:12%;width:46%"></div></div>
+            <input class="zl-slider__input" type="range" min="0" max="900" value="110" aria-label="Min">
+            <input class="zl-slider__input" type="range" min="0" max="900" value="520" aria-label="Max"></div>
+          <div class="zl-range-values">
+            <input class="zl-input" value="110" aria-label="Min"><span class="zl-range-values__sep">—</span>
+            <input class="zl-input" value="520" aria-label="Max"></div>
+        </div>
+        <div class="zl-rail__group" style="margin-bottom:24px">
+          <h3>Condition</h3>
+          <details class="zl-dropdown" open>
+            <summary class="zl-dropdown__toggle">2 selected</summary>
+            <div class="zl-dropdown__menu"><ul class="zl-checklist">
+              <li><label class="zl-checklist__row"><input type="checkbox" checked><span class="lbl">Like new</span><span class="n">8</span></label></li>
+              <li><label class="zl-checklist__row"><input type="checkbox" checked><span class="lbl">Good</span><span class="n">28</span></label></li>
+              <li><label class="zl-checklist__row is-empty"><input type="checkbox"><span class="lbl">For parts</span><span class="n">0</span></label></li>
+            </ul></div>
+          </details>
+        </div>
+        <div class="zl-rail__group">
+          <h3>Campus</h3>
+          <ul class="zl-checklist">
+            <li><label class="zl-checklist__row"><input type="checkbox" checked><span class="lbl">Zijingang</span><span class="n">15</span></label></li>
+            <li><label class="zl-checklist__row"><input type="checkbox"><span class="lbl">Yuquan</span><span class="n">7</span></label></li>
+            <li><label class="zl-checklist__row is-empty"><input type="checkbox"><span class="lbl">Zhoushan</span><span class="n">0</span></label></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Facets are <b>OR within, AND across</b>: ticking two campuses widens, adding a category
+      narrows. Counts are computed with that facet's own selection lifted, so ticking one campus
+      does not zero out every other campus's number; a zero-count option dims rather than
+      disappearing, so the list does not jump around under the cursor.
+      <b>The price slider is two overlaid native ranges</b> driving the numeric inputs below —
+      the inputs are the real form fields, so the filter still works with JavaScript off, and the
+      thumbs are clamped so they cannot cross and invert the range.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Applied filters &amp; sort</h3>
+    <div class="doc-demo">
+      <div class="zl-applied">
+        <span class="zl-applied__label" data-en="Filters:" data-zh="筛选：">Filters:</span>
+        <button class="zl-chip zl-chip--applied">紫金港 <span class="x" aria-hidden="true">×</span></button>
+        <button class="zl-chip zl-chip--applied" data-en="Under ¥100 <span class=&quot;x&quot;>×</span>" data-zh="¥100 以下 <span class=&quot;x&quot;>×</span>">Under ¥100 <span class="x" aria-hidden="true">×</span></button>
+        <button class="zl-chip zl-chip--applied" data-en="Like new <span class=&quot;x&quot;>×</span>" data-zh="几乎全新 <span class=&quot;x&quot;>×</span>">Like new <span class="x" aria-hidden="true">×</span></button>
+        <button class="zl-applied__clear" data-en="Clear all" data-zh="清除全部">Clear all</button>
+      </div>
+      <hr class="zl-divider">
+      <div class="zl-resultbar">
+        <span class="zl-resultbar__count" data-en="<b>42</b> items" data-zh="<b>42</b> 件物品"><b>42</b> items</span>
+        <div class="zl-sort">
+          <label class="zl-caption" for="sort" data-en="Sort" data-zh="排序">Sort</label>
+          <select class="zl-select" id="sort">
+            <option data-en="Recent &amp; varied" data-zh="最新且多样">Recent &amp; varied</option>
+            <option data-en="Newest first" data-zh="最新优先">Newest first</option>
+            <option data-en="Price: low to high" data-zh="价格：从低到高">Price: low to high</option>
+          </select>
+        </div>
+      </div>
+      <hr class="zl-divider">
+      <div class="zl-row" style="gap:12px; align-items:flex-end">
+        <div class="zl-field" style="max-width:120px">
+          <label class="zl-field__label zl-caption" for="pmin" data-en="Min ¥" data-zh="最低 ¥">Min ¥</label>
+          <div class="zl-range"><input class="zl-input" id="pmin" inputmode="numeric" placeholder="0"></div>
+        </div>
+        <span class="zl-caption" style="padding-bottom:12px">—</span>
+        <div class="zl-field" style="max-width:120px">
+          <label class="zl-field__label zl-caption" for="pmax" data-en="Max ¥" data-zh="最高 ¥">Max ¥</label>
+          <div class="zl-range"><input class="zl-input" id="pmax" inputmode="numeric" placeholder="500"></div>
+        </div>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Price is not optional. In Baymard's mobile testing 80% of users reached for a price filter
+      regardless of what they were shopping for — it is the single most-used filter type, and on a
+      student board it is the whole question. The applied-filters row gives the three things its
+      absence takes away: confirmation the filter landed, a one-tap undo, and context for what you
+      are looking at.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">No results — the common case here</h3>
+    <div class="doc-demo">
+      <div class="zl-noresults">
+        <div class="zl-icon-ring zl-icon-ring--lg" style="margin:0 auto var(--zl-space-3)" aria-hidden="true">⌕</div>
+        <p class="zl-noresults__title" data-en="Nothing matches <span class=&quot;zl-noresults__query&quot;>&ldquo;standing desk&rdquo;</span> on Zijingang under ¥100" data-zh="紫金港 ¥100 以下没有与 <span class=&quot;zl-noresults__query&quot;>&ldquo;升降桌&rdquo;</span> 匹配的物品">Nothing matches <span class="zl-noresults__query">&ldquo;standing desk&rdquo;</span> on Zijingang under ¥100</p>
+        <p class="zl-muted" style="margin:0" data-en="We dropped the price filter and found 3 nearby." data-zh="已为你去掉价格筛选，找到 3 件相近的。">We dropped the price filter and found 3 nearby.</p>
+        <div class="zl-noresults__paths">
+          <div class="zl-row" style="justify-content:center; gap:8px">
+            <button class="zl-btn zl-btn--secondary zl-btn--sm" data-en="Search all campuses" data-zh="搜索全部校区">Search all campuses</button>
+            <button class="zl-btn zl-btn--secondary zl-btn--sm" data-en="Remove price filter" data-zh="移除价格筛选">Remove price filter</button>
+            <button class="zl-btn zl-btn--secondary zl-btn--sm" data-en="Browse Furniture" data-zh="浏览家具">Browse Furniture</button>
+          </div>
+          <button class="zl-btn zl-btn--primary zl-btn--sm" data-en="Tell me when one is posted" data-zh="有新发布时通知我">Tell me when one is posted</button>
+        </div>
+        <div class="zl-noresults__fallback">
+          <h4 data-en="Recently posted on Zijingang" data-zh="紫金港最新发布">Recently posted on Zijingang</h4>
+          <div class="zl-feed">
+            <article class="zl-card"><div class="zl-card__media" style="background:linear-gradient(135deg,#0A6BD1,#003F88)"></div>
+              <div class="zl-card__body"><h3 class="zl-card__title" style="font-size:var(--zl-text-sm);font-weight:500"><a class="zl-card__link" href="#finding" data-en="Folding table" data-zh="折叠桌">Folding table</a></h3>
+              <div class="zl-card__meta"><span class="zl-price">¥60</span></div></div></article>
+            <article class="zl-card"><div class="zl-card__media" style="background:linear-gradient(135deg,#6FA8F5,#0A5AAF)"></div>
+              <div class="zl-card__body"><h3 class="zl-card__title" style="font-size:var(--zl-text-sm);font-weight:500"><a class="zl-card__link" href="#finding" data-en="Monitor stand" data-zh="显示器支架">Monitor stand</a></h3>
+              <div class="zl-card__meta"><span class="zl-price">¥45</span></div></div></article>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      On a marketplace with a few hundred listings, <b>the zero-result search is the normal case,
+      not the edge case</b> — which inverts the usual priority. Baymard found roughly half of sites
+      leave users stranded here. So this page names what was searched, says which filter it relaxed
+      and what that found, offers three one-tap ways to widen, and always puts something browsable
+      underneath. A dead end here is an uninstall.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Load more</h3>
+    <div class="doc-demo">
+      <div class="zl-loadmore">
+        <button class="zl-btn zl-btn--tertiary" data-en="Load more" data-zh="加载更多">Load more</button>
+        <span class="zl-loadmore__progress" data-en="Showing 24 of 42" data-zh="已显示 24 / 42">Showing 24 of 42</span>
+      </div>
+    </div>
+    <p class="doc-note">
+      A button, not infinite scroll — it tested better than both pagination and infinite scrolling,
+      as long as the URL keeps up so <kbd>Back</kbd> returns you to the item you were looking at.
+      The count matters: it tells you whether widening a filter is worth it.
+    </p>
+  </section>
+
+  <section class="doc-sec" id="facts">
+    <div class="doc-eyebrow">07c — Listing facts</div>
+    <h2 class="zl-h2">Details, and the way out.</h2>
+    <p class="doc-lede">
+      The structured facts of a listing, plus the report control. Both were added after
+      reviewing OLX — see <a href="../docs/ux-guidelines.md">ux-guidelines.md</a> §7 for what
+      was taken from it and what was deliberately left behind.
+    </p>
+    <div class="doc-demo">
+      <h3 class="zl-label" style="margin-bottom:8px">Details</h3>
+      <dl class="zl-specs" style="max-width:420px">
+        <div class="zl-specs__row"><dt class="zl-specs__key">Category</dt><dd class="zl-specs__val">Furniture</dd></div>
+        <div class="zl-specs__row"><dt class="zl-specs__key">Condition</dt><dd class="zl-specs__val">Good</dd></div>
+        <div class="zl-specs__row"><dt class="zl-specs__key">Location</dt><dd class="zl-specs__val">Zijingang 紫金港</dd></div>
+        <div class="zl-specs__row"><dt class="zl-specs__key">Posted</dt><dd class="zl-specs__val">7h ago</dd></div>
+        <div class="zl-specs__row"><dt class="zl-specs__key">Expires</dt><dd class="zl-specs__val zl-specs__val--num">2026-10-09</dd></div>
+        <div class="zl-specs__row"><dt class="zl-specs__key">Views</dt><dd class="zl-specs__val zl-specs__val--num">64</dd></div>
+      </dl>
+      <div class="zl-listing-actions">
+        <button class="zl-minor-action js-share" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M12 15.5V4.2m0 0L8.3 7.9M12 4.2l3.7 3.7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 13v5.3a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg> Share</button>
+      <details class="zl-report" open>
+        <summary class="zl-minor-action"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M6 21V4.5m0 0 5.2 1.8a4 4 0 0 0 2.9-.1l4-1.7v9l-4 1.7a4 4 0 0 1-2.9.1L6 13.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg> Report</summary>
+        <div class="zl-report__body">
+          <div class="zl-field" style="flex:1;min-width:180px">
+            <label class="zl-field__label zl-caption" for="dsreason">Reason</label>
+            <select class="zl-select zl-select--pill" id="dsreason">
+              <option>Prohibited item</option><option>Spam or scam</option>
+              <option>Misleading listing</option><option>Offensive content</option>
+            </select>
+          </div>
+          <button class="zl-btn zl-btn--tertiary zl-btn--sm" type="button">Send report</button>
+        </div>
+      </details>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Labels in caption grey, values in body size, figures in mono so they align down the
+      column. <b>Share and report sit together</b> as a matched pair of minor actions: one is a
+      courtesy, the other a safety valve, and neither should compete with <em>Message seller</em>,
+      so they share a single quiet style. The report control stays visible rather than buried in a
+      menu. Share is <b>rendered hidden and revealed by script</b> — it needs either the Web Share
+      API or the clipboard, so a button that silently fails is worse than no button; where a
+      native share sheet exists it is used, otherwise the link is copied and the label confirms it
+      for a moment.
+    </p>
+
+    <h3 class="zl-h3" style="margin-bottom:12px">Control shape</h3>
+    <div class="doc-demo">
+      <div class="zl-row" style="gap:12px; align-items:flex-end">
+        <button class="zl-chip" aria-pressed="true">Electronics</button>
+        <select class="zl-select zl-select--pill" style="width:auto"><option>Recent &amp; varied</option></select>
+        <div class="zl-field" style="max-width:120px">
+          <label class="zl-field__label zl-caption" for="dsmin">Min ¥</label>
+          <input class="zl-input" id="dsmin" placeholder="0">
+        </div>
+        <button class="zl-btn zl-btn--secondary zl-btn--sm" style="min-height:44px">Show results</button>
+      </div>
+    </div>
+    <p class="doc-note">
+      One rule keeps a filter row coherent: <b>pill = choose from options</b> (chips, sort,
+      condition), <b>rectangle = type a value</b> (search, price), <b>rectangle = perform an
+      action</b> (buttons) — and <b>everything on the row is 44px tall</b> regardless of family.
+      Before this the chips were 44px and the sort select was 36px with a heavier border: the
+      same job wearing two different appearances, which is what made the row look assembled
+      rather than designed.
+    </p>
+  </section>
+
+  <section class="doc-sec" id="seller">
+    <div class="doc-eyebrow">08 — Seller &amp; avatar</div>
+    <h2 class="zl-h2">Campus and languages, on every profile.</h2>
+    <p class="doc-lede">Before messaging a stranger about a fridge, you want to know where they are and whether the conversation will work at all.</p>
+    <div class="doc-demo">
+      <div class="zl-seller" style="max-width:460px">
+        <div class="zl-avatar zl-avatar--lg">GN</div>
+        <div style="flex:1">
+          <div class="zl-seller__name">Gabriel N. <span class="zl-badge zl-badge--verified">✓ <span data-en="ZJU verified" data-zh="浙大邮箱已验证">ZJU verified</span></span></div>
+          <div class="zl-caption" style="margin-top:2px" data-en="Haining International · member since Sept 2026" data-zh="海宁国际校区 · 2026 年 9 月加入">Haining International · member since Sept 2026</div>
+          <div class="zl-seller__langs">
+            <span class="zl-chip zl-chip--static">English</span>
+            <span class="zl-chip zl-chip--static">中文</span>
+            <span class="zl-chip zl-chip--static">Português</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="doc-note">Languages are shown as "can do a deal in" — no proficiency levels,
+      because the only question that matters is binary. There is no nationality field anywhere
+      in this system, deliberately.</p>
+  </section>
+
+  <section class="doc-sec" id="messages">
+    <div class="doc-eyebrow">09 — Messages</div>
+    <h2 class="zl-h2">Async threads, one per item.</h2>
+    <div class="doc-demo">
+      <div class="zl-thread" style="max-width:520px">
+        <div class="zl-msg zl-msg--them" data-en="Hi! Is the lamp still available?" data-zh="你好！台灯还在吗？">Hi! Is the lamp still available?<span class="zl-msg__time">14:02</span></div>
+        <div class="zl-msg zl-msg--me" data-en="Yes — I'm at Zijingang most evenings." data-zh="在的 — 我大部分晚上都在紫金港。">Yes — I'm at Zijingang most evenings.<span class="zl-msg__time">14:09</span></div>
+        <div class="zl-msg zl-msg--them" data-en="Great, can we meet Thursday?" data-zh="太好了，周四可以见面吗？">Great, can we meet Thursday?<span class="zl-msg__time">14:11</span></div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="zl-btn zl-btn--secondary zl-btn--sm" data-en="Share my WeChat with this person" data-zh="向对方显示我的微信">Share my WeChat with this person</button>
+      </div>
+    </div>
+    <p class="doc-note">WeChat is revealed per thread, per side, by explicit choice — after
+      both people have decided they want to meet, not as the price of asking a question.</p>
+  </section>
+
+  <section class="doc-sec" id="feedback">
+    <div class="doc-eyebrow">10 — Alerts, empty, loading</div>
+    <h2 class="zl-h2">The states a marketplace lives in.</h2>
+    <div class="doc-demo">
+      <div class="zl-stack" style="margin-bottom:24px">
+        <div class="zl-alert zl-alert--info"><div class="zl-icon-ring" aria-hidden="true">i</div>
+          <div><b data-en="Meet in a public place" data-zh="请在公共场所见面">Meet in a public place</b>
+          <span data-en="Inspect the item before paying. Never transfer money in advance." data-zh="付款前请检查物品。切勿提前转账。">Inspect the item before paying. Never transfer money in advance.</span></div></div>
+        <div class="zl-alert zl-alert--warning"><div class="zl-icon-ring zl-icon-ring--alert" aria-hidden="true">!</div>
+          <div><b data-en="This listing expires in 3 days" data-zh="该发布 3 天后过期">This listing expires in 3 days</b>
+          <span data-en="Still available? One tap renews it for another 30 days." data-zh="还在售吗？点击一次即可续期 30 天。">Still available? One tap renews it for another 30 days.</span></div></div>
+      </div>
+      <div class="zl-stack" style="margin-bottom:24px">
+        <div class="zl-alert zl-alert--success"><div class="zl-icon-ring" aria-hidden="true">✓</div>
+          <div><b data-en="Marked as sold" data-zh="已标记为售出">Marked as sold</b>
+          <span data-en="It stays in your history and stops appearing in the feed." data-zh="记录保留在你的历史中，并不再出现在列表里。">It stays in your history and stops appearing in the feed.</span></div></div>
+        <div class="zl-alert zl-alert--danger"><div class="zl-icon-ring zl-icon-ring--alert" aria-hidden="true">✕</div>
+          <div><b data-en="This listing was removed" data-zh="该发布已被下架">This listing was removed</b>
+          <span data-en="It broke the prohibited-items rules. Read them before posting again." data-zh="因违反禁售物品规定。再次发布前请阅读规定。">It broke the prohibited-items rules. Read them before posting again.</span></div></div>
+      </div>
+      <div class="zl-empty">
+        <div class="zl-icon-ring zl-icon-ring--lg" aria-hidden="true">◇</div>
+        <div class="zl-empty__title" data-en="Nothing here yet" data-zh="这里还没有物品">Nothing here yet</div>
+        <p style="max-width:38ch; margin:0" data-en="No listings on this campus in this category. Be the first — it takes about a minute." data-zh="该校区此分类下暂无物品。来做第一个吧 — 大约只需一分钟。">No listings on this campus in this category. Be the first — it takes about a minute.</p>
+        <button class="zl-btn zl-btn--primary" data-en="Post an item" data-zh="发布物品">Post an item</button>
+      </div>
+    </div>
+    <p class="doc-note">The empty state carries the first month of this product's life, so it
+      is a real component with a real call to action — not a shrug and a grey icon.</p>
+  </section>
+
+  <section class="doc-sec" id="overlays">
+    <div class="doc-eyebrow">11 — Modal &amp; sheet</div>
+    <h2 class="zl-h2">Confirm on desktop, sheet on mobile.</h2>
+    <div class="doc-demo" style="background:var(--zl-bg-sunken)">
+      <div class="zl-modal" style="margin:0 auto">
+        <div class="zl-modal__header"><h3 class="zl-modal__title" data-en="Delete this listing?" data-zh="删除该发布？">Delete this listing?</h3></div>
+        <div class="zl-modal__body" data-en="This cannot be undone. If it sold, mark it as sold instead — it stays in your history." data-zh="此操作无法撤销。如果已售出，请改为标记为已售出 — 记录会保留在你的历史中。">This cannot be undone. If it sold, mark it as sold instead — it stays in your history.</div>
+        <div class="zl-modal__footer">
+          <button class="zl-btn zl-btn--tertiary" data-en="Cancel" data-zh="取消">Cancel</button>
+          <button class="zl-btn zl-btn--urgent" data-en="Delete" data-zh="删除">Delete</button>
+        </div>
+      </div>
+    </div>
+    <h3 class="zl-h3" style="margin:28px 0 12px">Bottom sheet — filters on mobile</h3>
+    <div class="doc-demo" style="background:var(--zl-bg-sunken)">
+      <div class="zl-sheet" style="position:static; max-width:400px; margin:0 auto; border-radius:var(--zl-radius-lg)">
+        <div class="zl-sheet__grip"></div>
+        <div class="zl-label" style="margin-bottom:12px" data-en="Campus" data-zh="校区">Campus</div>
+        <div class="zl-row" style="gap:8px; margin-bottom:20px">
+          <button class="zl-chip" aria-pressed="true">紫金港</button>
+          <button class="zl-chip" aria-pressed="false">玉泉</button>
+          <button class="zl-chip" aria-pressed="false">西溪</button>
+        </div>
+        <hr class="zl-divider">
+        <button class="zl-btn zl-btn--primary zl-btn--block" data-en="Show 42 results" data-zh="显示 42 条结果">Show 42 results</button>
+      </div>
+    </div>
+    <p class="doc-note" style="margin-bottom:28px">
+      Filters open from the bottom on mobile, never as a centred modal — the controls have to be
+      reachable with a thumb, and the confirm button sits at the bottom where the thumb already is.
+      The sheet respects <code>env(safe-area-inset-bottom)</code> so it clears the home indicator.
+    </p>
+    <p class="doc-note">This is the one other place red is allowed — and it is inside a modal,
+      so the "one red action per view" rule holds automatically.</p>
+  </section>
+
+  <section class="doc-sec" id="rules">
+    <div class="doc-eyebrow">12 — The rules</div>
+    <h2 class="zl-h2">Seven things that don't bend.</h2>
+    <div class="do-dont" style="margin-bottom:16px">
+      <div class="dd dd--do"><h4>Do</h4><p>Compose from semantic tokens — <code>--zl-text</code>, <code>--zl-bg-raised</code>. It is what makes dark mode cost nothing.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Write a raw hex in a component. That is a dark-mode bug that hasn't happened yet.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Use red once per view, for the highest-priority action.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Use red for decoration, for a second button, or behind body text.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Underline every link, always.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Signal anything with colour alone — status badges carry a word or a mark too.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Show listing photos at their true colour.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Apply the blue duotone to listing photos. Editorial imagery only.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Keep every tappable thing at 44px, and inputs at 16px.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Shrink inputs below 16px — iOS zooms the page on focus.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Measure any colour you add, in both themes, before shipping it.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Trust that a colour "looks fine" on dark. Truth-Seeking Blue looks fine and measures 1.84.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Set the wordmark in the body typeface, as real text.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Use the ZJU seal, the eagle, or the 浙江大学 wordmark. Not in the header, not in the footer, not in the favicon.</p></div>
+    </div>
+  </section>
+
+  <section class="doc-sec" id="brand">
+    <div class="doc-eyebrow">13 — Brand</div>
+    <h2 class="zl-h2">WeZJUers</h2>
+    <p class="doc-lede">The name the community already uses for itself, which is the point: it reads
+      as students speaking, not as the university speaking. Two assets with different jobs: the name
+      is the logo, and a pair of <b>message balloons</b> is the app icon, for the places a name will not fit.</p>
+
+    <h3 class="zl-h3">The mark</h3>
+    <p>Two speech balloons, one answering the other, with the three dots of a reply being typed. The
+      platform's front door is the Community, so the icon says the thing the product is for — people
+      talking to each other — rather than spelling the name a second time. Solid, not outlined: at
+      16px an outline fills with its own background and the silhouette is all that survives, so the
+      silhouette is what the mark is made of.</p>
+    <div class="doc-demo" style="display:flex; gap:22px; align-items:center; flex-wrap:wrap">
+      <svg viewBox="0 0 64 64" width="96" height="96" role="img" aria-label="WeZJUers"><rect width="64" height="64" rx="14" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg><svg viewBox="0 0 64 64" width="96" height="96" role="img" aria-label="WeZJUers"><circle cx="32" cy="32" r="32" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg>
+      <span style="display:inline-flex;padding:10px;border:1px solid var(--zl-border);border-radius:8px"><svg viewBox="0 0 64 64" width="76" height="76" role="img" aria-label="WeZJUers, one ink"><path fill="#003F88" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg></span>
+      <svg viewBox="0 0 64 64" width="48" height="48" role="img" aria-label="WeZJUers"><rect width="64" height="64" rx="14" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg><svg viewBox="0 0 64 64" width="32" height="32" role="img" aria-label="WeZJUers"><rect width="64" height="64" rx="14" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg><svg viewBox="0 0 64 64" width="24" height="24" role="img" aria-label="WeZJUers"><rect width="64" height="64" rx="14" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg><svg viewBox="0 0 64 64" width="20" height="20" role="img" aria-label="WeZJUers"><rect width="64" height="64" rx="14" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg><svg viewBox="0 0 64 64" width="16" height="16" role="img" aria-label="WeZJUers"><rect width="64" height="64" rx="14" fill="#003F88"/><path fill="#fff" fill-rule="evenodd" d="M25.91 21.79C26.87 21.83 29.66 21.68 31.64 22.05C33.63 22.41 35.99 23.13 37.84 23.98C39.68 24.82 41.27 25.86 42.71 27.12C44.16 28.39 45.57 30.04 46.52 31.54C47.48 33.04 48.06 34.54 48.45 36.11C48.84 37.69 49.01 39.33 48.86 40.99C48.71 42.65 48.28 44.42 47.54 46.07C46.79 47.71 45.36 49.63 44.39 50.84C43.42 52.05 42.69 52.56 41.7 53.33C40.71 54.1 40.01 54.73 38.45 55.46C36.89 56.19 33.74 57.27 32.36 57.7C30.97 58.12 34.32 57.95 30.12 58C25.92 58.05 11.14 58.09 7.17 58C3.2 57.91 6.3 57.44 6.3 57.44L6.1 55.82L10.37 50.94C10.37 50.94 8.13 47.98 7.42 46.47C6.71 44.97 6.3 43.48 6.1 41.9C5.9 40.33 5.88 38.67 6.2 37.03C6.52 35.39 7.4 33.34 8.03 32.05C8.66 30.76 9.28 30.13 9.96 29.31C10.65 28.49 11.26 27.86 12.14 27.12C13.03 26.39 13.89 25.64 15.29 24.89C16.7 24.15 18.81 23.16 20.57 22.66C22.33 22.15 24.97 21.99 25.86 21.84C26.74 21.7 24.94 21.76 25.91 21.79ZM36.67 6.05C37.6 6.08 40.44 6.01 42.21 6.3C43.98 6.6 45.54 7 47.29 7.83C49.03 8.66 51.22 10.04 52.67 11.28C54.12 12.53 55.13 13.9 55.97 15.29C56.81 16.69 57.36 18.24 57.7 19.66C58.03 21.08 58.14 22.37 58 23.82C57.86 25.28 57.54 26.89 56.88 28.39C56.22 29.9 54.04 32.86 54.04 32.86C54.04 32.86 57.29 36.32 57.9 37.33C58.51 38.35 57.7 38.96 57.7 38.96C57.7 38.96 57.79 39.42 56.83 39.52C55.88 39.61 51.96 39.52 51.96 39.52C51.96 39.52 51.71 36.09 51.09 34.29C50.48 32.48 49.43 30.37 48.25 28.7C47.07 27.03 45.67 25.58 44.04 24.28C42.4 22.99 40.21 21.76 38.45 20.93C36.69 20.1 35.05 19.68 33.47 19.3C31.9 18.93 30.63 18.76 29 18.7C27.38 18.63 25.47 18.67 23.72 18.9C21.97 19.13 18.49 20.07 18.49 20.07C18.49 20.07 18.86 18.29 19.2 17.43C19.54 16.56 20.03 15.67 20.52 14.89C21.01 14.11 21.45 13.51 22.15 12.75C22.85 12 23.38 11.27 24.74 10.37C26.1 9.46 28.75 8 30.32 7.32C31.9 6.64 33.13 6.51 34.18 6.3C35.23 6.1 36.21 6.14 36.62 6.1C37.04 6.06 35.74 6.02 36.67 6.05ZM17.68 36.52C17.68 36.52 18.83 36.43 19.36 36.67C19.88 36.91 20.51 37.39 20.83 37.94C21.14 38.49 21.27 39.4 21.23 39.97C21.2 40.55 20.94 41 20.62 41.39C20.31 41.79 19.84 42.16 19.36 42.36C18.87 42.55 18.24 42.63 17.73 42.56C17.22 42.49 16.67 42.2 16.31 41.95C15.94 41.71 15.74 41.42 15.55 41.09C15.35 40.76 15.17 40.43 15.14 39.97C15.11 39.52 15.15 38.83 15.34 38.35C15.54 37.87 15.93 37.37 16.31 37.08C16.69 36.78 17.4 36.66 17.63 36.57C17.86 36.48 17.68 36.52 17.68 36.52ZM26.92 36.52C26.92 36.52 28.07 36.43 28.6 36.67C29.12 36.91 29.76 37.39 30.07 37.94C30.38 38.49 30.51 39.4 30.48 39.97C30.44 40.55 30.18 41 29.87 41.39C29.55 41.79 29.08 42.16 28.6 42.36C28.12 42.55 27.48 42.63 26.97 42.56C26.46 42.49 25.91 42.2 25.55 41.95C25.19 41.71 24.98 41.42 24.79 41.09C24.59 40.76 24.42 40.43 24.38 39.97C24.35 39.52 24.39 38.83 24.59 38.35C24.78 37.87 25.17 37.37 25.55 37.08C25.93 36.78 26.64 36.66 26.87 36.57C27.1 36.48 26.92 36.52 26.92 36.52ZM36.16 36.52C36.16 36.52 37.32 36.43 37.84 36.67C38.36 36.91 39 37.39 39.31 37.94C39.63 38.49 39.75 39.4 39.72 39.97C39.68 40.55 39.42 41 39.11 41.39C38.8 41.79 38.32 42.16 37.84 42.36C37.36 42.55 36.72 42.63 36.21 42.56C35.71 42.49 35.16 42.2 34.79 41.95C34.43 41.71 34.23 41.42 34.03 41.09C33.84 40.76 33.66 40.43 33.62 39.97C33.59 39.52 33.63 38.83 33.83 38.35C34.02 37.87 34.41 37.37 34.79 37.08C35.17 36.78 35.88 36.66 36.11 36.57C36.34 36.48 36.16 36.52 36.16 36.52Z"/></svg>
+    </div>
+    <p class="doc-note">Traced from supplied artwork, not redrawn: marching squares over the bitmap
+      for the five contours — two balloons and three dots — then Douglas&ndash;Peucker at
+      <code>&epsilon;&nbsp;2.5</code> to drop the sampling noise, then Catmull&ndash;Rom cubics with
+      corners above 48&deg; held sharp so the tails stay pointed instead of being rounded away. That
+      takes it from 3,668 sampled points to 93, and the whole mark to about 3KB. It fills
+      <code>52</code> of the 64 grid and carries <code>fill-rule="evenodd"</code>, which is what
+      knocks the dots and the gap between the balloons out of the fill rather than painting them in
+      the tile colour — so the mark works on any background, including one ink.</p>
+    <p class="doc-note"><b>It is detailed for an icon.</b> Two balloons, the gap between them and
+      three dots is three levels of detail, and below about 24px they compress into one shape:
+      measured, it reads cleanly at 24px and up, is soft at 20 and is a silhouette at 16. On a
+      retina display a 16px favicon is rasterised at 32 device pixels and reads fine, so this mostly
+      bites on older screens. Lives at <code>app/public/favicon.svg</code>, with
+      <code>icon-32.png</code> for browsers that will not take an SVG favicon and
+      <code>icon-180.png</code> for an iOS home screen. It is the app icon only — the logo is the
+      name, and the two are never set side by side.</p>
+
+    <h3 class="zl-h3">Wordmark</h3>
+    <p>The name as one word, in the body face at 800, tracking &minus;.035em. Real text, not an
+      image: sharp at any density, costs nothing to download, selectable, readable by a screen
+      reader, one CSS rule to restyle. No mark beside it and no spans inside it.</p>
+    <div class="doc-demo"><span class="zl-wordmark" style="font-size:30px">WeZJUers</span></div>
+    <div class="doc-demo" style="background:var(--zl-brand-surface)">
+      <span class="zl-wordmark" style="font-size:30px;color:var(--zl-on-brand)">WeZJUers</span>
+    </div>
+    <p class="doc-note">Joining the words is what fixed the junction. Set apart as
+      &ldquo;We&nbsp;ZJUers&rdquo;, the acronym towered over the lowercase and the eye tripped at
+      &ldquo;Uers&rdquo;; the fix then was to set ZJU at 90%. Closed up, that reduction reads as a
+      rendering fault — the acronym visibly dips below the leading W — and it is not needed, because
+      a capital already leads the word and the eye expects the capitals inside it. Camel case does
+      the work, as it does in WeChat, PayPal and YouTube. One colour, one weight: the earlier
+      wordmark tinted &ldquo;We&rdquo; pale blue, which on the blue header read as a disabled
+      control rather than as emphasis.</p>
+
+    <div class="do-dont" style="margin-top:16px">
+      <div class="dd dd--do"><h4>Do</h4><p>Keep the disclaimer strip above the header on every page. The name carries <code>ZJU</code>; the strip is what keeps it honest.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Set the wordmark as an image, or letterspace, outline, shadow or rotate it.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Use the tile wherever a wordmark would be illegible — favicon, app icon, avatars.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Put the tile and the wordmark side by side. They say the same thing twice.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Re-measure the ink after any change to the mark, and re-check it at 16px. A shape that survives there survives everywhere.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Add a second element to the tile — a letter, a full stop, a year. One mark is the whole point of having one.</p></div>
+      <div class="dd dd--dont"><h4>Don't</h4><p>Outline the balloon, or thin its tail. Both read fine at 96px and both disappear at 16.</p></div>
+      <div class="dd dd--do"><h4>Do</h4><p>Write the name closed up, as one word, wherever it appears — header, title, docs, slides.</p></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  /* Theme: system → light → dark */
+  var order=['system','light','dark'], btn=document.getElementById('themeBtn');
+  function get(){ try{ return localStorage.getItem('zl-theme')||'system'; }catch(e){ return 'system'; } }
+  function set(v){
+    try{ v==='system' ? localStorage.removeItem('zl-theme') : localStorage.setItem('zl-theme',v); }catch(e){}
+    v==='system' ? document.documentElement.removeAttribute('data-theme')
+                 : document.documentElement.setAttribute('data-theme',v);
+    btn.textContent='Theme: '+v;
+  }
+  set(get());
+  btn.addEventListener('click',function(){ set(order[(order.indexOf(get())+1)%3]); });
+
+  /* Language: demonstrates that every component holds in both. */
+  var lang='en', lbtn=document.getElementById('langBtn');
+  lbtn.addEventListener('click',function(){
+    lang = lang==='en' ? 'zh' : 'en';
+    lbtn.textContent = lang==='en' ? 'EN' : '中文';
+    document.documentElement.lang = lang==='en' ? 'en' : 'zh-CN';
+    document.querySelectorAll('[data-en][data-zh]').forEach(function(el){
+      el.innerHTML = el.getAttribute('data-'+lang);
+    });
+    document.querySelectorAll('[data-en-ph][data-zh-ph]').forEach(function(el){
+      el.placeholder = el.getAttribute('data-'+lang+'-ph');
+    });
+  });
+</script>
+</body>
+</html>
