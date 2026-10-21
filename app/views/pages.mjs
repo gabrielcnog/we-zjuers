@@ -62,7 +62,7 @@ function categoryRail({ locale, t, path, params, counts }) {
     </a>`;
   return h`<nav class="app-railnav js-swapnav" aria-label="${t('filter.category')}">
     <div class="app-railnav__label zl-label">${t('filter.category')}</div>
-    ${item(t('filter.all'), ICONS.grid, !params.category, { ...base, category: '' })}
+    ${item(t('filter.cat.all'), ICONS.grid, !params.category, { ...base, category: '' })}
     ${ref().categories.map((c) => item(categoryName(c, locale), c.icon || '•',
         params.category === c.slug, { ...base, category: c.slug }, counts[c.slug] || 0))}
   </nav>`;

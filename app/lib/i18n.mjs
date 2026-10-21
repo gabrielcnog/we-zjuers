@@ -17,7 +17,11 @@ const EN = {
   'nav.post': 'Add listing', 'nav.signin': 'Sign in', 'nav.signout': 'Sign out',
   'nav.my': 'My listings', 'nav.messages': 'Messages', 'nav.saved': 'Saved', 'nav.rules': 'Rules & safety',
   'home.title': 'Latest on campus', 'home.lede': 'Things other students are passing on. Free to use, no fees, meet on campus.',
-  'filter.all': 'All', 'filter.campus': 'Campus', 'filter.category': 'Category',
+  /* 'filter.all' still belongs to the campus row, where "All" is the whole
+     label. The category rows get their own string so they can say what they
+     are filtering, matching Events. */
+  'filter.all': 'All', 'filter.cat.all': 'All categories',
+  'filter.campus': 'Campus', 'filter.category': 'Category',
   'filter.price': 'Price', 'filter.condition': 'Condition', 'filter.min': 'Min ¥', 'filter.max': 'Max ¥',
   'filter.applied': 'Filters:', 'filter.clear': 'Clear all', 'filter.apply': 'Show results',
   'campus.all': 'All campuses', 'campus.searching': 'Location',
@@ -208,7 +212,8 @@ const ZH = {
   'nav.post': '发布物品', 'nav.signin': '登录', 'nav.signout': '退出',
   'nav.my': '我的发布', 'nav.messages': '消息', 'nav.saved': '收藏', 'nav.rules': '规则与安全',
   'home.title': '校园最新', 'home.lede': '同学们转让的物品。免费使用，无手续费，校内当面交易。',
-  'filter.all': '全部', 'filter.campus': '校区', 'filter.category': '分类',
+  'filter.all': '全部', 'filter.cat.all': '全部分类',
+  'filter.campus': '校区', 'filter.category': '分类',
   'filter.price': '价格', 'filter.condition': '成色', 'filter.min': '最低 ¥', 'filter.max': '最高 ¥',
   'filter.applied': '筛选：', 'filter.clear': '清除全部', 'filter.apply': '查看结果',
   'campus.all': '全部校区', 'campus.searching': '位置',

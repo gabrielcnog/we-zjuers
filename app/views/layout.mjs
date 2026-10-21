@@ -201,7 +201,7 @@ export function filters({ locale, t, path, params, showCampus = false }) {
   return h`
   <div class="zl-chipscroll js-chipscroll">
     <div class="zl-chiprow js-chiptrack" role="group" aria-label="${t('filter.category')}">
-      ${chip(t('filter.all'), !params.category, { ...base, category: '' })}
+      ${chip(t('filter.cat.all'), !params.category, { ...base, category: '' })}
       ${cats.map((c) => chip((c.icon || '') + ' ' + categoryName(c, locale), params.category === c.slug,
           { ...base, category: c.slug }))}
     </div>
