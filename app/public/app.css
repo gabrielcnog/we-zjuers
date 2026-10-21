@@ -382,6 +382,17 @@ summary.app-post__action::-webkit-details-marker{ display:none; }
 .app-reply__buttons{ display:flex; justify-content:flex-end; margin-top:var(--zl-space-2); }
 .app-thread{ display:grid; gap:var(--zl-space-3); }
 .app-comment__head{ display:flex; align-items:center; gap:var(--zl-s-2); font-size:var(--zl-text-sm); }
+/* Author links: the name reads as text until you point at it, the same way
+   the board link in a byline behaves. The comment's avatar and name are one
+   target so the whole chip is clickable, and it keeps the head's own gap so
+   the thread rail still lines up with the avatar's centre. */
+.zl-ui .app-comment__author{
+  display:flex; align-items:center; gap:var(--zl-s-2);
+  color:inherit; text-decoration:none; min-width:0;
+}
+.zl-ui .app-comment__author:hover b{ text-decoration:underline; }
+.zl-ui .app-post__author{ color:inherit; text-decoration:none; }
+.zl-ui .app-post__author:hover{ text-decoration:underline; }
 /* Comment geometry is derived from the avatar, not guessed: text starts after
    avatar + gap, the thread rail runs down the avatar's centre. */
 .app-comment__body{ margin:var(--zl-s-0-5) 0 0 calc(var(--zl-avatar-sm) + var(--zl-s-2)); max-width:var(--zl-measure); white-space:pre-wrap; line-height:1.55; overflow-wrap:anywhere; }

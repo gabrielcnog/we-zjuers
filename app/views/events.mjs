@@ -48,6 +48,11 @@ export function soon(e, t) {
   return null;
 }
 
+/* The Community's three, not the marketplace's five: an event has no price
+   and no item, so "prohibited item" and "misleading listing" have nothing to
+   describe. */
+const REPORT_REASONS = ['spam', 'offensive', 'other'];
+
 const CAT_ICON = { party: '🎉', sports: '⚽', club: '👥', cooking: '🍜', culture: '🏛', talk: '🎤', other: '📌' };
 
 const isPast = (e) => new Date(e.starts_at) < new Date();
@@ -249,7 +254,7 @@ function people({ locale, t, rows, user, teamEvent }) {
   </ul>`;
 }
 
-export function eventPage({ locale, t, e, parts, user, error, organiser, organiserLangs = [] }) {
+export function eventPage({ locale, t, e, parts, user, error, organiser, organiserLangs = [], reported = false }) {
   const mine = user && user.id === e.organizer_id;
   const past = isPast(e), full = isFull(e), off = e.status === 'cancelled';
   const closed = past || off || (full && !e.joined);
@@ -333,6 +338,29 @@ export function eventPage({ locale, t, e, parts, user, error, organiser, organis
       ${mine && e.status === 'published' ? h`<form method="post" action="${L(locale, '/events/' + e.id + '/cancel')}">
         <button class="zl-minor-action" type="submit">${ICONS.x}<span>${t('ev.cancel')}</span></button>
       </form>` : raw('')}
+
+      ${/* Report, the same component and the same three reasons the Community
+           offers — an event is a post by an organisation, so "prohibited item"
+           and "misleading listing" do not apply. Hidden from the organiser:
+           reporting your own event is not a thing, and the cancel button is
+           already the control they want. */
+        mine ? raw('')
+          : reported ? h`<p class="zl-caption">${t('report.sent')}</p>`
+          : user ? h`<div class="zl-listing-actions">
+              <details class="zl-report">
+                <summary class="zl-minor-action">${ICON.flag}<span>${t('listing.report')}</span></summary>
+                <form class="zl-report__body" method="post" action="${L(locale, '/events/' + e.id + '/report')}">
+                  <div class="zl-field zl-grow">
+                    <label class="zl-field__label zl-caption" for="reason">${t('report.reason')}</label>
+                    <select class="zl-select" id="reason" name="reason">
+                      ${REPORT_REASONS.map((r) => h`<option value="${r}">${t('report.r.' + r)}</option>`)}
+                    </select>
+                  </div>
+                  <button class="zl-btn zl-btn--tertiary zl-btn--sm" type="submit"><span>${t('report.send')}</span></button>
+                </form>
+              </details>
+            </div>`
+          : raw('')}
     </div>
 
     <div class="app-detail__body zl-stack">

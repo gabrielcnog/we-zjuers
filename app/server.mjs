@@ -712,6 +712,18 @@ const server = createServer(async (req, res) => {
       }
       if (rest[2] === 'leave') { await E.leave({ eventId: rest[1], userId: user.id }); return redirect(res, back); }
       if (rest[2] === 'cancel') { await E.cancelEvent(rest[1], user.id); return redirect(res, back); }
+      /* POST /events/:id/report — same shape as a listing or a post report:
+         signed in, not your own, rate limited, reason off a fixed list. */
+      if (rest[2] === 'report') {
+        const { reason } = parseForm(await readBody(req));
+        const e = await E.getEvent(rest[1], user.id);
+        if (!e) return send(res, 404, 'Not found');
+        if (e.organizer_id === user.id) return redirect(res, back);
+        if (!A.rateLimit('report:' + user.id, 20, 864e5)) return send(res, 429, 'Slow down');
+        await Q.createReport(user.id, 'event', e.id,
+          ['spam', 'offensive', 'other'].includes(reason) ? reason : 'other');
+        return redirect(res, back + '?reported=1');
+      }
     }
 
     /* ---- GET /events/:id ---- */
@@ -733,7 +745,7 @@ const server = createServer(async (req, res) => {
       const ERR = { team: t('ev.team.name'), full: t('ev.full'), past: t('ev.past'),
                     cancelled: t('ev.cancelled'), gone: t('error.title') };
       return render(e.title, EV.eventPage({ locale, t, e, parts, user, organiser, organiserLangs,
-        error: ERR[params.err] || null }));
+        error: ERR[params.err] || null, reported: params.reported === '1' }));
     }
 
     /* ---- GET /guide — static guidebook summary + glossary ---- */

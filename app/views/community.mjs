@@ -95,7 +95,11 @@ const eventWhen = (iso, locale) => new Date(iso).toLocaleDateString(
 function meta(p, locale, t, { showBoard = true, me = false } = {}) {
   return h`<div class="app-post__meta">
     ${showBoard ? h`<a class="app-post__board" href="${L(locale, '/community/b/' + p.board_slug)}">${ico(p.board_icon)}${postBoardLabel(p, locale)}</a><span aria-hidden="true">·</span>` : raw('')}
-    <span>${personName({ family: p.author_family, given: p.author_given, fallback: p.author }, me)}${p.is_zju_verified ? h` <span class="app-verified" title="${t('seller.verified')}" aria-hidden="true">${ICONS.check}</span><span class="zl-sr-only">${t('seller.verified')}</span>` : raw('')}</span>
+    ${/* The author links to their profile, the same affordance the marketplace
+         gives a seller. .app-post__meta a already carries z-index:1, so this
+         sits above the title's stretched overlay and stays clickable inside a
+         card. */
+      h`<a class="app-post__author" href="${L(locale, '/u/' + p.user_id)}">${personName({ family: p.author_family, given: p.author_given, fallback: p.author }, me)}${p.is_zju_verified ? h` <span class="app-verified" title="${t('seller.verified')}" aria-hidden="true">${ICONS.check}</span><span class="zl-sr-only">${t('seller.verified')}</span>` : raw('')}</a>`}
     <span aria-hidden="true">·</span>
     <time datetime="${new Date(p.created_at).toISOString()}">${ago(p.created_at, t)}</time>
     ${p.campus ? h`<span class="zl-badge zl-badge--campus">${campusName(p.campus, locale)}</span>` : raw('')}
@@ -227,8 +231,14 @@ function commentTree(list, ctx, parentId = null, depth = 0) {
     const nested = commentTree(list, ctx, c.id, depth + 1);
     return h`<div class="app-comment" id="c-${c.id}">
       <div class="app-comment__head">
-        <span class="zl-avatar zl-avatar--sm" aria-hidden="true">${deleted ? '?' : personInitials({ family: c.author_family, given: c.author_given, fallback: c.author })}</span>
-        <b>${deleted ? ctx.t('com.deleted') : personName({ family: c.author_family, given: c.author_given, fallback: c.author }, ctx.me)}</b>
+        ${/* Avatar and name are one link to the profile — a deleted comment has
+             no author to visit, so it stays plain text. */
+          deleted
+            ? h`<span class="zl-avatar zl-avatar--sm" aria-hidden="true">?</span><b>${ctx.t('com.deleted')}</b>`
+            : h`<a class="app-comment__author" href="${L(ctx.locale, '/u/' + c.user_id)}">
+                <span class="zl-avatar zl-avatar--sm" aria-hidden="true">${personInitials({ family: c.author_family, given: c.author_given, fallback: c.author })}</span>
+                <b>${personName({ family: c.author_family, given: c.author_given, fallback: c.author }, ctx.me)}</b>
+              </a>`}
         ${!deleted && c.user_id === ctx.post.user_id ? h`<span class="app-op">${ctx.t('com.op')}</span>` : raw('')}
         <span aria-hidden="true">·</span>
         <time class="zl-caption" datetime="${new Date(c.created_at).toISOString()}">${ago(c.created_at, ctx.t)}</time>
