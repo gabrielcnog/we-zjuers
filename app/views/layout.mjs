@@ -19,7 +19,15 @@ export function campusLabel(code, locale, t) {
    rendered differently on every font and platform — the full-width ＋ in the
    floating button is what gave it away. Size comes from the context (.zl-btn,
    .zl-icon-ring, .zl-ico) — the SVG itself carries none, so one icon fits all. */
-const svg = (d, extra = '') => raw(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"${extra}>${d}</svg>`);
+/* width/height are ATTRIBUTES, not CSS: a presentational attribute loses to
+   every stylesheet rule, so .zl-btn > svg and friends still decide the real
+   size and "one icon fits all" still holds. What they buy is a floor. An SVG
+   with a viewBox and no intrinsic size stretches to fill its container, so a
+   context that forgets to size it does not render a slightly-wrong icon, it
+   renders a 112px one — which is exactly what the organiser's Cancel button
+   and the "You are going" tick were doing, both of them only reachable while
+   signed in, which is why they sat there unseen. */
+const svg = (d, extra = '') => raw(`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"${extra}>${d}</svg>`);
 export const ICONS = {
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   check: svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),

@@ -190,6 +190,30 @@ export function eventList({ locale, t, rows, sel, counts, canPost }) {
   </div>`;
 }
 
+/* The team sheet, for the organiser and nobody else. It is the only place a
+   student ID appears, and it only renders when the server fetched the roster
+   — which it does solely for the organiser (lib/events.mjs participants()).
+   Captains type their teammates' IDs on their behalf, so those people never
+   consented to anything public; the organiser needs them to check a squad in
+   at the pitch, and that is the whole of the use. */
+function roster({ t, rows }) {
+  const teams = rows.filter((r) => r.team_name);
+  if (!teams.length) return raw('');
+  return h`<section class="app-ev-roster">
+    <h2 class="zl-h3 zl-section__title">${t('ev.roster.title')}</h2>
+    <p class="zl-field__hint">${t('ev.roster.note')}</p>
+    <ul class="app-ev-roster__list">
+      ${teams.map((r) => h`<li class="app-ev-roster__team">
+        <b>${r.team_name}</b>
+        <span class="zl-caption">${t('ev.roster.captain')}: ${personName({ family: r.family_name, given: r.given_name, fallback: r.display_name }, true)}</span>
+        ${r.teammates ? h`<ul class="app-ev-roster__mates">
+          ${r.teammates.split('\n').map((x) => x.trim()).filter(Boolean).map((x) => h`<li>${x}</li>`)}
+        </ul>` : raw('')}
+      </li>`)}
+    </ul>
+  </section>`;
+}
+
 /* The participant list. Signed-out visitors get the count and a prompt, not
    the names: attendance is open to the community, not to the public web.
    See docs/events.md. */
@@ -320,6 +344,7 @@ export function eventPage({ locale, t, e, parts, user, error, organiser, organis
         <h2 class="zl-label app-specs__title">${t('ev.f.body')}</h2>
         <p class="app-detail__desc">${e.body}</p>
       </section>` : raw('')}
+      ${mine && e.team_size ? roster({ t, rows: parts }) : raw('')}
       <section class="app-ev-people-sec">
         <h2 class="zl-h3 zl-section__title">${t('ev.participants')} <span class="zl-caption">${t('ev.going', e.signup_count)}</span></h2>
         ${people({ locale, t, rows: parts, user, teamEvent: !!e.team_size })}

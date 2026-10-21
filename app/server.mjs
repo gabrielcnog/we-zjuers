@@ -721,8 +721,12 @@ const server = createServer(async (req, res) => {
         body: '<h1 class="zl-h2">Not found</h1>', unread, path: url.pathname }));
       /* Who is coming is for signed-in students only — the view renders a
          prompt instead of names, and the names never leave the server. */
+      /* The roster (team names plus the student IDs the captain entered for
+         their teammates) is only fetched when the organiser is the one
+         asking — they are the person who has to check people in. */
+      const isOrganiser = !!user && user.id === e.organizer_id;
       const [parts, organiser, organiserLangs] = await Promise.all([
-        user ? E.participants(e.id) : [],
+        user ? E.participants(e.id, { withRoster: isOrganiser }) : [],
         Q.getUser(e.organizer_id),
         Q.userLanguages(e.organizer_id),
       ]);

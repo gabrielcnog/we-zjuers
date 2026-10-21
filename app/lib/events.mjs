@@ -57,9 +57,14 @@ export const getEvent = (id, userId = null) => one(
     WHERE e.id = $1 AND e.deleted_at IS NULL`, userId ? [id, userId] : [id]);
 
 /* Who is coming. Open to signed-in students by design — the caller is the
-   gate, not this query. */
-export const participants = (eventId) => q(
-  `SELECT s.user_id, s.team_name, s.teammates, s.created_at,
+   gate for *that*. The teammate roster is different: it carries student IDs
+   the captain typed on someone else's behalf, and those people never agreed
+   to anything. So it is not hidden in the view, it is not selected at all
+   unless the caller says it is the organiser asking. A column that is never
+   fetched cannot be leaked by a later change to a template. */
+export const participants = (eventId, { withRoster = false } = {}) => q(
+  `SELECT s.user_id, s.team_name, s.created_at,
+          ${withRoster ? 's.teammates,' : ''}
           u.display_name, u.family_name, u.given_name, u.is_zju_verified, u.home_campus
      FROM event_signup s JOIN "user" u ON u.id = s.user_id
     WHERE s.event_id = $1

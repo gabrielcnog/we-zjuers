@@ -80,6 +80,15 @@
   .app-detail{
     grid-template-columns:1.2fr 1fr;
     grid-template-areas:"media side" "body side";
+    /* auto 1fr, not the default auto auto. The side column spans both rows,
+       so when it is taller than media + body — a sports event's team form
+       does it — the grid shares the extra height between the two rows. That
+       grew the media row from 180px to 299px while align-items:start kept
+       the plate at 180, and the difference showed up as dead space under the
+       plate: measured 151px of it, against 32 on an event with no form.
+       1fr on the second row sends all the slack there instead, below the
+       body, where nothing is looking. */
+    grid-template-rows:auto 1fr;
     column-gap:var(--zl-s-12); row-gap:var(--zl-s-8);
     align-items:start;
   }
@@ -740,7 +749,9 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 .zl-gallery__nav svg{ width:20px; height:20px; }
 .app-boards__icon svg, .app-railnav__icon svg{ width:16px; height:16px; }
 .app-verified svg{ width:12px; height:12px; vertical-align:-1px; }
-.zl-minor-action > svg{ flex:none; }
+/* Sized, not just flex:none — see the svg() helper. Without a size the icon
+   filled the button at 112px. */
+.zl-minor-action > svg{ flex:none; width:var(--zl-icon-sm); height:var(--zl-icon-sm); }
 
 /* Rows / empty / no-results */
 .zl-row--center{ justify-content:center; }
@@ -1000,6 +1011,17 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
   font-size:var(--zl-text-caption); color:var(--zl-text-muted);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
+/* The organiser's team sheet. Marked out as a private block so it does not
+   read as part of the public page it sits above. */
+.app-ev-roster{
+  display:grid; gap:var(--zl-s-2);
+  padding:var(--zl-s-4); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); background:var(--zl-bg-sunken);
+}
+.app-ev-roster__list{ list-style:none; margin:0; padding:0; display:grid; gap:var(--zl-s-3); }
+.app-ev-roster__team{ display:grid; gap:var(--zl-s-0-5); }
+.app-ev-roster__mates{ margin:var(--zl-s-1) 0 0; padding-left:var(--zl-s-5); color:var(--zl-text-muted); font-size:var(--zl-text-sm); }
+
 .app-ev-people__gate{ margin:var(--zl-s-2) 0; }
 .app-ev-people-sec{ margin-top:var(--zl-s-2); }
 
