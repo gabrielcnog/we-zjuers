@@ -96,7 +96,12 @@ const EN = {
   'com.kind.question': 'Question', 'com.kind.discussion': 'Discussion', 'com.kind.tip': 'Tip', 'com.kind.event': 'Event',
   'com.count': (n) => `<b>${n}</b> post${n === 1 ? '' : 's'}`,
   'com.comments': (n) => `${n} comment${n === 1 ? '' : 's'}`,
-  'com.upvote': 'Upvote', 'com.reply': 'Reply', 'com.op': 'OP', 'com.deleted': '[deleted]',
+  /* "OP" is forum shorthand for "original poster". It reads as obvious to
+     anyone raised on Reddit and as noise to everyone else, which on a campus
+     where most readers are working in a second language is most of them.
+     "Author" needs no decoding. The Chinese keeps 楼主, which is the ordinary
+     word for it there rather than jargon. */
+  'com.upvote': 'Upvote', 'com.reply': 'Reply', 'com.op': 'Author', 'com.deleted': '[deleted]',
   'com.comment.label': 'Add a comment', 'com.comment.submit': 'Comment', 'com.reply.submit': 'Reply',
   'com.cancel': 'Cancel',
   'com.signin.to': 'Sign in to comment and upvote',
