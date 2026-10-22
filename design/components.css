@@ -624,6 +624,15 @@
   border-color:var(--zl-border); background-position:calc(100% - 20px) 52%, calc(100% - 15px) 52%;
 }
 .zl-select--pill:hover{ border-color:var(--zl-border-strong); }
+/* The pill shape exists to pair this control with the filter chips directly
+   above it. Above 900px those chips are display:none — the left rail replaces
+   them on the marketplace, and search never had them — so the pill was
+   matching a row that is not on screen, leaving one chip-shaped control above a
+   grid of 8px-cornered cards and reading as the heaviest thing on the page.
+   Below the breakpoint the chips are there and the pairing still holds. */
+@media (min-width:900px){
+  .zl-select--pill{ border-radius:var(--zl-radius); }
+}
 
 /* ---------- Chips ----------
    Category and campus filters. The most-tapped things on the
@@ -1003,10 +1012,18 @@
    while the page header above it had 24. Now 24 below as well: the same
    measure as the gap between the header and this bar, and as the gap between
    the rows of the feed itself. */
+/* A rule along the bottom, full width of the grid. The count sits at one end
+   and the sort at the other, and on a wide screen they are far apart — 463px
+   at 1024 and growing with the window — so with nothing between them they
+   stopped reading as one strip and became two objects adrift above the feed.
+   A shared edge gives them one line to belong to at any width, and binds the
+   strip to the grid it describes rather than to the header above it. */
 .zl-resultbar{
   display:flex; align-items:center; justify-content:space-between;
   gap:var(--zl-space-3); flex-wrap:wrap;
-  padding:var(--zl-s-2) 0 var(--zl-s-6);
+  padding:0 0 var(--zl-s-3);
+  border-bottom:1px solid var(--zl-border);
+  margin-bottom:var(--zl-s-5);
 }
 .zl-resultbar__count{ font-size:var(--zl-text-sm); color:var(--zl-text-muted); }
 .zl-resultbar__count b{ color:var(--zl-text); font-weight:var(--zl-weight-semi); }
