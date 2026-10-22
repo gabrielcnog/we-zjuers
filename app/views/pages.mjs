@@ -283,7 +283,7 @@ export function listing({ locale, t, l, images, seller, langs, favorited, user, 
              the way Kleinanzeigen marks the same two. */ raw('')}
         <div class="zl-row">
           <span class="zl-badge zl-badge--campus">${campusName(l.campus, locale)}</span>
-          ${l.condition ? h`<span class="zl-badge zl-badge--neutral">${t('cond.' + l.condition)}</span>` : raw('')}
+          ${l.condition ? h`<span class="zl-badge zl-badge--neutral">${t('condb.' + l.condition)}</span>` : raw('')}
         </div>
         <p class="zl-caption app-detail__signals">
           <span class="app-detail__fact">${ICON.calendar}<span>${ago(l.published_at, t)}</span></span>

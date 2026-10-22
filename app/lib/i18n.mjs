@@ -40,6 +40,15 @@ const EN = {
   'nores.browse': 'Browse everything', 'nores.notify': 'Tell me when one is posted',
   'nores.fallback': 'Recently posted', 'nores.relaxedhead': 'Close matches',
   'cond.new': 'New', 'cond.like_new': 'Like new', 'cond.good': 'Good', 'cond.fair': 'Fair', 'cond.parts': 'For parts',
+  /* The listing page shows the condition as a loose badge beside the campus,
+     with no "Condition" label anywhere near it — so "Good" was good what?
+     These are the same five values written to stand on their own. Everywhere
+     else (the filter group, the spec row, the posting form) a label already
+     says "Condition", and "Condition: Good condition" would be worse than
+     what we started with. "New", "Like new" and "For parts" already read as
+     condition unaided, and "For parts condition" is not English. */
+  'condb.new': 'New', 'condb.like_new': 'Like new', 'condb.good': 'Good condition',
+  'condb.fair': 'Fair condition', 'condb.parts': 'For parts',
   'price.free': 'Free', 'price.negotiable': 'Negotiable',
   'listing.by': 'Listed by', 'listing.contact': 'Message seller', 'listing.save': 'Save',
   'listing.saved': 'Saved', 'listing.report': 'Report', 'listing.meetup': 'Meet-up',
@@ -239,6 +248,10 @@ const ZH = {
   'nores.browse': '浏览全部', 'nores.notify': '有新发布时通知我',
   'nores.fallback': '最新发布', 'nores.relaxedhead': '相近的结果',
   'cond.new': '全新', 'cond.like_new': '几乎全新', 'cond.good': '良好', 'cond.fair': '一般', 'cond.parts': '配件',
+  /* 成色 is the word for the condition of a second-hand item: 良好 and 一般
+     alone mean "good" and "average" of nothing in particular. */
+  'condb.new': '全新', 'condb.like_new': '几乎全新', 'condb.good': '成色良好',
+  'condb.fair': '成色一般', 'condb.parts': '仅供配件',
   'price.free': '免费赠送', 'price.negotiable': '面议',
   'listing.by': '发布者', 'listing.contact': '联系卖家', 'listing.save': '收藏',
   'listing.saved': '已收藏', 'listing.report': '举报', 'listing.meetup': '交易地点',
