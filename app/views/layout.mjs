@@ -351,7 +351,7 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
 <div class="zl-disclaimer">${t('disclaimer')}</div>
 <header class="zl-header">
   <div class="zl-header__inner">
-    <a class="zl-wordmark" href="${L(locale, '/community')}">${wordmark}</a>
+    <a class="zl-wordmark" href="${L(locale, '/community')}"><span class="zl-wordmark__name">${wordmark}</span><span class="zl-wordmark__beta">${esc(t('brand.beta'))}</span></a>
     <form class="zl-campus" method="get" action="${L(locale, '/campus')}">
       <input type="hidden" name="next" value="${esc(path + (search || ''))}">
       <span class="zl-campus__pin">${unwrap(ICON.pin)}</span>

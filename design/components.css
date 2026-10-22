@@ -165,6 +165,11 @@
    4.16:1, so it is not used here. The mark inherits this colour too. */
 .zl-ui .zl-header .zl-wordmark,
 .zl-ui .zl-header .zl-wordmark:hover{ color:var(--zl-on-brand); }
+/* Inverted against the header: white chip, navy letters. Same pair as the
+   wordmark itself, so the two always agree whatever the surface. */
+.zl-ui .zl-header .zl-wordmark__beta{
+  background:var(--zl-on-brand); color:var(--zl-brand-surface);
+}
 /* Inverted primary: a red fill on this blue measures 1.48:1 and would sink
    into the bar, so the header's one action is white-on-blue instead — which
    also returns red to meaning exactly one thing again. */
@@ -185,8 +190,25 @@
 /* Scoped under .zl-ui for the same reason as the hover below: the wordmark is
    an <a>, and the global `.zl-ui a` (0,1,1) outranks a bare `.zl-wordmark`. */
 .zl-ui .zl-wordmark{
+  display:inline-flex; align-items:flex-start; gap:var(--zl-s-1);
   font-weight:var(--zl-weight-black); font-size:19px; letter-spacing:-.035em;
   color:var(--zl-text); text-decoration:none; white-space:nowrap;
+}
+/* The name keeps the mark's tight tracking; the tag must not inherit it or
+   four uppercase letters at 10px close up into a smudge. */
+.zl-wordmark__name{ letter-spacing:inherit; }
+/* BETA tag. Sized in em so it tracks the wordmark through the 420px step
+   down, and aligned to the cap line rather than the baseline — it should
+   read as a superscript on the name, the way a trademark does, not as a
+   second word standing beside it. Says what the thing is: an MVP a student
+   is showing to a university, where quietly claiming to be finished is the
+   wrong kind of confident. */
+.zl-ui .zl-wordmark__beta{
+  align-self:flex-start; margin-top:.1em;
+  padding:.18em .5em; border-radius:var(--zl-radius-pill);
+  font-size:.53em; font-weight:var(--zl-weight-bold);
+  letter-spacing:.08em; text-transform:uppercase; line-height:1.35;
+  background:var(--zl-text); color:var(--zl-bg);
 }
 /* No optical reduction on ZJU. It was right for the spaced form, where the
    acronym read as a word of its own towering over the lowercase — but set

@@ -668,7 +668,11 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
   .zl-ui .app-nav__link{ font-size:var(--zl-text-caption); padding:0 var(--zl-s-2); }
 }
 @media (max-width:420px){
-  .zl-wordmark{ font-size:var(--zl-text-title); }
+  /* .zl-ui-scoped to match the rule it is overriding: the base wordmark is
+     .zl-ui .zl-wordmark (0,2,0), so this bare .zl-wordmark (0,1,0) never
+     applied and the mark stayed 19px on a phone. The BETA tag is sized in em,
+     so it steps down with it. */
+  .zl-ui .zl-wordmark{ font-size:var(--zl-text-title); }
   .zl-campus__value{ max-width:11ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
 
