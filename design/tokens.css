@@ -132,6 +132,10 @@
      So any tinted surface (alerts, the accent hero) gets this one instead:
      5.24:1 blue · 5.44 green · 5.46 amber · 5.31 red. Same hue, one step down. */
   --zl-link-on-tint:  #0B5FBF;
+  /* The asking price carries the official blue rather than --zl-link: it is
+     the brand's colour, not a clickable one, and a price that reads as a link
+     invites a click there is nothing behind. 10.16:1 on bg. */
+  --zl-price-ink:     var(--zl-blue-800);
   --zl-focus:         var(--zl-blue-500);    /*  5.20:1 — ring */
   --zl-ring:          0 0 0 3px rgba(10,107,209,.35);
   --zl-ring-on-brand: 0 0 0 3px rgb(255 255 255 / .45);   /* focus on the blue header */
@@ -186,6 +190,10 @@
   --zl-text-h2:      clamp(24px, 3.2vw, 30px);   --zl-lh-h2: 1.27;
   --zl-text-h3:      clamp(19px, 2.2vw, 22px);   --zl-lh-h3: 1.36;
   --zl-text-body-lg: 18px;                       --zl-lh-body-lg: 1.6;
+  /* The asking price on a listing page. Its own step because it is neither a
+     heading nor body: it has to lose to the title and beat everything else,
+     and at --zl-text-body-lg it was losing to the lede as well. */
+  --zl-text-price:   clamp(22px, 2.6vw, 26px);   --zl-lh-price: 1.2;
   --zl-text-title:   17px;                       /* card and post titles */
   --zl-text-body:    16px;                       --zl-lh-body: 1.625;  /* 16/26 */
   --zl-text-sm:      14px;                       --zl-lh-sm: 1.5;
@@ -319,6 +327,7 @@
   /* Dark tints are deep enough that the normal link already clears AA on all
      four (6.45:1 green, the lowest), so there is nothing to correct here. */
   --zl-link-on-tint:  var(--zl-blue-300);
+  --zl-price-ink:     var(--zl-blue-300);
   --zl-focus:         var(--zl-blue-300);
   --zl-ring:          0 0 0 3px rgba(111,168,245,.40);
 

@@ -314,6 +314,12 @@ DO $$ BEGIN
   ALTER TABLE report ADD CONSTRAINT report_target_type_check
     CHECK (target_type IN ('listing','user','message','post','comment','event'));
 END $$;
+
+/* The price a listing carried before its owner last lowered it. One column,
+   not a price history: the only question a buyer asks is "has this come
+   down?", and the listing page answers it by striking the old figure. NULL
+   means the price has never been reduced. */
+ALTER TABLE listing ADD COLUMN IF NOT EXISTS previous_price_cents INTEGER;
 `;
 
 /* ---------- Events ----------

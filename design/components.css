@@ -912,6 +912,22 @@
   color:var(--zl-text); letter-spacing:-.01em;
 }
 .zl-price--negotiable{ font-size:var(--zl-text-body); color:var(--zl-text-muted); font-family:var(--zl-font-sans); }
+/* The listing page's price. Bold rather than semi, and on its own step of the
+   scale, so it reads as the second fact on the page after the title. */
+.zl-price--lead{
+  font-size:var(--zl-text-price); line-height:var(--zl-lh-price);
+  font-weight:var(--zl-weight-bold); color:var(--zl-price-ink);
+}
+.zl-price--negotiable.zl-price--lead{ font-size:var(--zl-text-h3); }
+.zl-price--free.zl-price--lead{ font-size:var(--zl-text-body-lg); }
+/* The price before it came down. Muted and struck: it is context for the
+   number beside it, never a figure to read on its own. Tabular so the two
+   line up digit for digit. */
+.zl-price__was{
+  font-family:var(--zl-font-mono); font-variant-numeric:tabular-nums;
+  font-size:var(--zl-text-body); font-weight:var(--zl-weight-regular);
+  color:var(--zl-text-subtle); text-decoration-thickness:1px;
+}
 /* Free is a status, not a price of zero — it gets the success
    token, which is exactly the reserved-meaning case: an item
    that costs nothing is good news, and it is labelled in words. */

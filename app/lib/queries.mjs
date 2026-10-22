@@ -299,6 +299,24 @@ export const setStatus = (id, userId, status) => run(
 export const renewListing = (id, userId) => run(
   `UPDATE listing SET status='active', expires_at = $1, bumped_at = $2, updated_at = $2
      WHERE id = $3 AND user_id = $4`, [daysFromNow(30), now(), id, userId]);
+/* Change the asking price. Scoped by user_id in the query like every other
+   owner action. Two rules live in the SQL rather than the caller:
+     - price_type='fixed', because a struck-out figure beside "Negotiable"
+       says nothing, and the owner typing a number is stating one.
+     - previous_price_cents only remembers a REDUCTION. Going up clears it:
+       keeping the old lower figure struck out beside a higher one would read
+       as a discount that is not being offered. A buyer reads a struck price
+       as "this came down", so it has to only ever mean that.
+   NULLIF guards the no-op save, where nothing should be recorded as a cut. */
+export const changePrice = (id, userId, cents) => run(
+  `UPDATE listing
+      SET previous_price_cents = CASE WHEN $1 < price_cents THEN price_cents ELSE NULL END,
+          price_cents = $1,
+          price_type  = 'fixed',
+          updated_at  = $2
+    WHERE id = $3 AND user_id = $4 AND price_cents IS DISTINCT FROM $1`,
+  [cents, now(), id, userId]);
+
 export const softDelete = (id, userId) => run(
   `UPDATE listing SET deleted_at = $1, status='removed', updated_at = $1 WHERE id = $2 AND user_id = $3`,
   [now(), id, userId]);

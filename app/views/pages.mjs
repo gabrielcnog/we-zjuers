@@ -261,17 +261,33 @@ export function listing({ locale, t, l, images, seller, langs, favorited, user, 
       <header class="app-detail__head">
         ${l.status !== 'active' ? h`<span class="zl-badge zl-badge--sold">${t('listing.' + (l.status === 'sold' ? 'sold' : 'expired'))}</span>` : raw('')}
         <h1 class="zl-h2">${l.title}</h1>
-        <p class="app-detail__price">${priceTag(l, t)}</p>
+        ${/* The price is the second thing a buyer looks for after the title,
+             and it was set at 18px — smaller than the lede under it. --lead
+             gives it the weight that ranking deserves. The old figure sits
+             beside it, struck, only when the seller actually lowered the
+             price: a reduction is news a buyer wants, and the query makes
+             sure it can never mean anything else. */ raw('')}
+        <p class="app-detail__price">
+          ${priceTag(l, t, { lead: true })}
+          ${l.previous_price_cents && l.price_type === 'fixed'
+            ? h`<s class="zl-price__was">${money(l.previous_price_cents)}</s>
+                <span class="zl-sr-only">${t('listing.wasprice', money(l.previous_price_cents))}</span>`
+            : raw('')}
+        </p>
+        ${/* Two rows, not one. The first says what the thing is — where it is
+             and what state it is in — and those are the two facts a buyer
+             filters on. The date was sitting in with them as a bare caption,
+             a different kind of fact wearing the same clothes. It moves down
+             to the second row, with the counts, where everything is a number
+             about the advert rather than about the item. Each gets an icon,
+             the way Kleinanzeigen marks the same two. */ raw('')}
         <div class="zl-row">
           <span class="zl-badge zl-badge--campus">${campusName(l.campus, locale)}</span>
           ${l.condition ? h`<span class="zl-badge zl-badge--neutral">${t('cond.' + l.condition)}</span>` : raw('')}
-          <span class="zl-caption">${ago(l.published_at, t)}</span>
         </div>
-        ${/* One caption line for the counts. Views used to be a row in the spec
-             table, where nobody reads it; next to the save count it is the
-             page's only evidence that other people are looking. */ raw('')}
         <p class="zl-caption app-detail__signals">
-          <span>${t('listing.views', l.view_count)}</span>
+          <span class="app-detail__fact">${ICON.calendar}<span>${ago(l.published_at, t)}</span></span>
+          <span class="app-detail__fact">${ICON.eye}<span>${t('listing.views', l.view_count)}</span></span>
           ${saveCount > 1 ? h`<span>${t('listing.saves', saveCount)}</span>` : raw('')}
           ${daysLeft != null ? h`<span>${t('listing.expires', daysLeft)}</span>` : raw('')}
         </p>
@@ -452,6 +468,21 @@ export function my({ locale, t, tab, rows, counts }) {
         <div class="zl-caption">${campusName(l.campus, locale)} · ${ago(l.bumped_at, t)}</div>
       </div>
       <div>${priceTag(l, t)}</div>
+      ${/* Changing the price is its own form: it carries a field, and putting
+           an input inside the sold/renew/delete form would submit the number
+           with whichever of those buttons was pressed. Active listings only —
+           there is no asking price to revise on something already sold. */
+        tab === 'active' ? h`<form method="post" action="${L(locale, '/listing/' + l.id + '/action')}" class="app-mylist__price">
+          <input type="hidden" name="op" value="price">
+          <label class="zl-sr-only" for="price-${l.id}">${t('my.newprice')}</label>
+          <div class="zl-price-input">
+            <span class="prefix">¥</span>
+            <input class="zl-input zl-input--sm" id="price-${l.id}" name="price" type="text" inputmode="numeric"
+                   value="${l.price_type === 'fixed' ? Math.round(l.price_cents / 100) : ''}"
+                   placeholder="${t('my.newprice')}" maxlength="7">
+          </div>
+          <button class="zl-btn zl-btn--tertiary zl-btn--sm" type="submit"><span>${t('my.setprice')}</span></button>
+        </form>` : raw('')}
       <form method="post" action="${L(locale, '/listing/' + l.id + '/action')}" class="app-mylist__actions">
         ${tab === 'active' ? h`<button class="zl-btn zl-btn--tertiary zl-btn--sm" type="submit" name="op" value="sold"><span>${t('my.marksold')}</span></button>` : raw('')}
         ${tab !== 'active' ? h`<button class="zl-btn zl-btn--tertiary zl-btn--sm" type="submit" name="op" value="renew"><span>${t('my.renew')}</span></button>` : raw('')}

@@ -134,7 +134,19 @@
 .zl-seller--compact .zl-seller__label{ margin:0; }
 .zl-seller--compact .zl-seller__langs{ margin-top:0; }
 .app-detail__media{ min-width:0; }
-.app-detail__price{ font-size:var(--zl-text-h3); margin-top:var(--zl-space-2); }
+/* The row carries the price and, when there is one, the old price struck out
+   beside it. Baseline alignment so the small figure sits on the big one's
+   line rather than floating at its cap. */
+.app-detail__price{
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:var(--zl-s-2);
+  margin-top:var(--zl-space-2);
+}
+/* A fact and its icon travel together: inline-flex so the pair never breaks
+   across a line, and the icon sized here rather than in the sprite, which is
+   how every other icon in this system gets its size. */
+.app-detail__fact{ display:inline-flex; align-items:center; gap:var(--zl-s-1); }
+.app-detail__fact svg{ width:14px; height:14px; flex:none; opacity:.75; }
+
 .app-detail__desc{ white-space:pre-wrap; color:var(--zl-text-muted); line-height:var(--zl-lh-body); }
 .zl-breadcrumbish{ margin-bottom:var(--zl-space-3); }
 
@@ -172,6 +184,12 @@
 }
 .app-mylist__thumb img{ border-radius:var(--zl-radius-sm); object-fit:cover; display:block; }
 .app-mylist__thumb{ flex:none; }
+/* The price field and its button on one line, sized to the number rather
+   than stretching: a four-digit price does not need half the row. */
+.app-mylist__price{ display:flex; align-items:center; gap:var(--zl-s-2); }
+.app-mylist__price .zl-price-input{ width:11ch; }
+.app-mylist__price .zl-input{ width:100%; }
+
 .app-mylist__actions{ display:flex; gap:var(--zl-space-2); margin-left:auto; }
 
 /* Inbox + thread */

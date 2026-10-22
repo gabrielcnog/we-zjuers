@@ -337,12 +337,27 @@ const server = createServer(async (req, res) => {
     /* ---- POST /listing/:id/action — owner only ---- */
     if (req.method === 'POST' && rest[0] === 'listing' && rest[2] === 'action') {
       if (!requireUser()) return;
-      const { op } = parseForm(await readBody(req));
+      const form = parseForm(await readBody(req));
+      const { op } = form;
       const id = rest[1];
       // Every one of these is scoped by user_id IN THE QUERY (infrastructure.md 4.1)
       if (op === 'sold') await Q.setStatus(id, user.id, 'sold');
       else if (op === 'renew') await Q.renewListing(id, user.id);
       else if (op === 'delete') await Q.softDelete(id, user.id);
+      else if (op === 'price') {
+        /* Yuan in, cents stored. Validated, not sanitised: stripping the
+           characters it does not like turned "-50" into a ¥50 listing, which
+           is not what anyone typing a minus sign meant. Anything that is not
+           plainly a positive amount is dropped and the price stands. */
+        /* Whole yuan, like the posting form, which is numeric with an "80"
+           placeholder. Allowing decimals here alone produced "¥79.5" — one
+           listing formatted unlike every other on the site. */
+        const raw$ = String(form.price ?? '').trim();
+        const n = /^\d{1,7}$/.test(raw$) ? Number(raw$) : NaN;
+        if (Number.isFinite(n) && n > 0 && n <= 1e6) {
+          await Q.changePrice(id, user.id, Math.round(n * 100));
+        }
+      }
       return redirect(res, L(locale, '/my'));
     }
 

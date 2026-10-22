@@ -49,6 +49,11 @@ export const ICON = {
     <circle cx="9.2" cy="6" r="1.15" fill="currentColor"/>
     <path d="M6 11.4l3.1-3a1 1 0 0 1 1.4 0l3.4 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`),
+  /* Kleinanzeigen puts a calendar beside the posting date and an eye beside
+     the view count; both read faster than the words did. Same 24-grid and
+     stroke weight as the rest of the set. */
+  calendar: svg('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  eye: svg('<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/>'),
   flag: raw(`<svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true">
     <path d="M6 21V4.5m0 0 5.2 1.8a4 4 0 0 0 2.9-.1l4-1.7v9l-4 1.7a4 4 0 0 1-2.9.1L6 13.5"
       stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
@@ -132,12 +137,16 @@ export const verifiedBadge = (t) =>
    browser on last week's stylesheet. */
 export const ASSET_V = process.env.ASSET_V || String(Date.now());
 
-export function priceTag(l, t) {
+/* `lead` is the listing page's own size: the price there is the second thing
+   read after the title and had been rendering smaller than the lede beneath
+   it. Everywhere else — cards, rows, linked items — keeps the default. */
+export function priceTag(l, t, { lead = false } = {}) {
+  const big = lead ? ' zl-price--lead' : '';
   if (l.price_type === 'free')
-    return h`<span class="zl-price zl-price--free">${t('price.free')}</span>`;
+    return h`<span class="zl-price zl-price--free${raw(big)}">${t('price.free')}</span>`;
   if (l.price_type === 'negotiable')
-    return h`<span class="zl-price zl-price--negotiable">${t('price.negotiable')}</span>`;
-  return h`<span class="zl-price">${money(l.price_cents)}</span>`;
+    return h`<span class="zl-price zl-price--negotiable${raw(big)}">${t('price.negotiable')}</span>`;
+  return h`<span class="zl-price${raw(big)}">${money(l.price_cents)}</span>`;
 }
 export const campusName = (code, locale) => {
   const c = ref().campuses.find((x) => x.code === code);
