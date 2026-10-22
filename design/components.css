@@ -205,9 +205,9 @@
    wrong kind of confident. */
 .zl-ui .zl-wordmark__beta{
   align-self:flex-start; margin-top:.1em;
-  padding:.18em .5em; border-radius:var(--zl-radius-pill);
-  font-size:.53em; font-weight:var(--zl-weight-bold);
-  letter-spacing:.08em; text-transform:uppercase; line-height:1.35;
+  padding:.2em .5em; border-radius:var(--zl-radius-pill);
+  font-size:.46em; font-weight:var(--zl-weight-bold);
+  letter-spacing:.07em; text-transform:uppercase; line-height:1.3;
   background:var(--zl-text); color:var(--zl-bg);
 }
 /* No optical reduction on ZJU. It was right for the spaced form, where the
