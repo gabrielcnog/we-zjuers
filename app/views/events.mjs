@@ -167,8 +167,13 @@ export function eventList({ locale, t, rows, sel, counts, canPost }) {
         <div class="zl-chipscroll js-chipscroll">
           <div class="zl-chiprow js-chiptrack" role="group" aria-label="${t('ev.f.cat')}">
             ${chip(t('ev.cat.all'), !sel.category, qs({ category: '' }))}
-            ${CATEGORIES.map((c) => chip(h`${CAT_ICON[c]} ${t('ev.cat.' + c)}${counts[c] ? h` <span class="zl-chip__n">${counts[c]}</span>` : raw('')}`,
-              sel.category === c, qs({ category: c })))}
+            ${/* Icon and name only, no count. The marketplace's chip row sets the
+                 pattern: counts belong to the rail, where they sit in a column
+                 and line up to be read down. In a horizontal row each count
+                 widens its own chip and pushes the next one further off the
+                 edge, which costs more than the number is worth on a phone. */
+              CATEGORIES.map((c) => chip(h`${CAT_ICON[c]} ${t('ev.cat.' + c)}`,
+                sel.category === c, qs({ category: c })))}
           </div>
           ${scrollNav(t)}
         </div>

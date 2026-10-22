@@ -858,7 +858,15 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 /* Declared before the breakpoint, not after it: an unlayered rule later in
    the file beats a media query earlier in it, and this pair is exactly how
    the chips stayed on screen next to the rail the first time. */
-.app-ev__chips{ display:grid; gap:var(--zl-s-2); margin-bottom:var(--zl-s-5); }
+/* minmax(0,1fr), not the implicit auto column. A grid item defaults to
+   min-width:auto, so the column grew to the widest chip row — 1173px inside a
+   343px box. The rows then never clipped, .zl-chiprow's overflow-x:auto had
+   nothing to scroll, and the "more" arrow stayed hidden because the script
+   correctly measured no overflow. The marketplace's wrapper is a plain block,
+   which is why it never had the problem. The grid is here only for the gap
+   between the two rows (When and Category), so it keeps the gap and gives up
+   the content-sized column. */
+.app-ev__chips{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-s-2); margin-bottom:var(--zl-s-5); }
 @media (min-width:900px){
   .app-ev{ grid-template-columns:210px minmax(0,1fr); }
   .app-ev__aside{
