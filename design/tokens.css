@@ -136,6 +136,15 @@
      the brand's colour, not a clickable one, and a price that reads as a link
      invites a click there is nothing behind. 10.16:1 on bg. */
   --zl-price-ink:     var(--zl-blue-800);
+  /* WeChat's brand green, darkened until white passes AA on it. The brand's
+     own #07C160 carries white at 2.38:1 and the first darkening I tried,
+     #06A552, only reached 3.22 — fine for a large label, not for a button
+     whose text can wrap small. #047A3C measures 5.45:1 and still reads as
+     WeChat green. Not --zl-success: that token means "this went well", and a
+     contact button is not a success state. */
+  --zl-wechat:        #047A3C;
+  --zl-wechat-hover:  #036030;
+  --zl-on-wechat:     var(--zl-white);
   --zl-focus:         var(--zl-blue-500);    /*  5.20:1 — ring */
   --zl-ring:          0 0 0 3px rgba(10,107,209,.35);
   --zl-ring-on-brand: 0 0 0 3px rgb(255 255 255 / .45);   /* focus on the blue header */
@@ -328,6 +337,10 @@
      four (6.45:1 green, the lowest), so there is nothing to correct here. */
   --zl-link-on-tint:  var(--zl-blue-300);
   --zl-price-ink:     var(--zl-blue-300);
+  --zl-wechat:        #07C160;   /* on a dark page the undarkened brand green
+                                    carries black text at 8.9:1 */
+  --zl-wechat-hover:  #27D178;
+  --zl-on-wechat:     #06230F;
   --zl-focus:         var(--zl-blue-300);
   --zl-ring:          0 0 0 3px rgba(111,168,245,.40);
 

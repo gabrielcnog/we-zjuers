@@ -246,7 +246,7 @@ function noResults({ locale, t, params, relaxed }) {
    the reason is measurable: with description and specs in the rail, "Message
    seller" started 824px down a 768px-tall screen, and the seller, Save, Share
    and Report were all below the fold. */
-export function listing({ locale, t, l, images, seller, langs, favorited, user, sellerOther, reported, saveCount = 0 }) {
+export function listing({ locale, t, l, images, seller, langs, favorited, user, sellerOther, reported, saveCount = 0, wechat = null }) {
   const isOwn = user && user.id === l.user_id;
   /* Scarcity is real here rather than manufactured: listings expire after 30
      days, so the countdown only appears in the last week. */
@@ -302,6 +302,22 @@ export function listing({ locale, t, l, images, seller, langs, favorited, user, 
           : h`<form class="js-fab-yield" method="post" action="${L(locale, '/listing/' + l.id + '/contact')}">
                 <button class="zl-btn zl-btn--primary zl-btn--lg zl-btn--block" type="submit"${l.status !== 'active' ? raw(' disabled') : raw('')}><span>${t('listing.contact')}</span></button>
               </form>
+              ${/* Second, never first: the in-app thread is the one that leaves
+                   a record if something goes wrong, so it keeps the primary
+                   button. This is the seller's stated preference, offered
+                   alongside. Once revealed the button is replaced by the
+                   handle — there is nothing left to press. */ raw('')}
+              ${l.wechat_ok && l.seller_wechat && l.status === 'active'
+                ? wechat
+                  ? h`<div class="app-wechat-out">
+                        <span class="app-wechat-out__mark" aria-hidden="true">${ICON.wechat}</span>
+                        <span class="zl-caption">${t('listing.wechat.is')}</span>
+                        <b class="app-wechat-out__id">${wechat}</b>
+                      </div>`
+                  : h`<form method="post" action="${L(locale, '/listing/' + l.id + '/wechat')}">
+                        <button class="zl-btn zl-btn--wechat zl-btn--lg zl-btn--block" type="submit">${ICON.wechat}<span>${t('listing.wechat')}</span></button>
+                      </form>`
+                : raw('')}
               <div class="app-detail__minor">
                 <button class="zl-btn zl-btn--secondary zl-grow js-fav" type="button" data-id="${l.id}"
                   aria-pressed="${favorited ? 'true' : 'false'}"
@@ -580,7 +596,7 @@ export function signin({ t, locale, step, email, devCode, error, next }) {
 }
 
 /* ---------- Post ---------- */
-export function post({ t, locale, error }) {
+export function post({ t, locale, error, wechatId = null }) {
   const { categories, campuses } = ref();
   return h`<div class="zl-narrow">
     ${pageHeader({ title: t('post.title'), description: t('post.lede') })}
@@ -626,6 +642,22 @@ export function post({ t, locale, error }) {
       <div class="zl-field">
         <label class="zl-field__label" for="description">${t('post.f.desc')}</label>
         <textarea class="zl-textarea" id="description" name="description" maxlength="2000"></textarea>
+      </div>
+      ${/* Optional, and off unless ticked. The hint says exactly who ends up
+           seeing the handle, because "contact me on WeChat" and "publish my
+           WeChat to the internet" are different offers and a seller should
+           not have to guess which one they are making. */ raw('')}
+      <div class="zl-field">
+        <label class="zl-field__label" for="wechat">${t('post.f.wechat')}</label>
+        <input class="zl-input" id="wechat" name="wechat" maxlength="20"
+               autocomplete="off" spellcheck="false"
+               placeholder="${t('post.f.wechat.ph')}" value="${wechatId || ''}"
+               aria-describedby="wechatHint">
+        <p class="zl-field__hint" id="wechatHint">${t('post.f.wechat.hint')}</p>
+        <label class="zl-check">
+          <input type="checkbox" name="wechat_ok" value="1"${wechatId ? raw(' checked') : raw('')}>
+          <span>${t('post.f.wechat.ok')}</span>
+        </label>
       </div>
       <div class="zl-form__actions"><button class="zl-btn zl-btn--primary" type="submit"><span>${t('post.submit')}</span></button></div>
     </form>

@@ -322,6 +322,35 @@ const server = createServer(async (req, res) => {
       return redirect(res, L(locale, '/messages/' + c.id));
     }
 
+    /* ---- POST /listing/:id/wechat — reveal the seller's handle ----
+       A POST, and the handle is never in the page until one is made. The
+       guidelines promise no contact details in public posts, and a WeChat ID
+       is the same kind of thing as a phone number: published on an open page
+       it is scrapeable by anyone, signed in or not. Requiring the press means
+       the reader is a signed-in student and the seller offered it on this
+       listing. Rate limited, because a determined account could otherwise
+       walk the catalogue and harvest every handle on the site. */
+    if (req.method === 'POST' && rest[0] === 'listing' && rest[2] === 'wechat') {
+      if (!requireUser(L(locale, '/listing/' + rest[1]))) return;
+      const l = await Q.getListing(rest[1]);
+      if (!l) return send(res, 404, 'Not found');
+      if (!l.wechat_ok || !l.seller_wechat) return redirect(res, L(locale, '/listing/' + l.id));
+      if (!A.rateLimit('wechat:' + user.id, 30, 864e5)) return send(res, 429, 'Slow down');
+      /* Rendered from the POST, not redirected to ?wechat=1. A query flag
+         would have been a GET that reveals, which any signed-in account could
+         walk across the catalogue without ever touching the rate limit above
+         — the exact harvesting this is meant to cost something. */
+      await Q.bumpView(l.id);
+      return render(l.title, V.listing({
+        locale, t, l, images: await Q.listingImages(l.id),
+        seller: await Q.getUser(l.user_id), langs: await Q.userLanguages(l.user_id),
+        favorited: await Q.isFavorited(user.id, l.id), user,
+        sellerOther: (await Q.userListings(l.user_id)).filter((x) => x.id !== l.id).slice(0, 4),
+        saveCount: await Q.favoriteCount(l.id),
+        wechat: l.seller_wechat,
+      }));
+    }
+
     /* ---- POST /listing/:id/report ---- */
     if (req.method === 'POST' && rest[0] === 'listing' && rest[2] === 'report') {
       if (!requireUser(L(locale, '/listing/' + rest[1]))) return;
@@ -463,9 +492,9 @@ const server = createServer(async (req, res) => {
     /* ---- Post an item ---- */
     if (rest[0] === 'post') {
       if (!requireUser()) return;
-      if (req.method === 'GET') return render(t('post.title'), V.post({ t, locale }));
+      if (req.method === 'GET') return render(t('post.title'), V.post({ t, locale, wechatId: user.wechat_id }));
       const f = parseForm(await readBody(req));
-      const err = (m) => render(t('post.title'), V.post({ t, locale, error: m }));
+      const err = (m) => render(t('post.title'), V.post({ t, locale, error: m, wechatId: user.wechat_id }));
       const title = (f.title || '').trim();
       if (!title) return err('A title is required.');
       if (title.length > 80) return err(`Title is ${title.length} characters — the maximum is 80.`);
@@ -484,12 +513,21 @@ const server = createServer(async (req, res) => {
       const price_type = free ? 'free' : priceN == null ? 'negotiable' : 'fixed';
       if (price_type === 'fixed' && priceN < 0) return err('Price cannot be negative.');
 
+      /* The handle is validated against WeChat's own shape, so the field
+         cannot be used to publish a phone number or an email instead. It is
+         saved on the account; the tick records that this listing offers it. */
+      const wechatIn = (f.wechat || '').trim();
+      if (wechatIn && !Q.WECHAT_RE.test(wechatIn)) return err(t('post.f.wechat.bad'));
+      if (wechatIn) await Q.setWechatId(user.id, wechatIn);
+      const wechatOk = f.wechat_ok === '1' && !!(wechatIn || user.wechat_id);
+
       const id = await Q.createListing({
         user_id: user.id, category_id: cat.id, title,
         description: (f.description || '').slice(0, 2000),
         price_type, price_cents: price_type === 'fixed' ? Math.round(priceN * 100) : null,
         condition: ['new','like_new','good','fair','parts'].includes(f.condition) ? f.condition : 'good',
         campus: f.campus, meetup_note: (f.meetup || '').slice(0, 200) || null,
+        wechat_ok: wechatOk,
       });
       for (const [i, dataUri] of images.entries()) {
         // Only ever accept an image data URI, and store the decoded payload.

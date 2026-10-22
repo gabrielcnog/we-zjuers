@@ -279,11 +279,11 @@ export async function createListing(d) {
   const id = uid(), ts = now();
   await run(`INSERT INTO listing
     (id,user_id,category_id,title,description,price_type,price_cents,condition,campus,meetup_note,
-     status,published_at,expires_at,bumped_at,created_at,updated_at)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'active',$11,$12,$13,$14,$15)`,
+     wechat_ok,status,published_at,expires_at,bumped_at,created_at,updated_at)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'active',$12,$13,$14,$15,$16)`,
     [id, d.user_id, d.category_id, d.title, d.description || '', d.price_type,
      d.price_cents ?? null, d.condition, d.campus, d.meetup_note || null,
-     ts, daysFromNow(30), ts, ts, ts]);
+     !!d.wechat_ok, ts, daysFromNow(30), ts, ts, ts]);
   return id;
 }
 export const addImage = (listingId, mime, data, order, credit = null, creditUrl = null) => run(
@@ -320,6 +320,15 @@ export const changePrice = (id, userId, cents) => run(
 export const softDelete = (id, userId) => run(
   `UPDATE listing SET deleted_at = $1, status='removed', updated_at = $1 WHERE id = $2 AND user_id = $3`,
   [now(), id, userId]);
+
+/* The handle lives on the account, so a seller types it once and every later
+   listing can offer it. Trimmed to WeChat's own shape — letters, digits, _ and
+   - , 6 to 20 characters — so a phone number or an email cannot be smuggled
+   into the field and published as if it were a WeChat ID. */
+export const setWechatId = (userId, id) => run(
+  'UPDATE "user" SET wechat_id = $1 WHERE id = $2', [id, userId]);
+
+export const WECHAT_RE = /^[A-Za-z][A-Za-z0-9_-]{5,19}$/;
 
 export const createReport = (reporterId, targetType, targetId, reason, note = null) => run(
   `INSERT INTO report (id,reporter_id,target_type,target_id,reason,note,created_at)

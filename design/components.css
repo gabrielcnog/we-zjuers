@@ -525,6 +525,17 @@
 /* (The CTA's old '＋' text glyph needed its own span sizing; the SVG icon is
    sized by the shared button anatomy, so that rule is gone.) */
 
+/* WeChat green. A brand colour borrowed from someone else, so it is written
+   as its own token pair rather than reusing --zl-success: green means "good
+   news" everywhere else in this system, and a contact button is not a success
+   state. See --zl-wechat for why the fill is darker than WeChat's own green. */
+.zl-ui .zl-btn--wechat{
+  background:var(--zl-wechat); color:var(--zl-on-wechat);
+  font-weight:var(--zl-weight-semi); border-color:transparent;
+}
+.zl-ui .zl-btn--wechat:hover:not(:disabled){ background:var(--zl-wechat-hover); color:var(--zl-on-wechat); }
+.zl-btn--wechat > svg{ width:var(--zl-icon); height:var(--zl-icon); }
+
 /* URGENT — red fill. Highest-priority conversion ONLY, and
    never more than one on a screen (guidelines slide 7). In this
    product that is "Post an item" in the header, and destructive

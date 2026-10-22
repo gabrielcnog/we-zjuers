@@ -320,6 +320,12 @@ END $$;
    down?", and the listing page answers it by striking the old figure. NULL
    means the price has never been reduced. */
 ALTER TABLE listing ADD COLUMN IF NOT EXISTS previous_price_cents INTEGER;
+
+/* Per listing, not per account: a seller may be happy to take WeChat for a
+   desk they want gone this week and not for the next thing they post. The
+   handle itself still lives on "user" — it is the same handle either way —
+   and this only records that the seller offered it on this listing. */
+ALTER TABLE listing ADD COLUMN IF NOT EXISTS wechat_ok BOOLEAN NOT NULL DEFAULT FALSE;
 `;
 
 /* ---------- Events ----------

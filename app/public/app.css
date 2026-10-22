@@ -101,6 +101,21 @@
 }
 /* Save and Share are peers: one row, equal halves. Without JavaScript Share
    never appears and Save simply takes the width. */
+/* The revealed handle, in the slot the button occupied. Selectable, in the
+   mono face so a handle with l/1/O in it can be copied by eye without
+   guessing. The mark stays WeChat green; the text is ordinary ink. */
+.app-wechat-out{
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--zl-s-1) var(--zl-s-2);
+  padding:var(--zl-s-3); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); background:var(--zl-bg-sunken);
+}
+.app-wechat-out__mark{ display:inline-flex; color:var(--zl-wechat); }
+.app-wechat-out__mark svg{ width:var(--zl-icon-sm); height:var(--zl-icon-sm); }
+.app-wechat-out__id{
+  font-family:var(--zl-font-mono); font-size:var(--zl-text-body);
+  user-select:all; overflow-wrap:anywhere;
+}
+
 .app-detail__minor{ display:flex; gap:var(--zl-s-2); }
 /* The heart fills when the item is saved — same state rule as the card. */
 .zl-ui .js-fav[aria-pressed="true"] svg path{ fill:currentColor; }
