@@ -733,9 +733,17 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 }
 .app-hero__points li::before{ content:"✓"; margin-right:var(--zl-s-1-5); color:var(--zl-success); font-weight:var(--zl-weight-bold); }
 .app-auth__why{ margin:calc(-1 * var(--zl-space-3)) 0 var(--zl-space-4); max-width:52ch; }
-.app-detail__signals{ display:flex; flex-wrap:wrap; gap:var(--zl-space-1) var(--zl-space-3); margin:0 0 var(--zl-space-3); }
-.app-detail__signals span::before{ content:"·"; margin-right:var(--zl-s-2); color:var(--zl-border-strong); }
-.app-detail__signals span:first-child::before{ content:none; }
+/* No interpuncts. They were a descendant rule — .app-detail__signals span —
+   so once each fact became an icon wrapping its own <span>, every inner span
+   drew one too: "· 12d ago · · 66 views". The icons already mark where one
+   fact starts, which is the job the dots were doing, so the separator is the
+   gap and nothing else. 20px rather than 16: without the dots the pairs need
+   a little more air to stay apart. */
+.app-detail__signals{
+  display:flex; flex-wrap:wrap;
+  gap:var(--zl-space-1) var(--zl-s-5);
+  margin:0 0 var(--zl-space-3);
+}
 @media (max-width:640px){ .app-hero{ padding:var(--zl-space-3); } }
 
 
