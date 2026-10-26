@@ -7,6 +7,7 @@
 .app-narrow{ max-width:560px; }
 
 .app-nav{ display:flex; align-items:center; gap:var(--zl-space-2); margin-left:auto; }
+.app-nav__link{ white-space:nowrap; }
 /* On the brand-surface header the nav inverts: the light-theme muted slate
    measures 1.72:1 there, which is why this block exists at all. */
 .zl-ui .zl-header .app-nav__link{
@@ -731,6 +732,12 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
   .zl-ui .app-nav__link{ font-size:var(--zl-text-caption); padding:0 var(--zl-s-2); }
 }
 @media (max-width:420px){
+  /* Five links share the second header row. They used to wrap inside
+     themselves ("中 / 文", "Sign / out"); keep each on one line, tighten the
+     padding to make it fit, and let a whole link drop to the next row before
+     it breaks mid-word. */
+  .zl-ui .zl-header .app-nav__link{ padding-inline:var(--zl-s-1-5); white-space:nowrap; }
+  .app-nav{ flex-wrap:wrap; }
   /* .zl-ui-scoped to match the rule it is overriding: the base wordmark is
      .zl-ui .zl-wordmark (0,2,0), so this bare .zl-wordmark (0,1,0) never
      applied and the mark stayed 19px on a phone. The BETA tag is sized in em,
@@ -1148,3 +1155,12 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
    Both take the same explicit height so they cannot drift apart. */
 .zl-report__body .zl-select,
 .zl-report__body .zl-btn{ height:var(--zl-control); min-height:var(--zl-control); }
+
+/* Touch targets. WCAG 2.2 AA (2.5.8) asks for 24x24 on anything that is not an
+   inline link inside a sentence; these stood-alone links measured 17-21px high.
+   Taller hit areas, same look: the extra height is padding, not larger text. */
+.zl-ui .app-footer__menu a{ display:inline-flex; align-items:center; min-height:var(--zl-control); }
+.zl-ui .app-post__author{ display:inline-flex; align-items:center; min-height:28px; }
+.app-gloss__see,
+.zl-link-arrow{ min-height:28px; }
+.zl-seller__name a{ display:inline-flex; align-items:center; min-height:28px; }

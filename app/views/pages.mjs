@@ -97,6 +97,13 @@ export function home({ locale, t, rows, total, params, favSet, catCounts = {} })
   </div>`;
 }
 
+/* An empty list should say what to do next, not just that it is empty. The
+   way out is browsing, which works in the demo too (posting does not). */
+const emptyHint = (t, locale, msg) => h`<div class="zl-stack">
+  <p class="zl-muted">${msg}</p>
+  ${arrowLink(L(locale, '/market'), t('empty.browse'))}
+</div>`;
+
 const emptyState = (t, locale) => h`<div class="zl-empty">
   <div class="zl-icon-ring zl-icon-ring--lg" aria-hidden="true">◇</div>
   <div class="zl-empty__title">${t('empty.title')}</div>
@@ -511,13 +518,13 @@ export function my({ locale, t, tab, rows, counts }) {
         ${tab !== 'active' ? h`<button class="zl-btn zl-btn--tertiary zl-btn--sm" type="submit" name="op" value="renew"><span>${t('my.renew')}</span></button>` : raw('')}
         <button class="zl-btn zl-btn--ghost zl-btn--sm js-confirm" type="submit" data-msg="${t('my.confirmdel')}" name="op" value="delete"><span>${t('my.delete')}</span></button>
       </form>
-    </div>`)}</div>` : h`<p class="zl-muted">${t('empty.title')}</p>`}`;
+    </div>`)}</div>` : emptyHint(t, locale, t('my.none'))}`;
 }
 
 /* ---------- Saved ---------- */
 export const saved = ({ locale, t, rows, favSet }) => h`
   ${pageHeader({ title: t('saved.title') })}
-  ${rows.length ? feed(rows, { locale, t, favSet }) : h`<p class="zl-muted">${t('saved.none')}</p>`}`;
+  ${rows.length ? feed(rows, { locale, t, favSet }) : emptyHint(t, locale, t('saved.none'))}`;
 
 /* ---------- Messages ---------- */
 export function inbox({ locale, t, convos }) {
@@ -531,7 +538,7 @@ export function inbox({ locale, t, convos }) {
         <div class="zl-caption zl-truncate">${c.last_body || ''}</div>
       </div>
       <span class="zl-caption">${ago(c.last_message_at, t)}</span>
-    </a>`)}</div>` : h`<p class="zl-muted">${t('msg.none')}</p>`}`;
+    </a>`)}</div>` : emptyHint(t, locale, t('msg.none'))}`;
 }
 
 export function thread({ locale, t, convo, msgs, me, otherUser, myWechat, theirWechat }) {
