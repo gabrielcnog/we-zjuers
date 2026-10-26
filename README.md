@@ -55,19 +55,24 @@ npm run seed && npm run seed:community && npm run seed:events
 
 ## Deploy
 
-[`render.yaml`](render.yaml) is the author's Render blueprint, and describes a web service and a Postgres database,
-and sets `DEMO_MODE=1`. The sample data loads itself on first boot, so there is
-nothing to seed and no keys to set.
+[`render.yaml`](render.yaml) is the author's Render blueprint: one web service
+(Singapore) with `DEMO_MODE=1`. The database is a free
+[Supabase](https://supabase.com) project, reached through its **session pooler**
+connection string (the one that works over IPv4), which is set as the service's
+`DATABASE_URL`. The sample data loads itself into the empty database on first
+boot, so there is nothing to seed.
 
 On Render's free plan the service sleeps when idle (the first request after a
-quiet spell is slow) and the free database is time-limited. Check their current
-terms before relying on it for anything long-lived.
+quiet spell is slow). Supabase's free projects pause after a week without
+activity and can be resumed from their dashboard. Check their current terms
+before relying on either for anything long-lived.
 
 | Variable | Purpose |
 |---|---|
 | `DEMO_MODE=1` | Read-only demo: no sign-up, no email sign-in, one shared demo account. Loads the sample data into an empty database. |
 | `NODE_ENV=production` | Secure cookies, and the sign-in code is never shown on screen. |
-| `DATABASE_URL` | Postgres connection string. Defaults to a local database. |
+| `DATABASE_URL` | Postgres connection string. Defaults to a local database. Remote hosts are reached over TLS. |
+| `DATABASE_CA` | Optional. The provider's root certificate (PEM), to verify the server certificate as well as encrypt. |
 | `PORT` | Defaults to 4400. |
 | `BUG_SHEET_URL`, `BUG_SHEET_TOKEN` | Where the footer's bug reports are forwarded, a Google Sheet by way of an Apps Script. Optional: without them reports are only stored. See [docs/bug-reports.md](docs/bug-reports.md). |
 | `UNSPLASH_ACCESS_KEY` | Local use only, for `npm run photos`. Not needed to run or deploy. |

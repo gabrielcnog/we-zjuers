@@ -18,8 +18,28 @@ import { randomUUID, createHash, randomBytes } from 'node:crypto';
 import { BOARDS } from './content/boards.mjs';
 
 const DEFAULT_DB = 'listings_dev';
-export const DATABASE_URL =
-  process.env.DATABASE_URL || `postgres://localhost/${DEFAULT_DB}`;
+const RAW_URL = process.env.DATABASE_URL || `postgres://localhost/${DEFAULT_DB}`;
+
+/* TLS. A database on this machine, or on a host's private network (Render's
+   internal name has no dots), is reached in the clear. Anything else is across
+   the internet, which is how a hosted Supabase or Neon is reached, and needs
+   TLS. Those providers sign with their own CA, which Node does not ship, so by
+   default the connection is encrypted but the certificate is not verified.
+   Set DATABASE_CA to the provider's root certificate (PEM) to verify it too.
+   `sslmode` is stripped from the URL because pg would let it override the
+   options below. */
+const parsed = new URL(RAW_URL);
+const sslMode = parsed.searchParams.get('sslmode');
+parsed.searchParams.delete('sslmode');
+const host = parsed.hostname;
+const local = host === 'localhost' || host === '127.0.0.1' || host === '::1' || !host.includes('.');
+export const DB_SSL = sslMode === 'disable' || local ? false
+  : process.env.DATABASE_CA ? { ca: process.env.DATABASE_CA }
+  : { rejectUnauthorized: false };
+export const DATABASE_URL = parsed.toString();
+
+/* The same address with the password blanked, for logs. */
+export const DATABASE_URL_SAFE = (() => { const u = new URL(DATABASE_URL); if (u.password) u.password = '***'; return u.toString(); })();
 
 /* Money is integer cents — make sure the driver never hands us a float,
    and that BIGINT counts arrive as numbers rather than strings. */
@@ -27,6 +47,7 @@ pg.types.setTypeParser(20, (v) => parseInt(v, 10));   // int8 / COUNT(*)
 
 export const pool = new pg.Pool({
   connectionString: DATABASE_URL,
+  ssl: DB_SSL,
   max: 10,                      // pooling matters: see docs/infrastructure.md 3.4
   idle_in_transaction_session_timeout: 10_000,
   statement_timeout: 5_000,     // one bad query must not hold the site
@@ -65,7 +86,7 @@ export async function tx(fn) {
 /* Create the database on first run rather than making the reader do it. */
 export async function ensureDatabase() {
   const name = new URL(DATABASE_URL).pathname.slice(1) || DEFAULT_DB;
-  const admin = new pg.Client({ connectionString: DATABASE_URL.replace(/\/[^/]*$/, '/postgres') });
+  const admin = new pg.Client({ connectionString: DATABASE_URL.replace(/\/[^/]*$/, '/postgres'), ssl: DB_SSL });
   /* A managed host (Render, Fly, Heroku) hands you one database that already
      exists and a user who may not be allowed into the maintenance database at
      all. Failing to get in is not failing to have a database: carry on, and

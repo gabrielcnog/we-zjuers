@@ -1,23 +1,18 @@
-# Render blueprint: one web service and one Postgres database.
+# Render blueprint: one web service. The database is Supabase (see README), so
+# there is no Render Postgres here; its free tier is time-limited.
 #
 #   https://render.com/deploy?repo=https://github.com/gabrielcnog/we-zjuers
 #
 # The service runs in DEMO_MODE, which is what makes it safe to leave on the
 # open internet: read-only, no sign-up, one shared demo account, and the sample
 # data loads itself into the empty database on first boot (app/lib/snapshot.mjs).
-# Nothing to seed by hand and no API keys to set.
-databases:
-  - name: we-zjuers-db
-    plan: free
-    databaseName: wezjuers
-    user: wezjuers
-    ipAllowList: []          # the app reaches it over Render's private network; nothing else may
-
+# Nothing to seed by hand. The one thing to set is DATABASE_URL (below).
 services:
   - type: web
     name: we-zjuers
     runtime: node
     plan: free
+    region: singapore      # nearest to Hangzhou; Supabase is in Tokyo (ap-northeast-1)
     autoDeploy: true
     # The server reads ../design, so build and run from the repo root and
     # step into app/ rather than setting rootDir.
@@ -37,7 +32,8 @@ services:
         sync: false
       - key: BUG_SHEET_TOKEN
         sync: false
+      # The Supabase session-pooler connection string. Set it by hand in the
+      # dashboard (Environment); it contains the database password, so it is
+      # never written to this file.
       - key: DATABASE_URL
-        fromDatabase:
-          name: we-zjuers-db
-          property: connectionString
+        sync: false

@@ -8,7 +8,7 @@ import { gzipSync } from 'node:zlib';
 import { readFile } from 'node:fs/promises';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { migrate, expireOverdue, pool, now, DATABASE_URL } from './db.mjs';
+import { migrate, expireOverdue, pool, now, DATABASE_URL_SAFE } from './db.mjs';
 import * as Q from './lib/queries.mjs';
 import * as A from './lib/auth.mjs';
 import { DEMO, PROD, DEMO_EMAIL, DEMO_SESSION_DAYS, refusal, ensureDemoUser, resetDemoSaves } from './lib/demo.mjs';
@@ -998,7 +998,7 @@ const boot = async () => {
                   COUNT(*)::int AS total FROM listing WHERE deleted_at IS NULL`));
   server.listen(PORT, () => {
     console.log(`\n  WeZJUers prototype  →  http://localhost:${PORT}`);
-    console.log(`  PostgreSQL: ${DATABASE_URL}`);
+    console.log(`  PostgreSQL: ${DATABASE_URL_SAFE}`);
     console.log(`  ${n} active listings${expired ? `, ${expired} auto-expired on boot` : ''}`);
     /* Zero used to be just another number in this list, which is how the
        marketplace came up empty on 2026-10-10 with nothing to show for it:
