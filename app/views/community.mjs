@@ -178,7 +178,16 @@ function hero({ locale, t }) {
     <h2 class="app-hero__title zl-h2" id="heroTitle">${t('hero.title')}</h2>
     <p class="app-hero__body">${t('hero.body')}</p>
     <div class="app-hero__actions">
-      <a class="zl-btn zl-btn--primary" href="${L(locale, '/signin') + '?next=' + encodeURIComponent(L(locale, '/community'))}"><span>${t('hero.cta')}</span></a>
+      ${/* The demo has no sign-up, so "Join with your email" would lead to a page
+           saying accounts cannot be made. Offer the thing that works, in one
+           click, instead of a promise the next page takes back. */ raw('')}
+      ${DEMO
+        ? h`<form method="post" action="${L(locale, '/signin')}">
+            <input type="hidden" name="step" value="demo">
+            <input type="hidden" name="next" value="${L(locale, '/community')}">
+            <button class="zl-btn zl-btn--primary" type="submit"><span>${t('demo.enter')}</span></button>
+          </form>`
+        : h`<a class="zl-btn zl-btn--primary" href="${L(locale, '/signin') + '?next=' + encodeURIComponent(L(locale, '/community'))}"><span>${t('hero.cta')}</span></a>`}
       <a class="zl-btn zl-btn--secondary" href="${L(locale, '/market')}"><span>${t('hero.browse')}</span>${ICONS.arrowRight}</a>
     </div>
     <ul class="app-hero__points">
