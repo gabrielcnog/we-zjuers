@@ -330,6 +330,26 @@ ALTER TABLE listing ADD COLUMN IF NOT EXISTS previous_price_cents INTEGER;
    handle itself still lives on "user" — it is the same handle either way —
    and this only records that the seller offered it on this listing. */
 ALTER TABLE listing ADD COLUMN IF NOT EXISTS wechat_ok BOOLEAN NOT NULL DEFAULT FALSE;
+
+/* Bug reports. Always stored here first and forwarded to the spreadsheet
+   second, so a slow or unreachable Google loses nothing: forwarded_at stays
+   NULL and the hourly sweep tries again. */
+CREATE TABLE IF NOT EXISTS bug_report (
+  id UUID PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL,
+  kind TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  details TEXT NOT NULL,
+  expected TEXT,
+  page TEXT,
+  email TEXT,
+  locale TEXT,
+  user_agent TEXT,
+  signed_in TEXT,
+  forwarded_at TIMESTAMPTZ,
+  forward_attempts INT NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS ix_bug_unforwarded ON bug_report(created_at) WHERE forwarded_at IS NULL;
 `;
 
 /* ---------- Events ----------

@@ -458,6 +458,9 @@ ${fabEl}
     <nav class="app-footer__menu" aria-label="${esc(t('footer.nav'))}">
       <a class="zl-caption" href="${L(locale, '/rules')}">${esc(t('nav.rules'))}</a>
       <a class="zl-caption" href="${L(locale, '/contact')}">${esc(t('nav.contact'))}</a>
+      ${/* Footer only, as asked. It passes the page you were on so the form can
+           say where the problem was without asking you to type a URL. */ ''}
+      <a class="zl-caption" href="${L(locale, '/bug')}?from=${encodeURIComponent((path + search).slice(0, 200))}">${esc(t('nav.bug'))}</a>
     </nav>
   </div>
 </footer>

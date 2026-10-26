@@ -69,6 +69,7 @@ terms before relying on it for anything long-lived.
 | `NODE_ENV=production` | Secure cookies, and the sign-in code is never shown on screen. |
 | `DATABASE_URL` | Postgres connection string. Defaults to a local database. |
 | `PORT` | Defaults to 4400. |
+| `BUG_SHEET_URL`, `BUG_SHEET_TOKEN` | Where the footer's bug reports are forwarded, a Google Sheet by way of an Apps Script. Optional: without them reports are only stored. See [docs/bug-reports.md](docs/bug-reports.md). |
 | `UNSPLASH_ACCESS_KEY` | Local use only, for `npm run photos`. Not needed to run or deploy. |
 
 ## How the demo stays safe

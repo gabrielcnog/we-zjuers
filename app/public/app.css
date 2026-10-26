@@ -1137,3 +1137,6 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
   background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
   font-size:var(--zl-text-sm); padding:var(--zl-s-2) 0; text-align:center;
 }
+
+/* The optional "what did you expect" box: a sentence, not a paragraph. */
+.app-bug__short{ min-height:var(--zl-s-24); }

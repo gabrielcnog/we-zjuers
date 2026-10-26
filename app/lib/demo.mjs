@@ -33,6 +33,7 @@ const ALLOWED_POSTS = [
   /^\/(en|zh)\/signout$/,
   /^\/(en|zh)\/signin$/,                          // only step=demo gets past the handler
   /^\/(en|zh)\/listing\/[0-9a-f-]{36}\/wechat$/i,
+  /^\/(en|zh)\/bug$/,                            // the bug-report form: rate limited, honeypotted, capped (server.mjs)
 ];
 
 /* Pages that exist only to compose something. Showing the form to someone who

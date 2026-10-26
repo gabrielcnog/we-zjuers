@@ -13,6 +13,7 @@ import * as Q from './lib/queries.mjs';
 import * as A from './lib/auth.mjs';
 import { DEMO, PROD, DEMO_EMAIL, DEMO_SESSION_DAYS, refusal, ensureDemoUser } from './lib/demo.mjs';
 import { loadSnapshotIfEmpty, freshenIfStale } from './lib/snapshot.mjs';
+import { saveBug, forwardBug, retryUnforwarded, KINDS as BUG_KINDS, LIMITS as BUG_LIMITS } from './lib/bugs.mjs';
 import { translator, LOCALES } from './lib/i18n.mjs';
 import { page, L, ICONS } from './views/layout.mjs';
 import * as V from './views/pages.mjs';
@@ -854,6 +855,47 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && rest[0] === 'rules')
       return render(t('nav.rules'), V.rules({ t, locale }));
 
+    /* ---- Report a bug: GET /bug, POST /bug ----
+       Open to anyone, signed in or not, demo visitors included: it is the one
+       write a public demo should accept. That is why it carries more defences
+       than a form behind a login would. */
+    if (rest[0] === 'bug' && !rest[1]) {
+      /* Only ever a path on this site, as with `next`, and short. */
+      const fromPage = (v) => (typeof v === 'string' && /^\/[^/\\]/.test(v) ? v.slice(0, BUG_LIMITS.page) : '');
+      if (req.method === 'GET')
+        return render(t('bug.title'), V.reportBug({ t, locale, sent: params.sent === '1',
+          v: { page: fromPage(params.from) } }));
+      if (req.method === 'POST') {
+        const f = parseForm(await readBody(req));
+        /* Honeypot: a person cannot see this field, so a filled one is a bot.
+           It is told it worked, so it has nothing to learn from. */
+        if (f.website) return redirect(res, L(locale, '/bug') + '?sent=1');
+        /* Per visitor, and overall. X-Forwarded-For is only trustworthy behind
+           the host's proxy, so the overall cap is what actually bounds a
+           determined flood; the per-visitor one stops ordinary repeats. */
+        const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '?';
+        if (!A.rateLimit('bug:' + ip, 5, 36e5) || !A.rateLimit('bug:all', 100, 36e5)) return fail(429, 'error.slow');
+        const v = {
+          kind: BUG_KINDS.includes(f.kind) ? f.kind : 'other',
+          summary: (f.summary || '').trim().slice(0, BUG_LIMITS.summary),
+          details: (f.details || '').trim().slice(0, BUG_LIMITS.details),
+          expected: (f.expected || '').trim().slice(0, BUG_LIMITS.expected),
+          page: fromPage((f.page || '').trim()) || (f.page || '').trim().slice(0, BUG_LIMITS.page),
+          email: (f.email || '').trim().slice(0, BUG_LIMITS.email),
+        };
+        const again = (msg) => render(t('bug.title'), V.reportBug({ t, locale, v, error: msg }));
+        if (v.summary.length < 3) return again(t('bug.err.summary'));
+        if (v.details.length < 10) return again(t('bug.err.details'));
+        if (v.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return again(t('bug.err.email'));
+        const id = await saveBug({ ...v, locale, userAgent: req.headers['user-agent'],
+          signedIn: !user ? 'no' : (DEMO && user.email === DEMO_EMAIL ? 'demo' : 'yes') });
+        /* After the response: the visitor is not made to wait on Google, and a
+           failure is already safe in the database for the hourly retry. */
+        forwardBug(id).catch((e) => console.error('[bug-sheet]', e.message));
+        return redirect(res, L(locale, '/bug') + '?sent=1');
+      }
+    }
+
     /* ---- GET /contact ---- */
     if (req.method === 'GET' && rest[0] === 'contact')
       return render(t('nav.contact'), V.contact({ t, locale }));
@@ -891,6 +933,8 @@ const boot = async () => {
   // Hourly sweep: a server running for weeks would otherwise keep showing
   // listings whose 30 days ran out. unref() so it never holds the process open.
   setInterval(() => expireOverdue().catch((err) => console.error('[expiry]', err.message)), 36e5).unref();
+  /* Reports that could not be delivered to the sheet are tried again. */
+  setInterval(() => retryUnforwarded().catch((err) => console.error('[bug-retry]', err.message)), 36e5).unref();
   if (DEMO) {
     await ensureDemoUser();
     /* Demo sessions are minted on a button press, so expired ones are swept. */

@@ -744,6 +744,61 @@ export const contact = ({ t, locale }) => h`<div class="zl-narrow">
   </div>
 </div>`;
 
+/* ---------- Report a bug ---------- */
+export function reportBug({ t, locale, v = {}, error = null, sent = false }) {
+  const KINDS = ['broken', 'looks', 'translation', 'other'];
+  return h`<div class="zl-narrow">
+    ${pageHeader({ title: t('bug.title'), description: t('bug.lede') })}
+    <div class="zl-stack">
+    ${sent ? alert({ tone: 'success', body: t('bug.thanks') }) : raw('')}
+    ${error ? alert({ tone: 'danger', body: error }) : raw('')}
+    <form class="zl-form" method="post" action="${L(locale, '/bug')}">
+      <div class="zl-field">
+        <label class="zl-field__label" for="kind">${t('bug.f.kind')}</label>
+        <select class="zl-select" id="kind" name="kind">
+          ${KINDS.map((k) => h`<option value="${k}"${v.kind === k ? raw(' selected') : raw('')}>${t('bug.kind.' + k)}</option>`)}
+        </select>
+      </div>
+      <div class="zl-field">
+        <label class="zl-field__label" for="summary">${t('bug.f.summary')}<span class="req">*</span></label>
+        <input class="zl-input" id="summary" name="summary" maxlength="120" required value="${v.summary || ''}">
+      </div>
+      <div class="zl-field">
+        <label class="zl-field__label" for="details">${t('bug.f.details')}<span class="req">*</span></label>
+        <textarea class="zl-textarea" id="details" name="details" maxlength="2000" required
+                  aria-describedby="detailsHint">${v.details || ''}</textarea>
+        <p class="zl-field__hint" id="detailsHint">${t('bug.f.detailshint')}</p>
+      </div>
+      <div class="zl-field">
+        <label class="zl-field__label" for="expected">${t('bug.f.expected')}</label>
+        <textarea class="zl-textarea app-bug__short" id="expected" name="expected" maxlength="1000">${v.expected || ''}</textarea>
+      </div>
+      <div class="zl-field">
+        <label class="zl-field__label" for="page">${t('bug.f.page')}</label>
+        <input class="zl-input" id="page" name="page" maxlength="200" value="${v.page || ''}" placeholder="/en/market">
+      </div>
+      <div class="zl-field">
+        <label class="zl-field__label" for="email">${t('bug.f.email')}</label>
+        <input class="zl-input" id="email" name="email" type="email" maxlength="120" autocomplete="email"
+               value="${v.email || ''}" aria-describedby="emailHint">
+        <p class="zl-field__hint" id="emailHint">${t('bug.f.emailhint')}</p>
+      </div>
+      ${/* A honeypot. People never see or reach it; a bot that fills every
+           field does, and its report is quietly dropped. Hidden with the
+           visually-hidden class rather than display:none, which some bots
+           skip. tabindex -1 and aria-hidden keep it out of a real reader's way. */ raw('')}
+      <div class="zl-sr-only" aria-hidden="true">
+        <label for="website">Leave this empty</label>
+        <input id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="zl-form__actions">
+        <button class="zl-btn zl-btn--primary" type="submit"><span>${t('bug.send')}</span></button>
+      </div>
+    </form>
+    </div>
+  </div>`;
+}
+
 export const rules = ({ t, locale }) => {
   const lang = locale === 'zh' ? 'zh' : 'en';
   return h`<div class="zl-narrow">
