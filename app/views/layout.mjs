@@ -363,7 +363,7 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
 </head>
 <body class="zl-ui">
 <a class="zl-sr-only" href="#main">${esc(t('a11y.skip'))}</a>
-<div class="zl-disclaimer">${t('disclaimer')}</div>
+<div class="zl-disclaimer"><b class="zl-disclaimer__a">${esc(t('disclaimer.a'))}</b><span class="zl-disclaimer__sep" aria-hidden="true"> · </span><span class="zl-disclaimer__b">${esc(t('disclaimer.b'))}</span></div>
 <header class="zl-header">
   <div class="zl-header__inner">
     <a class="zl-wordmark" href="${L(locale, '/community')}"><span class="zl-wordmark__name">${wordmark}</span><span class="zl-wordmark__beta">${esc(t('brand.beta'))}</span></a>

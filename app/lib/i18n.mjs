@@ -4,7 +4,6 @@ export const LOCALES = ['en', 'zh'];
 
 const EN = {
   'brand': 'WeZJUers', 'brand.beta': 'Beta',
-  'disclaimer': '<b>A project from students to students</b> · Not an official ZJU platform',
   'disclaimer.full': 'A project from students to students ❤️ Not an official ZJU platform',
   'disclaimer.a': 'A project from students to students', 'disclaimer.b': 'Not an official ZJU platform',
   'rules.lede': 'An independent project built by students, for students. Not an official Zhejiang University platform, and not affiliated with or endorsed by the university.',
@@ -242,7 +241,6 @@ const EN = {
 
 const ZH = {
   'brand': 'WeZJUers', 'brand.beta': 'Beta',
-  'disclaimer': '<b>学生做给学生的项目</b> · 非浙江大学官方平台',
   'disclaimer.full': '学生做给学生的项目 ❤️ 非浙江大学官方平台',
   'disclaimer.a': '学生做给学生的项目', 'disclaimer.b': '非浙江大学官方平台',
   'rules.lede': '本站为学生自发开发的独立项目，非浙江大学官方系统，与浙江大学无隶属或认可关系。',

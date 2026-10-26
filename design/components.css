@@ -163,6 +163,13 @@
   text-align:center;
 }
 .zl-disclaimer b{ font-weight:var(--zl-weight-semi); color:inherit; }
+/* On a phone the two sentences each get a line, with no dot between them: left
+   to wrap, the second sentence broke after "ZJU" and left "platform" alone. The
+   dot is only a separator for when they share a line. */
+@media (max-width:640px){
+  .zl-disclaimer__a, .zl-disclaimer__b{ display:block; }
+  .zl-disclaimer__sep{ display:none; }
+}
 
 /* ---------- Header ---------- */
 .zl-header{
