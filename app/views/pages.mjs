@@ -464,7 +464,7 @@ export function profile({ locale, t, u, langs, rows, going = [], organising = []
       <section class="zl-section">
         <h2 class="zl-h3 zl-section__title">${t('profile.events')}</h2>
         ${going.length
-          ? h`<div class="app-ev-list">${going.map((e) => eventCard(e, { locale, t }))}</div>`
+          ? h`<div class="app-ev-list">${going.map((e) => eventCard(e, { locale, t, joinedKey: 'ev.joined.them' }))}</div>`
           : h`<p class="zl-muted">${t('profile.events.none')}</p>`}
       </section>
     </div>

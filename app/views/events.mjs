@@ -73,7 +73,10 @@ function stateBadge(e, t, cls = '') {
    grid of grey placeholders would be worse than a grid of coloured ones. The
    date sits on the plate because that is what people scan a listing of events
    for, ahead of the name. */
-export function eventCard(e, { locale, t }) {
+/* `joinedKey` is whose "going" this is. On the events list it is the reader's
+   own, so "You are going" is right. On a profile every tile is the profile
+   owner's, and "You are going" read as if the person looking were signed up. */
+export function eventCard(e, { locale, t, joinedKey = 'ev.joined' }) {
   const gone = e.status === 'cancelled' || isPast(e);
   const d = new Date(e.starts_at);
   const loc = locale === 'zh' ? 'zh-CN' : 'en-GB';
@@ -86,7 +89,7 @@ export function eventCard(e, { locale, t }) {
       </span>
       ${(() => { const n = gone ? null : soon(e, t);
           return n ? h`<span class="app-ev-tile__soon">${n}</span>` : raw(''); })()}
-      ${e.joined ? h`<span class="app-ev-tile__flag zl-badge zl-badge--success">${t('ev.joined')}</span>`
+      ${e.joined ? h`<span class="app-ev-tile__flag zl-badge zl-badge--success">${t(joinedKey)}</span>`
         : gone || isFull(e) ? stateBadge(e, t, 'app-ev-tile__flag') : raw('')}
     </div>
     <div class="zl-card__body">
