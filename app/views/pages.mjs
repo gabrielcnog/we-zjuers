@@ -77,7 +77,7 @@ export function home({ locale, t, rows, total, params, favSet, catCounts = {} })
          is shareable either way and neither depends on JavaScript. */ raw('')}
     <aside class="app-mk__aside">${categoryRail({ locale, t, path, params, counts: catCounts })}</aside>
     <div class="app-mk__main">
-      ${pageHeader({ title: t('home.title'), description: t('home.lede'), size: 'h1', compact: true })}
+      ${pageHeader({ title: t('home.title'), description: t('home.lede'), compact: true })}
       <div class="app-mk__chips">${filters({ locale, t, path, params })}</div>
       ${/* No applied-filter row here: the rail and the chip row both show the
            active category, and campus lives in the header. The row belongs on

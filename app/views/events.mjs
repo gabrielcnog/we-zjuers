@@ -158,7 +158,7 @@ export function eventList({ locale, t, rows, sel, counts, canPost }) {
          URL is shareable either way and nothing depends on JavaScript. */ raw('')}
     <aside class="app-ev__aside">${filterRail({ locale, t, sel, counts, qs })}</aside>
     <div class="app-ev__main">
-      ${pageHeader({ title: t('ev.title'), description: t('ev.lede'), size: 'h1', compact: true,
+      ${pageHeader({ title: t('ev.title'), description: t('ev.lede'), compact: true,
         actions: canPost ? h`<a class="zl-btn zl-btn--primary" href="${L(locale, '/events/new')}">${ICONS.plus}<span>${t('ev.new')}</span></a>` : null })}
 
       <div class="app-ev__chips">
