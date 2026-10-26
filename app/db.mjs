@@ -14,6 +14,7 @@
    Connection: DATABASE_URL, else postgres://localhost/listings_dev
    ============================================================ */
 import pg from 'pg';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { randomUUID, createHash, randomBytes } from 'node:crypto';
 import { BOARDS } from './content/boards.mjs';
 
@@ -53,6 +54,20 @@ export const pool = new pg.Pool({
   statement_timeout: 5_000,     // one bad query must not hold the site
 });
 
+/* Per-request query count and time. The server opens a store for each request
+   and reports it (Server-Timing header, and the log line for slow ones), which
+   is how a page that is quick next to its database and slow far from it shows
+   up: the cost is the NUMBER of round trips, not any one query. */
+export const timing = new AsyncLocalStorage();
+const timed = (run) => (...args) => {
+  const store = timing.getStore();
+  if (!store || typeof args[args.length - 1] === 'function') return run(...args);
+  const t0 = performance.now(); store.n++;
+  return run(...args).finally(() => { store.ms += performance.now() - t0; });
+};
+const poolQuery = pool.query.bind(pool);
+pool.query = timed(poolQuery);
+
 /* A dropped idle connection emits 'error' on the pool; unhandled that is an
    uncaught exception and the process dies. Log it; the pool reconnects. */
 pool.on('error', (err) => console.error('[pg] idle client error:', err.message));
@@ -70,6 +85,7 @@ export const run = async (sql, params = []) => (await pool.query(sql, params)).r
 
 export async function tx(fn) {
   const client = await pool.connect();
+  client.query = timed(client.query.bind(client));
   try {
     await client.query('BEGIN');
     const out = await fn(client);

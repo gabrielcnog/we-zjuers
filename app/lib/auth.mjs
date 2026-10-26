@@ -61,8 +61,14 @@ export async function createSession(userId, days = SESSION_DAYS) {
 }
 export async function userForToken(t) {
   if (!t) return null;
+  /* The unread-message count rides along as a column: asking for it separately
+     was a second round trip on every signed-in page, which is the expensive
+     part when the database is in another city. */
   return (await one(
-    `SELECT u.* FROM session s JOIN "user" u ON u.id = s.user_id
+    `SELECT u.*,
+            (SELECT COUNT(*)::int FROM message m JOIN conversation c ON c.id = m.conversation_id
+              WHERE (c.buyer_id = u.id OR c.seller_id = u.id) AND m.sender_id <> u.id AND m.read_at IS NULL) AS unread
+       FROM session s JOIN "user" u ON u.id = s.user_id
       WHERE s.token_hash = $1 AND s.expires_at > now() AND u.status = 'active'`, [sha256(t)])) || null;
 }
 export const destroySession = (t) =>

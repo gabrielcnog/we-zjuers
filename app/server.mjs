@@ -8,7 +8,7 @@ import { gzipSync } from 'node:zlib';
 import { readFile } from 'node:fs/promises';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { migrate, expireOverdue, pool, now, DATABASE_URL_SAFE } from './db.mjs';
+import { migrate, expireOverdue, pool, now, DATABASE_URL_SAFE, timing } from './db.mjs';
 import * as Q from './lib/queries.mjs';
 import * as A from './lib/auth.mjs';
 import { DEMO, PROD, DEMO_EMAIL, DEMO_SESSION_DAYS, refusal, ensureDemoUser, resetDemoSaves } from './lib/demo.mjs';
@@ -46,7 +46,12 @@ const send = (res, status, body, headers = {}) => {
     body = gzipSync(typeof body === 'string' ? Buffer.from(body) : body);
     headers = { ...headers, 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' };
   }
+  const st = timing.getStore();
   res.writeHead(status, {
+    /* What this request cost: wall time, and how much of it was waiting on the
+       database across how many round trips. Visible in the browser's network
+       panel, so "it is slow" can be answered with a number. */
+    ...(st ? { 'Server-Timing': `app;dur=${Math.round(performance.now() - st.t0)}, db;dur=${Math.round(st.ms)};desc="${st.n} queries"` } : {}),
     'Content-Type': 'text/html; charset=utf-8',
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
@@ -92,7 +97,23 @@ const parseForm = (s) => noNul(Object.fromEntries(new URLSearchParams(s)));
 const num = (v) => { const n = Number(v); return Number.isFinite(n) && v !== '' ? n : null; };
 
 /* ---------- server ---------- */
-const server = createServer(async (req, res) => {
+const SLOW_MS = Number(process.env.SLOW_REQUEST_MS || 1000);
+const server = createServer((req, res) => {
+  const store = { n: 0, ms: 0, t0: performance.now() };
+  /* One log line for each request that is slow, or for all of them with
+     REQUEST_LOG=1. Assets and the health check are left out: they are not
+     what anyone is waiting on. */
+  res.on('finish', () => {
+    const path = (req.url || '').split('?')[0];
+    if (path === '/healthz' || path.startsWith('/assets/')) return;
+    const total = performance.now() - store.t0;
+    if (process.env.REQUEST_LOG === '1' || total >= SLOW_MS)
+      console.log(`[req] ${req.method} ${path} ${res.statusCode} ${Math.round(total)}ms db=${store.n}q/${Math.round(store.ms)}ms`);
+  });
+  timing.run(store, () => handle(req, res));
+});
+
+async function handle(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const seg = url.pathname.split('/').filter(Boolean);
   res.zlGzip = /\bgzip\b/.test(req.headers['accept-encoding'] || '');
@@ -170,7 +191,7 @@ const server = createServer(async (req, res) => {
     const locale = seg[0], t = translator(locale), rest = seg.slice(1);
     const cookies = A.readCookies(req);
     const user = await A.userForToken(cookies[A.COOKIE]);
-    const unread = user ? await Q.unreadCount(user.id) : 0;
+    const unread = user ? user.unread : 0;
     /* Campus is a persistent browsing scope, not a per-page filter: one cookie,
        read here, used by the feed and the search rail alike so the header and
        the rail can never disagree. "all" (or absent) means every campus. */
@@ -345,9 +366,13 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && rest[0] === 'listing' && rest[1] && !rest[2]) {
       const l = await Q.getListing(rest[1]);
       if (!l) return send(res, 404, page({ locale, t, user, title: '404', body: raw('<h1 class="zl-h2">Not found</h1>'), unread, path: url.pathname }));
-      await Q.bumpView(l.id);
-      const seller = await Q.getUser(l.user_id);
-      const sellerOther = (await Q.userListings(l.user_id)).filter((x) => x.id !== l.id).slice(0, 4);
+      /* Everything else the page needs is independent of everything else, so it is
+         asked for together: one round trip of waiting, not eight. */
+      const [, seller, sellerListings, images, langs, favorited, saveCount] = await Promise.all([
+        Q.bumpView(l.id), Q.getUser(l.user_id), Q.userListings(l.user_id), Q.listingImages(l.id),
+        Q.userLanguages(l.user_id), Q.isFavorited(user?.id, l.id), Q.favoriteCount(l.id),
+      ]);
+      const sellerOther = sellerListings.filter((x) => x.id !== l.id).slice(0, 4);
       /* On a phone the thumb button is the page's own action: message this
          seller. "Add listing" would be competing with the thing you came for,
          and the real button is a scroll away. Your own listing keeps the
@@ -356,9 +381,9 @@ const server = createServer(async (req, res) => {
         fabOverride = { action: L(locale, '/listing/' + l.id + '/contact'), label: t('listing.contact'), icon: ICONS.message };
       }
       return render(l.title, V.listing({
-        locale, t, l, images: await Q.listingImages(l.id), seller, langs: await Q.userLanguages(l.user_id),
-        favorited: await Q.isFavorited(user?.id, l.id), user, sellerOther,
-        saveCount: await Q.favoriteCount(l.id),
+        locale, t, l, images, seller, langs,
+        favorited, user, sellerOther,
+        saveCount,
         reported: params.reported === '1',
       }));
     }
@@ -940,7 +965,7 @@ const server = createServer(async (req, res) => {
         + `<a class="zl-btn zl-btn--primary" href="/${loc}/community">${esc(t2('com.title'))}</a></div>`),
     }));
   }
-});
+}
 
 /* Boot: migrate, run the expiry sweep, warm the reference cache, then listen.
    Nothing serves traffic before the database is ready. */
