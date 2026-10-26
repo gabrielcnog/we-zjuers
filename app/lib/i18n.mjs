@@ -14,6 +14,7 @@ const EN = {
   'search.terms': ['a desk', 'a bike', 'a kettle', 'a book',
                    'an office chair', 'a winter coat', 'an extension cord', 'a rice cooker'],
   'nav.post': 'Add listing', 'nav.signin': 'Sign in', 'nav.signout': 'Sign out',
+  'nav.menu': 'Menu', 'nav.menu.close': 'Close menu', 'nav.menu.unread': (n) => `Menu, ${n} unread message${n === 1 ? '' : 's'}`, 'nav.unread': (n) => `${n} unread message${n === 1 ? '' : 's'}`,
   'nav.my': 'My listings', 'nav.messages': 'Messages', 'nav.saved': 'Saved', 'nav.rules': 'Rules & safety',
   'home.title': 'Latest on campus', 'home.lede': 'Things other students are passing on. Free to use, no fees, meet on campus.',
   /* 'filter.all' still belongs to the campus row, where "All" is the whole
@@ -249,6 +250,7 @@ const ZH = {
   'search.terms': ['书桌', '自行车', '水壶', '教材',
                    '办公椅', '冬季外套', '插线板', '电饭煲'],
   'nav.post': '发布物品', 'nav.signin': '登录', 'nav.signout': '退出',
+  'nav.menu': '菜单', 'nav.menu.close': '关闭菜单', 'nav.menu.unread': (n) => `菜单，${n} 条未读消息`, 'nav.unread': (n) => `${n} 条未读消息`,
   'nav.my': '我的发布', 'nav.messages': '消息', 'nav.saved': '收藏', 'nav.rules': '规则与安全',
   'home.title': '校园最新', 'home.lede': '同学们转让的物品。免费使用，无手续费，校内当面交易。',
   'filter.all': '全部', 'filter.cat.all': '全部分类',

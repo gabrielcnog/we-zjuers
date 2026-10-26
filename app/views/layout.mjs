@@ -35,6 +35,7 @@ export const ICONS = {
   x: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
   alert: svg('<path d="M12 8v5M12 16.5v.01"/><circle cx="12" cy="12" r="9"/>'),
   info: svg('<path d="M12 11v5.5M12 7.5v.01"/><circle cx="12" cy="12" r="9"/>'),
+  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),
   mapPin: svg('<path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>'),
   details: svg('<path d="M5 6h14M5 11h14M5 16h9"/>'),
   chevronLeft: svg('<path d="m15 18-6-6 6-6"/>'),
@@ -360,6 +361,7 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=${ASSET_V}">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon-32.png?v=${ASSET_V}">
 <link rel="apple-touch-icon" href="/assets/icon-180.png?v=${ASSET_V}">
+<noscript><style>.app-burger{display:none !important} .app-nav--user{display:flex !important}</style></noscript>
 </head>
 <body class="zl-ui">
 <a class="zl-sr-only" href="#main">${esc(t('a11y.skip'))}</a>
@@ -409,7 +411,8 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
            animated hint. -->
       <button class="zl-search__btn" type="submit" aria-label="${esc(searchLabel)}">${unwrap(ICON.search)}</button>
     </form>
-    <nav class="app-nav">
+    ${user ? `<button type="button" class="app-burger js-menu-open" aria-haspopup="dialog" aria-controls="appMenu" aria-expanded="false" aria-label="${esc(unread ? t('nav.menu.unread', unread) : t('nav.menu'))}">${unwrap(ICONS.menu)}${unread ? `<span class="app-dot" aria-hidden="true">${unread}</span>` : ''}</button>` : ''}
+    <nav class="app-nav${user ? ' app-nav--user' : ''}">
       ${user ? `<a class="app-nav__link" href="${L(locale, '/messages')}">${esc(t('nav.messages'))}${unread ? `<span class="app-dot">${unread}</span>` : ''}</a>` : ''}
       ${user ? `<a class="app-nav__link" href="${L(locale, '/my')}">${esc(t('nav.my'))}</a>` : ''}
       ${user ? `<a class="app-nav__link" href="${L(locale, '/saved')}">${esc(t('nav.saved'))}</a>` : ''}
@@ -424,6 +427,20 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
     </nav>
   </div>
 </header>
+${user ? `<dialog class="app-menu js-menu" id="appMenu" aria-labelledby="appMenuTitle">
+  <div class="app-menu__panel">
+    <div class="app-menu__head">
+      <h2 class="app-menu__title" id="appMenuTitle">${esc(t('nav.menu'))}</h2>
+      <button type="button" class="app-menu__close js-menu-close" aria-label="${esc(t('nav.menu.close'))}">${unwrap(ICONS.x)}</button>
+    </div>
+    <ul class="app-menu__list">
+      ${[['/messages', t('nav.messages'), unread], ['/my', t('nav.my'), 0], ['/saved', t('nav.saved'), 0]].map(([href, label, n]) =>
+        `<li><a class="app-menu__item" href="${L(locale, href)}"${path === L(locale, href) ? ' aria-current="page"' : ''}><span>${esc(label)}</span>${n ? `<span class="app-dot" aria-hidden="true">${n}</span><span class="zl-sr-only">${esc(t('nav.unread', n))}</span>` : ''}</a></li>`).join('')}
+      <li><a class="app-menu__item" href="${switchPath}" lang="${locale === 'en' ? 'zh' : 'en'}"><span>${esc(t('lang'))}</span></a></li>
+    </ul>
+    <form class="app-menu__signout" method="post" action="${L(locale, '/signout')}"><button class="app-menu__item app-menu__item--quiet" type="submit"><span>${esc(t('nav.signout'))}</span></button></form>
+  </div>
+</dialog>` : ''}
 <!-- Outside <header> on purpose: a sticky element can only stick inside its
      own parent, and on a phone the header itself scrolls away. As a sibling
      the section bar can stay pinned on its own. -->

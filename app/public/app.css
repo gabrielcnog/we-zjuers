@@ -1175,3 +1175,74 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 }
 .app-toast[hidden]{ display:none; }
 .app-gloss__head{ min-height:28px; }
+
+/* ============================================================
+   Header menu (phones, signed in)
+   Five links on their own row made a cramped second line under the logo. They
+   now live behind one button on the first row, in a drawer from the right. The
+   drawer is a native <dialog>: the browser traps focus, closes on Escape and
+   dims the page behind it. Signed-out visitors keep the two-item row (one link
+   and a button) and see no burger.
+   ============================================================ */
+.app-burger, .app-menu{ display:none; }
+@media (max-width:860px){
+  .app-burger{
+    display:inline-flex; align-items:center; justify-content:center; position:relative;
+    width:var(--zl-tap-min); height:var(--zl-tap-min); margin-left:auto; padding:0;
+    border:0; border-radius:var(--zl-radius); background:none; cursor:pointer;
+    color:var(--zl-on-brand);
+    transition:background-color var(--zl-duration) var(--zl-ease);
+  }
+  .app-burger:hover{ background:var(--zl-on-brand-hover); }
+  .app-burger:focus-visible{ outline:none; box-shadow:var(--zl-ring-on-brand); }
+  .app-burger svg{ width:24px; height:24px; }
+  /* A new message must not be hidden by tucking the link away. */
+  .app-burger .app-dot{ position:absolute; top:3px; right:1px; }
+  .app-nav--user{ display:none; }
+
+  .app-menu{
+    display:none; width:100%; max-width:none; height:100%; max-height:none;
+    margin:0; padding:0; border:0; background:transparent; color:var(--zl-text);
+  }
+  .app-menu[open]{ display:block; }
+  .app-menu::backdrop{ background:rgb(0 20 50 / .55); }
+  .app-menu__panel{
+    display:flex; flex-direction:column; width:min(86vw, 340px); height:100%; margin-left:auto;
+    overflow-y:auto; background:var(--zl-bg); box-shadow:var(--zl-shadow-pop);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .app-menu__head{
+    display:flex; align-items:center; justify-content:space-between;
+    min-height:64px; padding:0 var(--zl-s-2) 0 var(--zl-s-4);
+    border-bottom:1px solid var(--zl-border);
+  }
+  .app-menu__title{ margin:0; font-size:var(--zl-text-title); font-weight:var(--zl-weight-bold); }
+  .app-menu__close{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:var(--zl-tap-min); height:var(--zl-tap-min); padding:0;
+    border:0; border-radius:var(--zl-radius); background:none; cursor:pointer; color:var(--zl-text);
+  }
+  .app-menu__close:hover{ background:var(--zl-bg-sunken); }
+  .app-menu__close:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+  .app-menu__close svg{ width:24px; height:24px; }
+  .app-menu__list{ list-style:none; margin:0; padding:0; }
+  .app-menu__signout{ margin:0; border-top:1px solid var(--zl-border); }
+  .zl-ui .app-menu__item{
+    display:flex; align-items:center; justify-content:space-between; gap:var(--zl-s-3);
+    width:100%; min-height:56px; padding:0 var(--zl-s-4); box-sizing:border-box;
+    border:0; border-bottom:1px solid var(--zl-border); border-radius:0; background:none;
+    font:inherit; font-size:var(--zl-text-body); color:var(--zl-text); text-decoration:none; text-align:left; cursor:pointer;
+  }
+  .zl-ui .app-menu__signout .app-menu__item{ border-bottom:0; color:var(--zl-text-muted); }
+  .zl-ui .app-menu__item:hover{ background:var(--zl-bg-sunken); }
+  .zl-ui .app-menu__item:focus-visible{ outline:none; box-shadow:inset 0 0 0 2px var(--zl-focus, var(--zl-brand-surface)); }
+  .zl-ui .app-menu__item[aria-current="page"]{ font-weight:var(--zl-weight-semi); background:var(--zl-bg-sunken); }
+  html.menu-open{ overflow:hidden; }
+  @media (prefers-reduced-motion: no-preference){
+    .app-menu[open] .app-menu__panel{ animation:app-menu-in .18s var(--zl-ease); }
+    @keyframes app-menu-in{ from{ transform:translateX(24px); opacity:0; } to{ transform:none; opacity:1; } }
+  }
+  /* A browser without <dialog>: put the old link row back and drop the button. */
+  .no-menu .app-burger{ display:none; }
+  .no-menu .app-nav--user{ display:flex; }
+}

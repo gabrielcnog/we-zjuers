@@ -1,5 +1,32 @@
 /* Small and unbundled on purpose: this page is content, not an application. */
 (function () {
+  /* Header menu (phones, signed in). A native <dialog> does the hard parts:
+     focus stays inside, Escape closes it, and focus returns to the button. A
+     browser without it gets the old row of links back instead. */
+  var menuBtn = document.querySelector('.js-menu-open'), menu = document.getElementById('appMenu');
+  if (menuBtn && menu) {
+    if (typeof menu.showModal !== 'function') {
+      document.documentElement.classList.add('no-menu');
+    } else {
+      var root = document.documentElement;
+      var closeMenu = function () { if (menu.open) menu.close(); };
+      menuBtn.addEventListener('click', function () {
+        menu.showModal(); root.classList.add('menu-open'); menuBtn.setAttribute('aria-expanded', 'true');
+      });
+      menu.addEventListener('close', function () {
+        root.classList.remove('menu-open'); menuBtn.setAttribute('aria-expanded', 'false');
+      });
+      menu.querySelector('.js-menu-close').addEventListener('click', closeMenu);
+      /* The dialog fills the screen and the panel sits on its right edge, so a
+         click that lands on the dialog itself is a click on the dimmed area. */
+      menu.addEventListener('click', function (e) { if (e.target === menu) closeMenu(); });
+      /* Rotated or resized to the desktop layout while open: the button is gone. */
+      window.matchMedia('(min-width: 861px)').addEventListener('change', function (e) { if (e.matches) closeMenu(); });
+      /* Coming back with the Back button must not show an open menu. */
+      window.addEventListener('pageshow', closeMenu);
+    }
+  }
+
   /* The filter rail is rendered open so it works without JavaScript; below the
      rail breakpoint it starts collapsed so results are the first thing on screen. */
   var rail = document.querySelector('.js-rail');
