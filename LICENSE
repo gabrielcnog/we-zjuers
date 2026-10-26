@@ -1,0 +1,34 @@
+WeZJUers — source-available, all rights reserved
+
+Copyright (c) 2026 Gabriel Nogueira. All rights reserved.
+
+This repository is public so that it can be read and evaluated. It is not open
+source, and no licence to use it is granted.
+
+You may:
+  - view the source code in this repository, and run the hosted demo, for the
+    purpose of evaluating the project.
+
+You may not, without the copyright holder's prior written permission:
+  - use, run or deploy this software or any part of it, other than the hosted
+    demo, for any purpose, commercial or not;
+  - copy, modify, merge, adapt or create derivative works from it;
+  - publish, distribute, sublicense or sell it or any part of it;
+  - use its design system, text, data or artwork in another project.
+
+Nothing in this file limits the rights that the GitHub Terms of Service give
+other users of that platform (such as viewing and forking this repository
+within GitHub). Those rights come from GitHub's terms, not from this licence.
+
+Third-party components are not covered by this notice and remain under their
+own licences, including the "pg" Postgres client (MIT). Listing photographs are
+hotlinked from Unsplash and remain under the Unsplash License; they are not
+part of this repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+To ask for permission, open an issue on this repository.

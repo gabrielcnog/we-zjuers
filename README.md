@@ -17,12 +17,18 @@ goods change hands in person, on campus.
 Built for international students first, with a campus (not a city) as the unit
 that matters: ZJU is spread across seven.
 
-## Try it
+## The demo
 
-Everything runs in a **read-only demo mode** with made-up sample data. Press
+The hosted version runs in a **read-only demo mode** with made-up sample data. Press
 *Browse as a demo student* and look around. Posting, messaging, joining and
 voting are switched off, and nobody can create an account, so nothing you do
 there is saved.
+
+### Running it locally
+
+These notes are for the author and for anyone given written permission. The code
+is [all rights reserved](#licence), so running your own copy needs that
+permission.
 
 ```bash
 cd app
@@ -49,9 +55,7 @@ npm run seed && npm run seed:community && npm run seed:events
 
 ## Deploy
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/gabrielcnog/we-zjuers)
-
-[`render.yaml`](render.yaml) describes a web service and a Postgres database,
+[`render.yaml`](render.yaml) is the author's Render blueprint, and describes a web service and a Postgres database,
 and sets `DEMO_MODE=1`. The sample data loads itself on first boot, so there is
 nothing to seed and no keys to set.
 
@@ -113,6 +117,12 @@ scripts/   make-snapshot.sh, which regenerates the demo's sample data
 To change the sample data, edit the seed scripts, run them against a local
 database, then `npm run snapshot` (from `app/`) to regenerate
 `app/seed/demo-data.sql`.
+
+## Licence
+
+**All rights reserved.** The code is public so it can be read, not so it can be
+reused: see [LICENSE](LICENSE). Running the hosted demo is fine; using, copying
+or redistributing the code is not, without permission.
 
 ## Credits
 

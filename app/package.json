@@ -17,5 +17,6 @@
   "description": "WeZJUers: a free, bilingual student platform for Zhejiang University. Not an official ZJU platform.",
   "engines": {
     "node": ">=22"
-  }
+  },
+  "license": "UNLICENSED"
 }

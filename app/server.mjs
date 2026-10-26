@@ -559,7 +559,11 @@ const server = createServer(async (req, res) => {
          cannot be used to publish a phone number or an email instead. It is
          saved on the account; the tick records that this listing offers it. */
       const wechatIn = (f.wechat || '').trim();
-      if (wechatIn && !Q.WECHAT_RE.test(wechatIn)) return err(t('post.f.wechat.bad'));
+      /* A handle already saved on the account is not re-checked: it is the value
+         the form pre-fills, and the sample accounts carry 21-character demo
+         handles that the 20-character rule (WeChat's own limit) would reject
+         on every post. Only what the person newly types has to pass. */
+      if (wechatIn && wechatIn !== user.wechat_id && !Q.WECHAT_RE.test(wechatIn)) return err(t('post.f.wechat.bad'));
       if (wechatIn) await Q.setWechatId(user.id, wechatIn);
       const wechatOk = f.wechat_ok === '1' && !!(wechatIn || user.wechat_id);
 
