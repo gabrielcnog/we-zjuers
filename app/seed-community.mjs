@@ -256,6 +256,117 @@ const POSTS = [
    'Some courses seem to have them floating around, some do not. Is there an official place?',
    null,
    []],
+  /* ---- More of everyday life: a second pass so every board has company ---- */
+  ['food', 7, 'tip', 30, 38, 'zijingang',
+   'The little bakery behind the south gate is worth the detour',
+   'Opens early, sells out of the milk bread by nine. Around ¥6 for a loaf, and the owner does not mind if you point at things.\n\nGo before your first class and thank me later.',
+   null,
+   [[2, 2, 14, 'Their scallion rolls are the real find. Eat them warm.', []],
+    [5, 4, 9, '去晚了真的买不到，我周三早上必去。', []],
+    [3, 9, 4, 'Does it take WeChat Pay? I only have the app with a foreign card.', [
+      [7, 10, 5, 'Yes, scan the QR on the counter. Tested last week.', []],
+    ]]]],
+
+  ['study', 6, 'question', 14, 19, null,
+   'How do you handle group projects when half the group is still learning the language?',
+   'We have a team of five from four countries and our meetings drift into three languages. We are not fighting, just slow.\n\nAnything that worked for you?',
+   null,
+   [[1, 1, 12, 'Write the plan down in simple English before the meeting, and use the meeting only to agree or disagree with it. Much faster than talking it out.', []],
+    [8, 3, 7, 'Split by task, not by topic. Then everybody reports back in short written updates.', [
+      [6, 4, 3, 'We tried this yesterday. Already better, thanks.', []],
+    ]],
+    [9, 5, 6, '用共享文档，大家都在上面写，不用担心口语跟不上。', []]]],
+
+  ['paperwork', 2, 'tip', 52, 47, null,
+   'Setting up mobile payments as a foreigner — what worked for me',
+   'This is my experience, not a rule, so check with your bank. I linked a Chinese bank card to Alipay first, then WeChat Pay a day later.\n\nThe verification step wanted my passport and a local phone number; it took about ten minutes at the counter.\n\nIf you have trouble, the staff at the branch usually know exactly what to do.',
+   null,
+   [[0, 2, 16, 'Same order for me. I also kept a bit of cash for the small stalls that still prefer it.', []],
+    [4, 6, 8, 'Does anyone know if a foreign card works as a backup? Mine did not, but my friend’s did.', [
+      [2, 7, 4, 'It depends on the card and the shop. I would not count on it.', []],
+    ]]]],
+
+  ['campus-life', 8, 'question', 11, 12, 'yuquan',
+   'Quiet places to study after the library closes?',
+   'The library is lovely but shuts earlier than I work. Anywhere at Yuquan with a table, a plug and not too much noise?',
+   null,
+   [[7, 1, 8, 'The ground floor of Teaching Building 5 stays open for a while longer than the sign says. Bring your campus card.', []],
+    [1, 3, 5, 'The study rooms in the dorm common areas, if your block has one.', []]]],
+
+  ['sports', 3, 'discussion', 26, 22, null,
+   'Anyone up for a running group around the lake?',
+   'Early mornings, easy pace, about 5 km. Nobody left behind: we wait at the corners.\n\nTell me which days work and I will set one up.',
+   null,
+   [[0, 1, 9, 'Tuesday and Friday would be perfect for me.', []],
+    [6, 3, 6, 'In, but I will be the slow one.', [
+      [3, 4, 7, 'Everyone starts as the slow one. See you there.', []],
+    ]],
+    [2, 6, 4, 'Is there somewhere to leave a bag? I always forget the key.', []]]],
+
+  ['housing', 5, 'tip', 70, 33, 'yuquan',
+   '合租找室友的几点经验',
+   '1. 先说清楚作息和卫生习惯，别等住进去再讨论。\n2. 水电网怎么分摊，写下来。\n3. 带朋友过夜的规则，也提前讲。\n\n一起住不容易，但把这些讲明白，大部分矛盾都能避免。',
+   null,
+   [[1, 3, 12, 'Add: ask who is responsible for the deposit if somebody moves out early.', []],
+    [8, 5, 6, '我们还会建一个小群，有事直接在群里说，比当面轻松。', []]]],
+
+  ['clubs', 1, 'event', 18, 15, null,
+   'Photography society is recruiting — no gear needed',
+   'We meet every second week for a walk and share what we shot. Phones are completely fine, and so is zero experience.\n\nThere is a sign-up for the first walk on the Events page.',
+   null,
+   [[4, 2, 7, 'I joined last term without owning a camera. Best decision.', []],
+    [7, 5, 4, 'Is there a membership fee?', [
+      [1, 6, 3, 'No, it is free for students.', []],
+    ]]]],
+
+  ['language', 4, 'question', 40, 17, null,
+   'Good ways to practise characters beyond a dictionary app?',
+   'I can read menus on a good day but I forget everything I do not use. Flashcards help a little. What actually stuck for you?',
+   null,
+   [[5, 3, 11, '多看，多写。可以每天抄一段短新闻，慢慢就记住了。', []],
+    [2, 5, 7, 'Reading children’s books out loud. The sentences are short and the pictures help.', []],
+    [9, 8, 5, 'Change your phone language. Annoying for a week, then you stop noticing.', []]]],
+
+  ['careers', 9, 'tip', 60, 29, null,
+   'Internship search: what worked for me as an international student',
+   'Not a guarantee, just what I did. I asked my department which companies had taken international students before, and I wrote to those first.\n\nA short, simple message in Chinese with an English line underneath got more replies than a long English one.\n\nAlso go to the careers events. They are less awkward than they sound.',
+   null,
+   [[0, 4, 10, 'The tip about asking the department is gold.', []],
+    [3, 9, 5, 'Does a visa limit what kind of internship you can do? I never found a clear answer.', [
+      [9, 10, 6, 'It depends on your permit. Ask the International Student Office before you accept anything.', []],
+    ]]]],
+
+  ['events', 0, 'discussion', 8, 24, 'zijingang',
+   'What dish are you bringing to the semester-end potluck?',
+   'Starting a thread so we do not end up with nine salads. I am thinking something simple that travels well.',
+   null,
+   [[2, 1, 9, 'Jollof rice, enough for ten.', []],
+    [7, 2, 7, 'Kimchi pancakes, made on the spot if there is a hot plate.', []],
+    [5, 3, 6, '我带饺子，提前包好。', []],
+    [4, 5, 4, 'Dessert is covered by me. Tell me if somebody is allergic to nuts.', []]]],
+
+  ['campus-life', 7, 'discussion', 100, 41, null,
+   'Small dorm tricks nobody told you about',
+   'Mine: a shower caddy that hangs from the door, a second power strip, and a bag of coins for the laundry.\n\nWhat is yours?',
+   null,
+   [[3, 2, 14, 'Earplugs. Always earplugs.', []],
+    [9, 4, 11, '宿舍晚上很冷，买一个电热毯，比空调省电。', []],
+    [6, 6, 8, 'A clip-on desk lamp so you do not wake your roommate.', []],
+    [8, 10, 5, 'Hooks with suction cups, removable, do not damage the wall.', []]]],
+
+  ['food', 6, 'question', 4, 6, 'haining',
+   'Vegetarian food in Haining?',
+   'I have been eating a lot of plain rice. Is there somewhere that does proper vegetarian dishes, not just a bit of meat on the side?',
+   null,
+   [[4, 1, 6, 'The canteen on the first floor has a vegetable counter. Ask for no pork broth.', []]]],
+
+  ['sports', 8, 'event', 20, 9, 'zijingang',
+   'Looking for a fourth for badminton doubles tomorrow evening',
+   'Two of us and one more, intermediate level. We will be at the Zijingang courts around seven. DM me if you can make it.',
+   'Badminton racket + case (Yonex)',
+   [[7, 1, 4, 'I could be there at 7:15, is that too late?', [
+      [8, 2, 3, 'Not at all, we start slowly.', []],
+    ]]]],
 ];
 
 async function main() {

@@ -65,7 +65,7 @@ list — the whole feature is a noticeboard with a register attached.
 | `app/lib/events.mjs` | Feed and date windows, detail, participants, join/leave, categories |
 | `app/lib/names.mjs` | Which name form a given viewer sees |
 | `app/views/events.mjs` | List, detail, create form, the organiser gate |
-| `app/seed-events.mjs` | 8 events, 25 signups, and the name split (`npm run seed:events`) |
+| `app/seed-events.mjs` | 24 events (from tonight out to three months ahead), 74 signups, and the name split (`npm run seed:events`) |
 
 Joining is a form POST and a redirect, not a fetch: it works with JavaScript
 off, and the page you land on is the proof it worked. Capacity is checked

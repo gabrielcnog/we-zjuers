@@ -99,7 +99,8 @@ export function eventCard(e, { locale, t, joinedKey = 'ev.joined' }) {
       <p class="app-ev-tile__org">${e.org_name}</p>
       <div class="zl-card__meta">
         ${e.campus ? h`<span class="zl-badge zl-badge--campus">${campusLabel(e.campus, locale, t)}</span>` : raw('')}
-        <span class="zl-caption">${t('ev.going', e.signup_count)}</span>
+        ${/* "0 going" reads as nobody wants to come; say nothing until someone does. */ raw('')}
+        ${e.signup_count > 0 ? h`<span class="zl-caption">${t('ev.going', e.signup_count)}</span>` : raw('')}
       </div>
     </div>
   </article>`;
@@ -291,7 +292,7 @@ export function eventPage({ locale, t, e, parts, user, error, organiser, organis
           ${e.campus ? h`<span class="zl-badge zl-badge--campus">${campusLabel(e.campus, locale, t)}</span>` : raw('')}
         </div>
         <p class="zl-caption app-detail__signals">
-          <span>${t('ev.going', e.signup_count)}</span>
+          ${e.signup_count > 0 ? h`<span>${t('ev.going', e.signup_count)}</span>` : raw('')}
           ${scarce ? h`<span class="app-ev-scarce">${t('ev.places', left, e.capacity)}</span>` : raw('')}
         </p>
       </header>

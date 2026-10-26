@@ -87,9 +87,119 @@ const EVENTS = [
    'A different film each month, always with English subtitles, always followed by an argument about it in the corridor.',
    'zijingang', 'Lecture hall 2, Zijingang', at(-5, 19), at(-5, 22), 80, null, 'Mei L.',
    ['Gabriel N.', 'Nadia B.']],
+
+  /* ---- Soon: the next two or three weeks ---- */
+  ['ZJU Photography Society', 'club',
+   'Campus photo walk — golden hour at Zijingang',
+   'Ninety minutes around the lake and the old library, with a short tip for each stop. Any camera is fine, a phone included.\n\nWe share the favourites in a group chat afterwards.',
+   'zijingang', 'Library steps, Zijingang', at(5, 16, 30), at(5, 19), 25, null, 'Chen Yu',
+   ['Aisha R.', 'Ji-woo P.', 'Nadia B.']],
+
+  ['ZJU Badminton Club', 'sports',
+   'Doubles evening — all levels, pairs sign up together',
+   'Round-robin doubles, short games so everyone plays a lot. Rackets can be borrowed at the desk.\n\nEnter as a pair: your partner goes in the squad box.',
+   'xixi', 'Sports hall 2, Xixi', at(7, 19), at(7, 21, 30), 6, 2, 'Chen Yu',
+   ['Kenji T.', 'Sofia M.', 'Dmitri K.', 'Wang Hao', 'Ji-woo P.', 'Mei L.']],
+
+  ['ZJU Music Society', 'culture',
+   'Open mic night — bring a song, or just listen',
+   'Three minutes each, any language, any instrument. The piano is tuned this time.\n\nListeners are as welcome as performers; the front rows fill up first.',
+   'yuquan', 'Student activity hall, Yuquan', at(8, 19), at(8, 21, 30), 80, null, 'Mei L.',
+   ['Gabriel N.', 'Aisha R.', 'Nadia B.', 'Ji-woo P.', 'Sofia M.']],
+
+  ['ZJU Board Game Society', 'club',
+   'Board game café night — learn something new',
+   'Two tables of easy games for first-timers and two for people who already own too many. Snacks on the house.',
+   'yuquan', 'Club room 3, Yuquan', at(10, 19), at(10, 22), 10, null, 'Mei L.',
+   ['Gabriel N.', 'Kenji T.', 'Sofia M.', 'Wang Hao', 'Dmitri K.', 'Ji-woo P.', 'Nadia B.', 'Chen Yu', 'Aisha R.']],
+
+  ['ZJU Debate Club', 'talk',
+   'Beginner debate workshop — no experience needed',
+   'We give you a motion, ten minutes to prepare, and a friendly room. The point is to find out that you can do this, not to win.\n\nRun in English, with a Chinese round at the end.',
+   'zijingang', 'Teaching building B, room 204', at(12, 18, 30), at(12, 20, 30), 30, null, 'Mei L.',
+   ['Dmitri K.', 'Nadia B.']],
+
+  ['ZJU Volunteer Association', 'club',
+   'Weekend volunteering — English corner at a community school',
+   'Half a day with primary school children who want to practise their English. No teaching experience needed; we send a short plan beforehand.\n\nA minibus leaves from the east gate.',
+   'off_campus', 'East gate bus stop', at(16, 8, 30), at(16, 13), 20, null, 'Chen Yu',
+   ['Aisha R.', 'Sofia M.', 'Kenji T.']],
+
+  ['ZJU International Student Union', 'party',
+   'International food market — twelve countries, one square',
+   'Stalls run by student groups: bring cash or WeChat Pay, and an appetite. Each stall has an ingredients card for anyone with allergies.',
+   'zijingang', 'Main square, Zijingang', at(20, 17), at(20, 21), null, null, 'Mei L.',
+   ['Gabriel N.', 'Aisha R.', 'Dmitri K.']],
+
+  /* ---- Later: weeks and months out, so there is always something to join ---- */
+  ['Hangzhou Walks', 'culture',
+   'West Lake sunrise walk',
+   'Up early for the quietest hour at the lake. Easy flat walking, about two hours, with breakfast at the end.\n\nWe meet by the metro because the first buses are unreliable.',
+   'off_campus', 'Longxiangqiao metro exit, 05:30', at(24, 5, 30), at(24, 9), 40, null, 'Chen Yu',
+   ['Kenji T.', 'Sofia M.']],
+
+  ['ZJU Career Centre', 'talk',
+   'Working in China after graduation — a panel for international students',
+   'Three alumni talk about finding a first job, what employers ask, and what they wish they had known. Questions from the room at the end.\n\nThe session is in English; slides are shared afterwards.',
+   'zijingang', 'Lecture hall 1, Zijingang', at(30, 15), at(30, 17), 120, null, 'Mei L.',
+   ['Gabriel N.', 'Nadia B.', 'Ji-woo P.', 'Dmitri K.']],
+
+  ['ZJU Football Association', 'sports',
+   'Winter five-a-side league — registration and first matches',
+   'Eight weeks, one match a week, teams of six. Captains register the squad here; free agents are matched into teams on the day.',
+   'yuquan', 'Astro pitch, Yuquan', at(38, 14), at(38, 18), 24, 6, 'Chen Yu',
+   ['Wang Hao']],
+
+  ['ZJU Language Exchange', 'talk',
+   'Language exchange weekend — Anji bamboo forest',
+   'Two days outside the city, speaking only the language you are learning. Beds in shared rooms, meals included.\n\nCar share from the east gate on Saturday morning.',
+   'off_campus', 'Anji county, minibus from the east gate', at(45, 8), at(46, 17), 35, null, 'Mei L.',
+   ['Aisha R.', 'Dmitri K.']],
+
+  ['ZJU International Student Union', 'party',
+   'Semester-end potluck — bring a dish from home',
+   'The last big gathering before the break. Bring something that tastes like where you are from; we provide plates, rice and tea.\n\nPut your dish in the comments on the announcement so we do not end up with nine salads.',
+   'zijingang', 'Student Centre, Zijingang', at(58, 18), at(58, 22), 150, null, 'Mei L.',
+   ['Gabriel N.']],
+
+  ['International Kitchen', 'cooking',
+   'Hotpot masterclass — and how not to order it wrong',
+   'Broths, dipping sauces, what goes in first and what to leave alone. Then we eat all of it.',
+   'yuquan', 'Dormitory 12 common kitchen', at(65, 18, 30), at(65, 21), 24, null, 'Chen Yu',
+   []],
+
+  ['ZJU Music Society', 'culture',
+   'Winter concert — student orchestra and choir',
+   'Two hours of music from students across every college, from film themes to a Chinese folk suite. Free, but seats are limited, so add yourself here.',
+   'zijingang', 'Grand hall, Zijingang', at(80, 19), at(80, 21, 30), 600, null, 'Mei L.',
+   ['Sofia M.']],
+
+  ['Student Societies Council', 'club',
+   'Spring club fair — new societies, new stalls',
+   'The second round: every society recruits again, and the ones that did not exist last semester introduce themselves. Good moment to try something you missed.',
+   'zijingang', 'Main square, Zijingang', at(100, 13), at(100, 17), null, null, 'Mei L.',
+   []],
+
+  /* ---- Already over: shows the finished state ---- */
+  ['ZJU International Student Union', 'culture',
+   'Welcome-week campus tour in English',
+   'A walking tour of Zijingang led by second-year students: canteens, the library, where the post office actually is.',
+   'zijingang', 'Gate 1, Zijingang', at(-12, 10), at(-12, 12), 40, null, 'Mei L.',
+   ['Aisha R.', 'Kenji T.', 'Sofia M.', 'Dmitri K.', 'Nadia B.', 'Gabriel N.', 'Ji-woo P.']],
 ];
 
 const TEAMS = {
+  'Doubles evening — all levels, pairs sign up together': {
+    'Kenji T.':  ['Kenji and Mei', 'Mei Chen'],
+    'Sofia M.':  ['Net Gains', 'Camila R.'],
+    'Dmitri K.': ['The Shuttlecocks', 'Ivan P.'],
+    'Wang Hao':  ['Hao and Hao', 'Hao Lin'],
+    'Ji-woo P.': ['Dorm 12 B', 'Min-jun K.'],
+    'Mei L.':    ['Club committee', 'Yu Chen'],
+  },
+  'Winter five-a-side league — registration and first matches': {
+    'Wang Hao': ['Canteen 2 FC', 'Lin Feng\nZhao Kai\nYusuf A.\nTomás P.\nMarco B.'],
+  },
   'Inter-college 5-a-side tournament': {
     'Gabriel N.': ['Medicine United', 'Rafael S.\nTomás P.\nLiu Wei\nMarco B.'],
     'Dmitri K.':  ['Zijingang Rovers', 'Ivan P.\nSasha M.\nChen Long\nYusuf A.'],
@@ -99,13 +209,27 @@ const TEAMS = {
   },
 };
 
-const ANNOUNCE = {
-  by: 'Mei L.',
-  title: 'Autumn welcome party — everyone is invited, nothing to pay',
-  body: 'Friday from seven at the Student Centre. Music, food from a dozen '
-      + 'countries, and a room full of people who also arrived this year.\n\n'
-      + 'Put your name down on the event page so we know how much food to order.',
-};
+const ANNOUNCE = [
+  { by: 'Mei L.', event: 'Autumn welcome party — all nationalities', campus: 'zijingang', score: 31, hoursAgo: 6,
+    title: 'Autumn welcome party — everyone is invited, nothing to pay',
+    body: 'Friday from seven at the Student Centre. Music, food from a dozen '
+        + 'countries, and a room full of people who also arrived this year.\n\n'
+        + 'Put your name down on the event page so we know how much food to order.' },
+  { by: 'Chen Yu', event: 'Saturday hike — Longjing tea fields', campus: 'off_campus', score: 18, hoursAgo: 30,
+    title: 'Longjing hike: what to bring and where we meet',
+    body: 'Comfortable shoes, water, and a layer for the top. We meet at the metro exit '
+        + 'and walk about three hours, with a long tea stop halfway.\n\n'
+        + 'If it rains hard the night before we move it a week and tell everyone on the event page.' },
+  { by: 'Mei L.', event: 'International food market — twelve countries, one square', campus: 'zijingang', score: 24, hoursAgo: 14,
+    title: 'Running a stall at the international food market? Read this first',
+    body: 'Student groups can still take a table. Tell us what you are cooking, '
+        + 'and put an ingredients card on the front for anyone with allergies.\n\n'
+        + 'We provide the table, power and a cashier QR code; you bring the food.' },
+  { by: 'Mei L.', event: 'Semester-end potluck — bring a dish from home', campus: 'zijingang', score: 12, hoursAgo: 52,
+    title: 'Potluck sign-up: what are you bringing?',
+    body: 'Reply here with your dish so we can keep the table varied. Rice, plates '
+        + 'and tea are on us. Vegetarian and halal dishes are especially welcome.' },
+];
 
 async function main() {
   await migrate();
@@ -147,19 +271,21 @@ async function main() {
       }
     }
 
-    /* 4. One announcement post, so the Community -> Events bridge is visible
-          out of the box rather than only after somebody posts by hand. The
-          post is replaced on each run so the link never dangles. */
+    /* 4. Announcement posts, so the Community -> Events bridge is visible out
+          of the box rather than only after somebody posts by hand. Each is
+          replaced on every run so the link never dangles. */
     const [board] = (await c.query(`SELECT id FROM board WHERE slug = 'events'`)).rows;
-    const [ev] = (await c.query(
-      `SELECT id FROM event WHERE category = 'party' ORDER BY starts_at LIMIT 1`)).rows;
-    if (board && ev) {
-      await c.query(`DELETE FROM post WHERE title = $1`, [ANNOUNCE.title]);
-      await c.query(
-        `INSERT INTO post (id, board_id, user_id, kind, title, body, campus, event_id, score, created_at)
-         VALUES ($1,$2,$3,'event',$4,$5,'zijingang',$6,$7,$8)`,
-        [uid(), board.id, byName[ANNOUNCE.by], ANNOUNCE.title, ANNOUNCE.body, ev.id, 31,
-         new Date(Date.now() - 6 * 36e5).toISOString()]);
+    if (board) {
+      for (const a of ANNOUNCE) {
+        const [ev] = (await c.query(`SELECT id FROM event WHERE title = $1 LIMIT 1`, [a.event])).rows;
+        if (!ev) continue;
+        await c.query(`DELETE FROM post WHERE title = $1`, [a.title]);
+        await c.query(
+          `INSERT INTO post (id, board_id, user_id, kind, title, body, campus, event_id, score, created_at)
+           VALUES ($1,$2,$3,'event',$4,$5,$6,$7,$8,$9)`,
+          [uid(), board.id, byName[a.by], a.title, a.body, a.campus, ev.id, a.score,
+           new Date(Date.now() - a.hoursAgo * 36e5).toISOString()]);
+      }
     }
   });
 
