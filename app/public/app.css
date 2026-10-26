@@ -1116,8 +1116,12 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 .app-ev-roster__team{ display:grid; gap:var(--zl-s-0-5); }
 .app-ev-roster__mates{ margin:var(--zl-s-1) 0 0; padding-left:var(--zl-s-5); color:var(--zl-text-muted); font-size:var(--zl-text-sm); }
 
-.app-ev-people__gate{ margin:var(--zl-s-2) 0; }
-.app-ev-people-sec{ margin-top:var(--zl-s-2); }
+.app-ev-people__gate{ margin:0; }   /* the section's gap spaces it now; its own margin doubled it */
+/* The section owns the space between its title and what follows it, the same
+   rule the profile page's sections follow. The title is margin:0 (.zl-h3), so
+   with a plain block here the cards sat 0px under it. 24px matches the profile;
+   it covers the cards, the "nobody yet" line and the sign-in prompt alike. */
+.app-ev-people-sec{ display:grid; gap:var(--zl-s-6); margin-top:var(--zl-s-2); }
 
 /* The linked-event card in a community post, matching the linked listing. */
 .app-linked__cat{
