@@ -53,10 +53,10 @@ export async function findOrCreateUser(email, displayName) {
   return one('SELECT * FROM "user" WHERE id = $1', [id]);
 }
 
-export async function createSession(userId) {
+export async function createSession(userId, days = SESSION_DAYS) {
   const t = token();
   await run('INSERT INTO session (id,user_id,token_hash,expires_at,created_at) VALUES ($1,$2,$3,$4,$5)',
-    [uid(), userId, sha256(t), new Date(Date.now() + SESSION_DAYS * 864e5).toISOString(), now()]);
+    [uid(), userId, sha256(t), new Date(Date.now() + days * 864e5).toISOString(), now()]);
   return t;
 }
 export async function userForToken(t) {

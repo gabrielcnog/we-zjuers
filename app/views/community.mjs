@@ -8,6 +8,7 @@ import { ref } from '../lib/queries.mjs';
 import { sized } from '../lib/unsplash.mjs';
 import { boards, KINDS, SORTS } from '../lib/community.mjs';
 import { L, ICON, ICONS, campusName, priceTag, pageHeader, alert, crumbs, arrowLink } from './layout.mjs';
+import { DEMO } from '../lib/demo.mjs';
 import { personName, personInitials } from '../lib/names.mjs';
 
 const REPORT_REASONS = ['spam', 'offensive', 'other'];
@@ -161,7 +162,7 @@ function aside({ locale, t, stats, board }) {
         <div><dt>${t('com.stats.comments')}</dt><dd>${stats.comments}</dd></div>
         <div><dt>${t('com.stats.members')}</dt><dd>${stats.members}</dd></div>
       </dl>` : raw('')}
-      <a class="zl-btn zl-btn--primary zl-btn--block" href="${L(locale, '/community/new') + (board ? '?board=' + board.slug : '')}">${ICONS.plus}<span>${t('com.new')}</span></a>
+      ${DEMO ? raw('') : h`<a class="zl-btn zl-btn--primary zl-btn--block" href="${L(locale, '/community/new') + (board ? '?board=' + board.slug : '')}">${ICONS.plus}<span>${t('com.new')}</span></a>`}
     </div>
     <div class="app-side-card">
       <h2 class="app-side-card__title">${t('com.guidelines')}</h2>
@@ -212,7 +213,7 @@ export function communityFeed({ locale, t, board, rows, total, sort, query, stat
               <div class="zl-icon-ring zl-icon-ring--lg" aria-hidden="true">${CI.bubble}</div>
               <div class="zl-empty__title">${t('com.empty')}</div>
               <p class="zl-empty__body">${t('com.empty.body')}</p>
-              <a class="zl-btn zl-btn--primary" href="${L(locale, '/community/new') + (board ? '?board=' + board.slug : '')}">${ICONS.plus}<span>${t('com.new')}</span></a>
+              ${DEMO ? raw('') : h`<a class="zl-btn zl-btn--primary" href="${L(locale, '/community/new') + (board ? '?board=' + board.slug : '')}">${ICONS.plus}<span>${t('com.new')}</span></a>`}
             </div>`}
       </div>
     </div>

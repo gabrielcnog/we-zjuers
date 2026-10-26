@@ -66,7 +66,11 @@ export async function tx(fn) {
 export async function ensureDatabase() {
   const name = new URL(DATABASE_URL).pathname.slice(1) || DEFAULT_DB;
   const admin = new pg.Client({ connectionString: DATABASE_URL.replace(/\/[^/]*$/, '/postgres') });
-  await admin.connect();
+  /* A managed host (Render, Fly, Heroku) hands you one database that already
+     exists and a user who may not be allowed into the maintenance database at
+     all. Failing to get in is not failing to have a database: carry on, and
+     let the first real query say so if it is actually missing. */
+  try { await admin.connect(); } catch { return null; }
   try {
     const { rowCount } = await admin.query('SELECT 1 FROM pg_database WHERE datname = $1', [name]);
     if (!rowCount) {

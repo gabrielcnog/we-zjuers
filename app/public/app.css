@@ -1126,3 +1126,10 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
   border-radius:var(--zl-radius-sm); font-size:24px;
 }
 .app-linked__go{ color:var(--zl-link); font-weight:var(--zl-weight-medium); }
+
+/* Demo banner, under the section tabs. A note, not an alert: it is there so a
+   visitor who finds a button dead knows why, and then gets out of the way. */
+.app-demobar{
+  background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
+  font-size:var(--zl-text-sm); padding:var(--zl-s-2) 0; text-align:center;
+}

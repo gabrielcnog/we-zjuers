@@ -11,6 +11,8 @@ import { fileURLToPath } from 'node:url';
 import { migrate, expireOverdue, pool, now, DATABASE_URL } from './db.mjs';
 import * as Q from './lib/queries.mjs';
 import * as A from './lib/auth.mjs';
+import { DEMO, PROD, DEMO_EMAIL, DEMO_SESSION_DAYS, refusal, ensureDemoUser } from './lib/demo.mjs';
+import { loadSnapshotIfEmpty, freshenIfStale } from './lib/snapshot.mjs';
 import { translator, LOCALES } from './lib/i18n.mjs';
 import { page, L, ICONS } from './views/layout.mjs';
 import * as V from './views/pages.mjs';
@@ -193,6 +195,21 @@ const server = createServer(async (req, res) => {
     const params = Object.fromEntries(url.searchParams);
     const favSet = await Q.favoriteIds(user?.id);
 
+    /* Demo mode: refuse every write that is not on the short allowlist, and
+       the pages that only exist to compose one. One check, before any route,
+       so nothing added later is writable by accident. See lib/demo.mjs. */
+    const blocked = refusal(req.method, url.pathname);
+    if (blocked) {
+      /* A form post asks for HTML; the page's own fetch() calls (Save, vote)
+         do not, and want something they can read rather than a whole page. */
+      const fromScript = !(req.headers.accept || '').includes('text/html');
+      if (req.method === 'POST' && fromScript) return json(res, 403, { error: 'demo' });
+      return send(res, 403, page({ locale, t, user, title: t('demo.refused.title'), unread, path: url.pathname,
+        body: `<div class="app-narrow"><h1 class="zl-h2">${esc(t('demo.refused.title'))}</h1>`
+          + `<p class="zl-muted">${esc(t('demo.refused.body'))}</p>`
+          + `<a class="zl-btn zl-btn--primary" href="${L(locale, '/community')}">${esc(t('com.title'))}</a></div>` }));
+    }
+
     /* Every route whose second segment is a record id: reject anything that
        isn't a UUID here, once, as a 404 — otherwise Postgres throws on the cast
        and the visitor gets a 500 for mistyping a link. */
@@ -301,7 +318,7 @@ const server = createServer(async (req, res) => {
          seller. "Add listing" would be competing with the thing you came for,
          and the real button is a scroll away. Your own listing keeps the
          default — you cannot message yourself. */
-      if (l.status === 'active' && user?.id !== l.user_id) {
+      if (!DEMO && l.status === 'active' && user?.id !== l.user_id) {
         fabOverride = { action: L(locale, '/listing/' + l.id + '/contact'), label: t('listing.contact'), icon: ICONS.message };
       }
       return render(l.title, V.listing({
@@ -457,9 +474,25 @@ const server = createServer(async (req, res) => {
     if (rest[0] === 'signin') {
       if (req.method === 'GET')
         return render(t('auth.title'), V.signin({
-          t, locale, step: 'email', email: '', next: safeNext(params.next) }));
+          t, locale, demo: DEMO, step: 'email', email: '', next: safeNext(params.next) }));
       const f = parseForm(await readBody(req));
       sectionOverride = sectionOf(safeNext(f.next));
+      /* Demo: the one way in. A shared read-only account, a day long, and a
+         cap on how fast sessions can be minted so the button cannot be used
+         to fill the session table. */
+      if (DEMO && f.step === 'demo') {
+        if (!A.rateLimit('demo-login', 300, 36e5))
+          return send(res, 429, 'Busy — try again in a few minutes.');
+        const id = await ensureDemoUser();
+        const tok = await A.createSession(id, DEMO_SESSION_DAYS);
+        A.setCookie(res, tok, DEMO_SESSION_DAYS);
+        return redirect(res, safeNext(f.next) || L(locale, '/community'),
+          { 'Set-Cookie': res.getHeader('Set-Cookie') });
+      }
+      /* Demo: no email sign-in and so no sign-up. Refused, not hidden — the
+         form being absent from the page does not stop a hand-written POST. */
+      if (DEMO) return render(t('auth.title'), V.signin({
+        t, locale, demo: true, step: 'email', email: '', next: safeNext(f.next), error: t('demo.nosignup') }));
       if (f.step === 'request') {
         const email = (f.email || '').trim().toLowerCase();
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
@@ -469,7 +502,7 @@ const server = createServer(async (req, res) => {
         const code = await A.requestCode(email);
         console.log(`\n  ✉  sign-in code for ${email}: ${code}\n`);
         return render(t('auth.title'), V.signin({
-          t, locale, step: 'code', email, devCode: code, next: safeNext(f.next) }));
+          t, locale, step: 'code', email, devCode: PROD ? undefined : code, next: safeNext(f.next) }));
       }
       if (f.step === 'verify') {
         const email = (f.email || '').trim().toLowerCase();
@@ -834,10 +867,24 @@ const server = createServer(async (req, res) => {
 const boot = async () => {
   const created = await migrate();
   if (created) console.log('  ' + created);
+  /* Demo only, and before anything reads the reference data: an empty
+     database gets the sample data, and a stale one is moved back to "now". */
+  if (DEMO) {
+    if (await loadSnapshotIfEmpty()) console.log('  DEMO_MODE: loaded the sample data');
+    const moved = await freshenIfStale();
+    if (moved) console.log(`  DEMO_MODE: sample data was ${moved} days old, moved to today`);
+  }
   const expired = await expireOverdue();
   // Hourly sweep: a server running for weeks would otherwise keep showing
   // listings whose 30 days ran out. unref() so it never holds the process open.
   setInterval(() => expireOverdue().catch((err) => console.error('[expiry]', err.message)), 36e5).unref();
+  if (DEMO) {
+    await ensureDemoUser();
+    /* Demo sessions are minted on a button press, so expired ones are swept. */
+    setInterval(() => pool.query('DELETE FROM session WHERE expires_at < now()')
+      .catch((err) => console.error('[sessions]', err.message)), 36e5).unref();
+    console.log('  DEMO_MODE: read-only, sign-up off, one shared demo account');
+  }
   await Q.loadRef();
   await C.loadBoards();
   const { n, total } = await import('./db.mjs').then((m) =>
@@ -858,8 +905,10 @@ const boot = async () => {
         + `     Fix (keeps the photos):  npm run refresh:demo\n`
       : `\n  !  The marketplace will render EMPTY: there are no listings at all.\n`
         + `     Fix:  npm run seed && npm run seed:community\n`);
-    console.log(`  Sign in with any seeded email, e.g. demo@we-zjuers.com`);
-    console.log(`  The 6-digit code is printed here and shown on screen.\n`);
+    if (!DEMO) {
+      console.log(`  Sign in with any seeded email, e.g. demo@we-zjuers.com`);
+      console.log(`  The 6-digit code is printed here${PROD ? '.' : ' and shown on screen.'}\n`);
+    }
   });
 };
 boot().catch((e) => { console.error('\nBoot failed:', e.message); process.exit(1); });

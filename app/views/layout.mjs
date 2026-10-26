@@ -1,6 +1,7 @@
 import { h, raw, esc, html as unwrap, money, ago, qs } from '../lib/html.mjs';
 import { ref } from '../lib/queries.mjs';
 import { sized, srcset } from '../lib/unsplash.mjs';
+import { DEMO, DEMO_EMAIL } from '../lib/demo.mjs';
 
 export const other = (l) => (l === 'en' ? 'zh' : 'en');
 
@@ -324,7 +325,8 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
      anyone else, and the header and the thumb button both go quiet. */
   const mayAct = !sec.cta.organiserOnly
     || (user && (user.role === 'organizer' || user.role === 'admin'));
-  const cta = mayAct ? { href: L(locale, sec.cta.href), label: t(sec.cta.label) } : null;
+  /* Demo: every creation button would lead to a refusal, so there are none. */
+  const cta = mayAct && !DEMO ? { href: L(locale, sec.cta.href), label: t(sec.cta.label) } : null;
   const switchPath = '/' + o + (path.replace(/^\/(en|zh)/, '') || '/');
   /* The logo is the name and nothing else: no mark beside it, no spans inside
      it. Real text — sharp at any density, selectable, readable by a screen
@@ -439,6 +441,8 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
       }).join('\n      ')}
   </div>
 </nav>
+${DEMO && user && user.email === DEMO_EMAIL
+  ? `<div class="app-demobar" role="note"><div class="zl-container">${esc(t('demo.banner'))}</div></div>` : ''}
 <main id="main" class="zl-container app-main">
 ${unwrap(body)}
 </main>

@@ -2,6 +2,7 @@ import { h, raw, esc, html as unwrap, money, ago, qs } from '../lib/html.mjs';
 import { ref } from '../lib/queries.mjs';
 import { personName, personInitials } from '../lib/names.mjs';
 import { eventCard } from './events.mjs';
+import { DEMO } from '../lib/demo.mjs';
 import { sized, srcset, utm, unsplashHome } from '../lib/unsplash.mjs';
 import { L, ICON, ICONS, feed, card, filters, appliedFilters, sortBar, selQuery, priceTag, campusName, categoryName,
   pageHeader, alert, crumbs, arrowLink, verifiedBadge } from './layout.mjs';
@@ -100,7 +101,7 @@ const emptyState = (t, locale) => h`<div class="zl-empty">
   <div class="zl-icon-ring zl-icon-ring--lg" aria-hidden="true">◇</div>
   <div class="zl-empty__title">${t('empty.title')}</div>
   <p class="zl-empty__body">${t('empty.body')}</p>
-  <a class="zl-btn zl-btn--primary" href="${L(locale, '/post')}">${ICONS.plus}<span>${t('nav.post')}</span></a>
+  ${DEMO ? raw('') : h`<a class="zl-btn zl-btn--primary" href="${L(locale, '/post')}">${ICONS.plus}<span>${t('nav.post')}</span></a>`}
 </div>`;
 
 /* ---------- Search ---------- */
@@ -563,8 +564,22 @@ export function thread({ locale, t, convo, msgs, me, otherUser, myWechat, theirW
 /* ---------- Sign in ----------
    One narrow column; the form fills it. The old fixed 340px form left the
    input and button short of the text above them on every phone. */
-export function signin({ t, locale, step, email, devCode, error, next }) {
+export function signin({ t, locale, step, email, devCode, error, next, demo = false }) {
   const nextField = next ? h`<input type="hidden" name="next" value="${next}">` : raw('');
+  /* Demo: no email field at all. One button, one shared read-only account. */
+  if (demo) return h`<div class="zl-narrow">
+    ${pageHeader({ title: t('demo.title'), description: t('demo.lede') })}
+    <div class="zl-stack">
+      ${error ? alert({ tone: 'danger', body: error }) : raw('')}
+      ${alert({ tone: 'info', body: t('demo.rules') })}
+      <form method="post" action="${L(locale, '/signin')}" class="zl-form">
+        <input type="hidden" name="step" value="demo">${nextField}
+        <div class="zl-form__actions">
+          <button class="zl-btn zl-btn--primary zl-btn--lg" type="submit"><span>${t('demo.enter')}</span></button>
+        </div>
+      </form>
+    </div>
+  </div>`;
   return h`<div class="zl-narrow">
     ${pageHeader({ title: t('auth.title'), description: t('auth.lede'), meta: t('auth.why') })}
     <div class="zl-stack">
@@ -711,7 +726,7 @@ export const contact = ({ t, locale }) => h`<div class="zl-narrow">
     <section class="zl-section">
       <h2 class="zl-h3 zl-section__title">${t('contact.organiser.title')}</h2>
       <p>${t('contact.organiser.body')}</p>
-      <p>${arrowLink(L(locale, '/community/new?board=' + CONTACT.board), t('contact.organiser.cta'))}</p>
+      ${DEMO ? raw('') : h`<p>${arrowLink(L(locale, '/community/new?board=' + CONTACT.board), t('contact.organiser.cta'))}</p>`}
     </section>
     <section class="zl-section">
       <h2 class="zl-h3 zl-section__title">${t('contact.report.title')}</h2>

@@ -20,7 +20,11 @@ export const boardBySlug = (slug) => boards().find((b) => b.slug === slug) || nu
 
 /* "Hot": votes and replies, decaying with age. The +2h offset keeps a brand
    new post from dividing by ~0 and rocketing to the top on its first vote. */
-const HOT = `((p.score + p.comment_count * 0.5 + 1) / power(EXTRACT(EPOCH FROM (now() - p.created_at)) / 3600 + 2, 1.5))`;
+/* GREATEST(…, 0): a post dated a moment in the future — clock skew between the
+   app and the database is enough — made the base of the power negative, and
+   Postgres refuses a negative number to a fractional power. The whole front
+   page returned a 500 over one post's timestamp. */
+const HOT = `((p.score + p.comment_count * 0.5 + 1) / power(GREATEST(EXTRACT(EPOCH FROM (now() - p.created_at)) / 3600, 0) + 2, 1.5))`;
 const ORDER = {
   hot: `${HOT} DESC, p.created_at DESC`,
   new: 'p.created_at DESC',

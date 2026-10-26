@@ -8,6 +8,7 @@
 import { h, raw, esc } from '../lib/html.mjs';
 import { CHAPTERS, GLOSSARY, GUIDE_SOURCE } from '../content/guide.mjs';
 import { L, pageHeader, arrowLink, extLink } from './layout.mjs';
+import { DEMO } from '../lib/demo.mjs';
 
 const pick = (o, locale) => (o ? (o[locale] ?? o.en) : '');
 
@@ -152,7 +153,7 @@ export function guide({ locale, t, q = '' }) {
 
       <div class="app-guide__foot">
         <p>${t('guide.feedback')}</p>
-        <a class="zl-btn zl-btn--secondary" href="${L(locale, '/community/new?board=paperwork&from=guide')}"><span>${t('guide.ask')}</span></a>
+        ${DEMO ? raw('') : h`<a class="zl-btn zl-btn--secondary" href="${L(locale, '/community/new?board=paperwork&from=guide')}"><span>${t('guide.ask')}</span></a>`}
       </div>
     </div>
 
