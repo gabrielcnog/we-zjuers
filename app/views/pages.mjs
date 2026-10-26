@@ -722,19 +722,19 @@ const RULES = {
 };
 export const contact = ({ t, locale }) => h`<div class="zl-narrow">
   ${pageHeader({ title: t('nav.contact'), description: t('contact.lede') })}
-  <div class="zl-stack">
-    <section class="zl-section">
+  <div class="zl-stack zl-stack--lg">
+    <section class="zl-section zl-section--prose">
       <h2 class="zl-h3 zl-section__title">${t('contact.organiser.title')}</h2>
       <p>${t('contact.organiser.body')}</p>
       ${DEMO ? raw('') : h`<p>${arrowLink(L(locale, '/community/new?board=' + CONTACT.board), t('contact.organiser.cta'))}</p>`}
     </section>
-    <section class="zl-section">
+    <section class="zl-section zl-section--prose">
       <h2 class="zl-h3 zl-section__title">${t('contact.report.title')}</h2>
       <p>${t('contact.report.body')}</p>
       <p>${arrowLink(L(locale, '/rules'), t('nav.rules'))}</p>
     </section>
     ${CONTACT.email
-      ? h`<section class="zl-section">
+      ? h`<section class="zl-section zl-section--prose">
             <h2 class="zl-h3 zl-section__title">${t('contact.email.title')}</h2>
             <p>${t('contact.email.body')}</p>
             <p><a class="zl-link-arrow" href="mailto:${CONTACT.email}">${CONTACT.email}</a></p>

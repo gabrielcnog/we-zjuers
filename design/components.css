@@ -84,7 +84,16 @@
    instead, the same way .zl-page-header does, and it cannot be cancelled by
    whatever type class the heading happens to wear. */
 .zl-section{ display:grid; gap:var(--zl-s-6); }
+/* Between sections, 48px, when they sit in a plain block (the profile). Inside
+   a .zl-stack the stack already spaces its children, so the margin stopped
+   being a separation and became a second, added on top: the Contact page
+   measured 72px between sections, 24 + 48. The parent owns the gap. */
 .zl-section + .zl-section{ margin-top:var(--zl-s-12); }
+.zl-stack > .zl-section + .zl-section{ margin-top:0; }
+/* A section that holds sentences rather than a grid of cards. 24px suits a
+   title above tiles and is far too loose above two lines of text, where it
+   made the title read as belonging to neither what is above nor below it. */
+.zl-section--prose{ gap:var(--zl-s-3); }
 .zl-section__title{ margin:0; }
 /* Same reason: a bare <p> empty state ("Not going to anything yet.") brings
    the browser's own margin and would sit further from its title than a grid
