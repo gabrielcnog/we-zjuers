@@ -128,19 +128,49 @@
    fields beside a small avatar, which reads fine in a 210px sidebar next to a
    listing but looks crowded when the card is the page's subject. Variant
    rather than a second component: same markup, same data, different frame. */
-.zl-seller--stacked{
+/* Doubled class, not a bare .zl-seller--stacked. The base .zl-seller rule
+   further down this file sets gap and padding at the same specificity and
+   comes later, so it won: the card declared 24/20px padding and rendered
+   16px all round. Two classes makes the variant win without depending on
+   source order. */
+.zl-seller.zl-seller--stacked{
   flex-direction:column; align-items:center; text-align:center;
-  gap:var(--zl-s-4); padding:var(--zl-s-6) var(--zl-s-5);
+  /* 24px above and below, 16px at the sides. The sides were 20, which left
+     238px for the language chips; English, Spanish and Portuguese need 241 on
+     one row, so Portuguese dropped alone to a second line. 16 leaves 246. */
+  gap:var(--zl-s-4); padding:var(--zl-s-6) var(--zl-s-4);
 }
 .zl-seller--stacked .zl-avatar{
   width:80px; height:80px; font-size:var(--zl-text-h2);
 }
-.zl-seller--stacked .zl-seller__body{ flex:none; width:100%; justify-items:center; gap:var(--zl-s-3); }
+/* Three groups, spaced as groups. Identity (name and badge), facts, and
+   languages used to sit an even 12px apart, which made one stack of six lines
+   with no way to tell what belonged to what. Inside a group the lines stay
+   tight; between groups there is real room, and the languages get a rule so
+   the card reads as a header, a few facts, and a footer. */
+.zl-seller--stacked .zl-seller__body{ flex:none; width:100%; justify-items:center; gap:var(--zl-s-5); }
 /* The badge drops under the name instead of sitting beside it. */
 .zl-seller--stacked .zl-row{ flex-direction:column; align-items:center; gap:var(--zl-s-2); }
+.zl-seller--stacked .zl-seller__facts{ display:grid; justify-items:center; gap:var(--zl-s-1); }
 .zl-seller--stacked .zl-seller__meta{ margin:0; }
-.zl-seller--stacked .zl-seller__speaks{ display:grid; justify-items:center; gap:var(--zl-s-2); }
+/* Campus and "member since" stack as two lines rather than one joined by a
+   dot: with a long campus the dot dangled at the end of the first line. */
+.zl-seller--stacked .zl-seller__where,
+.zl-seller--stacked .zl-seller__since{ display:block; }
+.zl-seller--stacked .zl-seller__dot{ display:none; }
+.zl-seller--stacked .zl-seller__speaks{
+  display:grid; justify-items:center; gap:var(--zl-s-2);
+  width:100%; padding-top:var(--zl-s-5); border-top:1px solid var(--zl-border);
+}
+.zl-seller--stacked .zl-seller__label{ margin:0; }
 .zl-seller--stacked .zl-seller__langs{ justify-content:center; margin-top:0; }
+
+/* Everywhere else the facts wrapper is transparent, so the horizontal and
+   compact cards lay out exactly as they did before it existed. And outside
+   the stacked card the phrase may not break between its two halves' words:
+   it wraps between "campus" and "member since", never inside either. */
+.zl-seller__facts{ display:contents; }
+.zl-seller__where, .zl-seller__since{ white-space:nowrap; }
 
 .zl-seller--compact{ padding:var(--zl-s-3); gap:var(--zl-s-3); }
 .zl-seller--compact .zl-seller__speaks{

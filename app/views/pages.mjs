@@ -378,8 +378,14 @@ export function sellerCard({ locale, t, u, langs, level = 'h2', link = true, com
     <div class="zl-seller__body">
       <div class="zl-row">${heading}${u.is_zju_verified ? verifiedBadge(t) : raw('')}</div>
       ${note ? h`<p class="zl-seller__note">${note}</p>` : raw('')}
-      <p class="zl-seller__meta">${campusName(u.home_campus, locale)} · ${t('seller.since')} ${new Date(u.created_at).getFullYear()}</p>
-      ${u.last_seen_at ? h`<p class="zl-seller__meta">${t('seller.active')} ${ago(u.last_seen_at, t)}</p>` : raw('')}
+      ${/* The facts are one group so the stacked card can space them as one.
+           Each half of "campus · member since 2026" is its own span: a long
+           campus name used to wrap mid-phrase and leave the year alone on a
+           line, and as separate pieces the break can only fall between them. */ raw('')}
+      <div class="zl-seller__facts">
+        <p class="zl-seller__meta"><span class="zl-seller__where">${campusName(u.home_campus, locale)}</span><span class="zl-seller__dot" aria-hidden="true"> · </span><span class="zl-seller__since">${t('seller.since')} ${new Date(u.created_at).getFullYear()}</span></p>
+        ${u.last_seen_at ? h`<p class="zl-seller__meta">${t('seller.active')} ${ago(u.last_seen_at, t)}</p>` : raw('')}
+      </div>
       ${/* One wrapper, two layouts: stacked on the profile, label and chips on
            one line in the listing rail. */ raw('')}
       ${langs.length ? h`<div class="zl-seller__speaks">
