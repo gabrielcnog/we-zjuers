@@ -69,7 +69,7 @@ before relying on either for anything long-lived.
 
 | Variable | Purpose |
 |---|---|
-| `DEMO_MODE=1` | Read-only demo: no sign-up, no email sign-in, one shared demo account. Loads the sample data into an empty database. |
+| `DEMO_MODE=1` | Read-only demo: no sign-up, no email sign-in, one shared demo account. Loads the sample data into an empty database. It is **on by default when `NODE_ENV=production`**; running the full app on a public host takes an explicit `DEMO_MODE=0`. |
 | `NODE_ENV=production` | Secure cookies, and the sign-in code is never shown on screen. |
 | `DATABASE_URL` | Postgres connection string. Defaults to a local database. Remote hosts are reached over TLS. |
 | `DATABASE_CA` | Optional. The provider's root certificate (PEM), to verify the server certificate as well as encrypt. |

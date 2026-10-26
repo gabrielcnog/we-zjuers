@@ -19,8 +19,15 @@
    each time someone signs in as the demo student. */
 import { one, run, uid, now } from '../db.mjs';
 
-export const DEMO = process.env.DEMO_MODE === '1';
 export const PROD = process.env.NODE_ENV === 'production';
+
+/* A production server is a demo unless it says otherwise. The full app has no
+   mail sender, so on a public host it is only ever safe as the read-only demo;
+   leaving it to a DEMO_MODE=1 setting meant a service created by hand without
+   that one variable came up with a normal "enter your email" sign-in. Opening
+   it up now takes a deliberate DEMO_MODE=0. Locally nothing changes: without
+   NODE_ENV=production the full app still runs unless DEMO_MODE=1. */
+export const DEMO = process.env.DEMO_MODE === '1' || (PROD && process.env.DEMO_MODE !== '0');
 
 /* .invalid is reserved (RFC 2606): it can never be a real mailbox, so this
    address cannot be reached by the email flow even if it were switched on. */
