@@ -9,7 +9,7 @@
 # Nothing to seed by hand. The one thing to set is DATABASE_URL (below).
 services:
   - type: web
-    name: we-zjuers
+    name: we-zjuers-demo
     runtime: node
     plan: free
     region: singapore      # nearest to Hangzhou; Supabase is in Tokyo (ap-northeast-1)
