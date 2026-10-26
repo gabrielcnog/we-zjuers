@@ -353,9 +353,7 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} · ${esc(t('brand'))}</title>
 <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/assets/components.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/assets/app.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/assets/site.css?v=${ASSET_V}">
 <!-- SVG first for the browsers that take it; the 32px PNG is the fallback for the
      ones that do not (Safari), and the 180px one is what iOS puts on a home screen.
      That one is square on purpose: iOS rounds the corners itself. -->

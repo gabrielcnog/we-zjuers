@@ -120,6 +120,7 @@ const server = createServer(async (req, res) => {
         'tokens.css': join(HERE, '..', 'design', 'tokens.css'),
         'components.css': join(HERE, '..', 'design', 'components.css'),
         'app.css': join(HERE, 'public', 'app.css'),
+        'site.css': 'built',   // not a file: assembled from the three above
         'app.js': join(HERE, 'public', 'app.js'),
         'favicon.svg': join(HERE, 'public', 'favicon.svg'),
         /* PNG fallbacks for the browsers that do not take an SVG favicon, and
@@ -131,6 +132,14 @@ const server = createServer(async (req, res) => {
       // Read once per file per boot: these change only when the server restarts,
       // which is also when their ?v= cache key changes.
       let buf = ASSET_CACHE.get(name);
+      if (!buf && name === 'site.css') {
+        /* One stylesheet instead of three: each <link> in the head blocks the
+           first paint and costs a round trip. Same files, same order, so the
+           cascade is unchanged; the design system is still the only source. */
+        buf = Buffer.concat(await Promise.all(['tokens.css', 'components.css', 'app.css']
+          .flatMap((f) => [readFile(map[f]), Buffer.from('\n')])));
+        ASSET_CACHE.set(name, buf);
+      }
       if (!buf) { buf = await readFile(map[name]); ASSET_CACHE.set(name, buf); }
       return send(res, 200, buf, { 'Content-Type': MIME[extname(name)] || 'text/plain',
                                    'Cache-Control': url.searchParams.has('v')
