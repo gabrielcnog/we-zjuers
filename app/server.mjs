@@ -22,7 +22,7 @@ import * as GV from './views/guide.mjs';
 import * as E from './lib/events.mjs';
 import * as EV from './views/events.mjs';
 import { personName } from './lib/names.mjs';
-import { esc } from './lib/html.mjs';
+import { esc, raw } from './lib/html.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 4400);
@@ -80,7 +80,11 @@ function readBody(req) {
     req.on('error', reject);
   });
 }
-const parseForm = (s) => Object.fromEntries(new URLSearchParams(s));
+/* A NUL byte cannot be stored in a Postgres text value, so one in a query or a
+   form field made the whole request a 500. Nothing legitimate contains one;
+   strip it where input enters rather than guarding each query. */
+const noNul = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, String(v).replace(/\u0000/g, '')]));
+const parseForm = (s) => noNul(Object.fromEntries(new URLSearchParams(s)));
 const num = (v) => { const n = Number(v); return Number.isFinite(n) && v !== '' ? n : null; };
 
 /* ---------- server ---------- */
@@ -166,6 +170,11 @@ const server = createServer(async (req, res) => {
     /* A page can claim the floating button on a phone — see page() in
        views/layout.mjs. Only the listing does, so far. */
     let fabOverride = null;
+    /* A failure that looks like the site, in the reader's language. These were
+       bare text ("Not found", "Slow down") on a blank page. */
+    const fail = (status, key) => send(res, status, page({ locale, t, user, title: t(key), unread, path: url.pathname,
+      body: raw(`<div class="app-narrow"><h1 class="zl-h2">${esc(t(key))}</h1>`
+        + `<a class="zl-btn zl-btn--primary" href="${L(locale, '/community')}">${esc(t('com.title'))}</a></div>`) }));
     const render = (title, body) =>
       send(res, 200, page({ locale, t, user, title, body, unread,
         path: url.pathname, search: url.search, searchValue: params.q || '',
@@ -192,7 +201,7 @@ const server = createServer(async (req, res) => {
       }
       return true;
     };
-    const params = Object.fromEntries(url.searchParams);
+    const params = noNul(Object.fromEntries(url.searchParams));
     const favSet = await Q.favoriteIds(user?.id);
 
     /* Demo mode: refuse every write that is not on the short allowlist, and
@@ -205,9 +214,9 @@ const server = createServer(async (req, res) => {
       const fromScript = !(req.headers.accept || '').includes('text/html');
       if (req.method === 'POST' && fromScript) return json(res, 403, { error: 'demo' });
       return send(res, 403, page({ locale, t, user, title: t('demo.refused.title'), unread, path: url.pathname,
-        body: `<div class="app-narrow"><h1 class="zl-h2">${esc(t('demo.refused.title'))}</h1>`
+        body: raw(`<div class="app-narrow"><h1 class="zl-h2">${esc(t('demo.refused.title'))}</h1>`
           + `<p class="zl-muted">${esc(t('demo.refused.body'))}</p>`
-          + `<a class="zl-btn zl-btn--primary" href="${L(locale, '/community')}">${esc(t('com.title'))}</a></div>` }));
+          + `<a class="zl-btn zl-btn--primary" href="${L(locale, '/community')}">${esc(t('com.title'))}</a></div>`) }));
     }
 
     /* Every route whose second segment is a record id: reject anything that
@@ -216,7 +225,7 @@ const server = createServer(async (req, res) => {
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (['listing', 'u', 'messages', 'fav'].includes(rest[0]) && rest[1] && !UUID_RE.test(rest[1]))
       return send(res, 404, page({ locale, t, user, title: '404', unread, path: url.pathname,
-        body: `<h1 class="zl-h2">Not found</h1><p class="zl-muted"><a href="${L(locale, '/community')}">${esc(t('com.title'))}</a></p>` }));
+        body: raw(`<h1 class="zl-h2">Not found</h1><p class="zl-muted"><a href="${L(locale, '/community')}">${esc(t('com.title'))}</a></p>`) }));
 
     /* ---- GET /campus — set the browsing scope ---- */
     if (req.method === 'GET' && rest[0] === 'campus') {
@@ -310,7 +319,7 @@ const server = createServer(async (req, res) => {
     /* ---- GET /listing/:id ---- */
     if (req.method === 'GET' && rest[0] === 'listing' && rest[1] && !rest[2]) {
       const l = await Q.getListing(rest[1]);
-      if (!l) return send(res, 404, page({ locale, t, user, title: '404', body: '<h1 class="zl-h2">Not found</h1>', unread, path: url.pathname }));
+      if (!l) return send(res, 404, page({ locale, t, user, title: '404', body: raw('<h1 class="zl-h2">Not found</h1>'), unread, path: url.pathname }));
       await Q.bumpView(l.id);
       const seller = await Q.getUser(l.user_id);
       const sellerOther = (await Q.userListings(l.user_id)).filter((x) => x.id !== l.id).slice(0, 4);
@@ -334,7 +343,7 @@ const server = createServer(async (req, res) => {
       if (!requireUser(L(locale, '/listing/' + rest[1]))) return;
       const l = await Q.getListing(rest[1]);
       if (!l || l.user_id === user.id) return redirect(res, L(locale, '/listing/' + rest[1]));
-      if (!A.rateLimit('thread:' + user.id, 20, 864e5)) return send(res, 429, 'Slow down');
+      if (!A.rateLimit('thread:' + user.id, 20, 864e5)) return fail(429, 'error.slow');
       const c = await Q.findOrCreateConversation(l.id, user.id, l.user_id);
       return redirect(res, L(locale, '/messages/' + c.id));
     }
@@ -350,9 +359,9 @@ const server = createServer(async (req, res) => {
     if (req.method === 'POST' && rest[0] === 'listing' && rest[2] === 'wechat') {
       if (!requireUser(L(locale, '/listing/' + rest[1]))) return;
       const l = await Q.getListing(rest[1]);
-      if (!l) return send(res, 404, 'Not found');
+      if (!l) return fail(404, 'error.notfound');
       if (!l.wechat_ok || !l.seller_wechat) return redirect(res, L(locale, '/listing/' + l.id));
-      if (!A.rateLimit('wechat:' + user.id, 30, 864e5)) return send(res, 429, 'Slow down');
+      if (!A.rateLimit('wechat:' + user.id, 30, 864e5)) return fail(429, 'error.slow');
       /* Rendered from the POST, not redirected to ?wechat=1. A query flag
          would have been a GET that reveals, which any signed-in account could
          walk across the catalogue without ever touching the rate limit above
@@ -373,8 +382,8 @@ const server = createServer(async (req, res) => {
       if (!requireUser(L(locale, '/listing/' + rest[1]))) return;
       const { reason } = parseForm(await readBody(req));
       const l = await Q.getListing(rest[1]);
-      if (!l) return send(res, 404, 'Not found');
-      if (!A.rateLimit('report:' + user.id, 20, 864e5)) return send(res, 429, 'Slow down');
+      if (!l) return fail(404, 'error.notfound');
+      if (!A.rateLimit('report:' + user.id, 20, 864e5)) return fail(429, 'error.slow');
       await Q.createReport(user.id, 'listing', l.id,
         ['prohibited','spam','wrong','offensive','other'].includes(reason) ? reason : 'other');
       return redirect(res, L(locale, '/listing/' + l.id) + '?reported=1');
@@ -410,7 +419,7 @@ const server = createServer(async (req, res) => {
     /* ---- GET /u/:id ---- */
     if (req.method === 'GET' && rest[0] === 'u' && rest[1]) {
       const u = await Q.getUser(rest[1]);
-      if (!u) return send(res, 404, 'Not found');
+      if (!u) return fail(404, 'error.notfound');
       const [langs, rows, going, organising] = await Promise.all([
         Q.userLanguages(u.id), Q.userListings(u.id),
         E.eventsFor(u.id), E.organisedBy(u.id)]);
@@ -446,7 +455,7 @@ const server = createServer(async (req, res) => {
     if (rest[0] === 'messages' && rest[1]) {
       if (!requireUser()) return;
       const convo = await Q.getConversationFor(rest[1], user.id);   // scoped: 404 for non-participants
-      if (!convo) return send(res, 404, 'Not found');
+      if (!convo) return fail(404, 'error.notfound');
       if (req.method === 'POST' && rest[2] === 'wechat') {
         await Q.shareWechat(convo.id, user.id);
         return redirect(res, L(locale, '/messages/' + convo.id));
@@ -454,7 +463,7 @@ const server = createServer(async (req, res) => {
       if (req.method === 'POST') {
         const { body } = parseForm(await readBody(req));
         if (body?.trim()) {
-          if (!A.rateLimit('msg:' + user.id, 60, 36e5)) return send(res, 429, 'Slow down');
+          if (!A.rateLimit('msg:' + user.id, 60, 36e5)) return fail(429, 'error.slow');
           await Q.sendMessage(convo.id, user.id, body.trim().slice(0, 2000));
         }
         return redirect(res, L(locale, '/messages/' + convo.id));
@@ -482,7 +491,7 @@ const server = createServer(async (req, res) => {
          to fill the session table. */
       if (DEMO && f.step === 'demo') {
         if (!A.rateLimit('demo-login', 300, 36e5))
-          return send(res, 429, 'Busy — try again in a few minutes.');
+          return fail(429, 'error.slow');
         const id = await ensureDemoUser();
         const tok = await A.createSession(id, DEMO_SESSION_DAYS);
         A.setCookie(res, tok, DEMO_SESSION_DAYS);
@@ -574,7 +583,7 @@ const server = createServer(async (req, res) => {
     if (rest[0] === 'community') {
       const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const notFound = () => send(res, 404, page({ locale, t, user, title: '404', section: 'community',
-        body: `<h1 class="zl-h2">Not found</h1><p class="zl-muted"><a href="${L(locale, '/community')}">${esc(t('com.title'))}</a></p>`,
+        body: raw(`<h1 class="zl-h2">Not found</h1><p class="zl-muted"><a href="${L(locale, '/community')}">${esc(t('com.title'))}</a></p>`),
         unread, path: url.pathname }));
 
       /* GET /community  ·  GET /community/b/:slug */
@@ -600,7 +609,7 @@ const server = createServer(async (req, res) => {
         if (!user) return wantsJson ? json(res, 401, { error: 'signin' })
           : redirect(res, L(locale, '/signin') + '?next=' + encodeURIComponent(back));
         if (!A.rateLimit('vote:' + user.id, 300, 36e5))
-          return wantsJson ? json(res, 429, { error: 'slow down' }) : send(res, 429, 'Slow down');
+          return wantsJson ? json(res, 429, { error: 'slow down' }) : fail(429, 'error.slow');
         const r = await (rest[2] === 'post' ? C.togglePostVote : C.toggleCommentVote)(rest[3], user.id);
         if (!r) return wantsJson ? json(res, 404, { error: 'not found' }) : notFound();
         return wantsJson ? json(res, 200, r) : redirect(res, back);
@@ -623,7 +632,7 @@ const server = createServer(async (req, res) => {
         const back = L(locale, '/community/post/' + rest[2]);
         const body = (f.body || '').trim();
         if (!body) return redirect(res, back + '#comments');
-        if (!A.rateLimit('comment:' + user.id, 60, 36e5)) return send(res, 429, 'Slow down');
+        if (!A.rateLimit('comment:' + user.id, 60, 36e5)) return fail(429, 'error.slow');
         const p = await C.getPost(rest[2]);
         if (!p) return notFound();
         const id = await C.createComment({ postId: p.id, userId: user.id,
@@ -637,7 +646,7 @@ const server = createServer(async (req, res) => {
         const { reason } = parseForm(await readBody(req));
         const p = await C.getPost(rest[2]);
         if (!p) return notFound();
-        if (!A.rateLimit('report:' + user.id, 20, 864e5)) return send(res, 429, 'Slow down');
+        if (!A.rateLimit('report:' + user.id, 20, 864e5)) return fail(429, 'error.slow');
         await Q.createReport(user.id, 'post', p.id, ['spam', 'offensive', 'other'].includes(reason) ? reason : 'other');
         return redirect(res, L(locale, '/community/post/' + p.id) + '?reported=1');
       }
@@ -768,7 +777,7 @@ const server = createServer(async (req, res) => {
       if (starts < new Date()) return again('That start time is in the past.');
       const ends = f.ends ? new Date(f.ends) : null;
       if (ends && (Number.isNaN(ends.getTime()) || ends < starts)) return again('The end time must come after the start.');
-      if (!A.rateLimit('event:' + user.id, 10, 864e5)) return send(res, 429, 'Slow down');
+      if (!A.rateLimit('event:' + user.id, 10, 864e5)) return fail(429, 'error.slow');
       const { id } = await E.createEvent({
         organizerId: user.id, orgName: f.org.trim(), category: f.category,
         title: f.title.trim(), body: f.body?.trim() || null,
@@ -786,7 +795,7 @@ const server = createServer(async (req, res) => {
       if (rest[2] === 'join') {
         const f = parseForm(await readBody(req));
         const e = await E.getEvent(rest[1], user.id);
-        if (!e) return send(res, 404, 'Not found');
+        if (!e) return fail(404, 'error.notfound');
         if (e.organizer_id === user.id) return redirect(res, back);
         /* A team event needs a squad; without one the signup would say
            nothing to the organiser trying to build a fixture list. */
@@ -803,9 +812,9 @@ const server = createServer(async (req, res) => {
       if (rest[2] === 'report') {
         const { reason } = parseForm(await readBody(req));
         const e = await E.getEvent(rest[1], user.id);
-        if (!e) return send(res, 404, 'Not found');
+        if (!e) return fail(404, 'error.notfound');
         if (e.organizer_id === user.id) return redirect(res, back);
-        if (!A.rateLimit('report:' + user.id, 20, 864e5)) return send(res, 429, 'Slow down');
+        if (!A.rateLimit('report:' + user.id, 20, 864e5)) return fail(429, 'error.slow');
         await Q.createReport(user.id, 'event', e.id,
           ['spam', 'offensive', 'other'].includes(reason) ? reason : 'other');
         return redirect(res, back + '?reported=1');
@@ -816,7 +825,7 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && rest[0] === 'events' && rest[1] && !rest[2]) {
       const e = await E.getEvent(rest[1], user?.id);
       if (!e) return send(res, 404, page({ locale, t, user, title: '404', section: 'events',
-        body: '<h1 class="zl-h2">Not found</h1>', unread, path: url.pathname }));
+        body: raw('<h1 class="zl-h2">Not found</h1>'), unread, path: url.pathname }));
       /* Who is coming is for signed-in students only — the view renders a
          prompt instead of names, and the names never leave the server. */
       /* The roster (team names plus the student IDs the captain entered for
@@ -846,7 +855,7 @@ const server = createServer(async (req, res) => {
       return render(t('nav.contact'), V.contact({ t, locale }));
 
     return send(res, 404, page({ locale, t, user, title: '404',
-      body: `<h1 class="zl-h2">Not found</h1><p class="zl-muted"><a href="${L(locale, '/community')}">${esc(t('com.title'))}</a></p>`,
+      body: raw(`<h1 class="zl-h2">Not found</h1><p class="zl-muted"><a href="${L(locale, '/community')}">${esc(t('com.title'))}</a></p>`),
       unread, path: url.pathname }));
   } catch (e) {
     console.error('[error]', req.method, url.pathname, e.message);
@@ -855,9 +864,9 @@ const server = createServer(async (req, res) => {
     const t2 = translator(loc);
     return send(res, 500, page({
       locale: loc, t: t2, user: null, title: t2('error.title'), unread: 0, path: url.pathname,
-      body: `<div class="app-narrow"><h1 class="zl-h2">${esc(t2('error.title'))}</h1>`
+      body: raw(`<div class="app-narrow"><h1 class="zl-h2">${esc(t2('error.title'))}</h1>`
         + `<p class="zl-muted">${esc(t2('error.body'))}</p>`
-        + `<a class="zl-btn zl-btn--primary" href="/${loc}/community">${esc(t2('com.title'))}</a></div>`,
+        + `<a class="zl-btn zl-btn--primary" href="/${loc}/community">${esc(t2('com.title'))}</a></div>`),
     }));
   }
 });
