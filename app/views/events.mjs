@@ -383,7 +383,7 @@ export function eventPage({ locale, t, e, parts, user, error, organiser, organis
       </section>` : raw('')}
       ${mine && e.team_size ? roster({ t, rows: parts }) : raw('')}
       <section class="app-ev-people-sec">
-        <h2 class="zl-h3 zl-section__title">${t('ev.participants')} <span class="zl-caption">${t('ev.going', e.signup_count)}</span></h2>
+        <h2 class="zl-h3 zl-section__title">${t('ev.participants')} ${e.signup_count > 0 ? h`<span class="zl-caption">${t('ev.going', e.signup_count)}</span>` : raw('')}</h2>
         ${people({ locale, t, rows: parts, user, teamEvent: !!e.team_size })}
       </section>
     </div>
