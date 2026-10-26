@@ -51,6 +51,9 @@ const send = (res, status, body, headers = {}) => {
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    /* Only where there is HTTPS to insist on: on http://localhost it would be
+       ignored, and a stray header is not worth explaining. */
+    ...(PROD ? { 'Strict-Transport-Security': 'max-age=31536000' } : {}),
     /* Photos come from Unsplash; everything else is same-origin. Scripts are
        'self' with no inline escape hatch — the two onchange handlers that used
        to force 'unsafe-inline' now live in app.js. Inline STYLE attributes are
@@ -100,6 +103,15 @@ const server = createServer(async (req, res) => {
   if (req.method === 'HEAD') { req.method = 'GET'; res.zlHead = true; }
 
   try {
+    /* Liveness for the host's health check. The old target was a full community
+       page (~125KB and several queries) hit every few seconds; this answers with
+       two bytes and one trivial query, and still fails if the database is gone. */
+    if (url.pathname === '/healthz') {
+      try { await pool.query('SELECT 1'); }
+      catch { return send(res, 503, 'db', { 'Content-Type': 'text/plain' }); }
+      return send(res, 200, 'ok', { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+    }
+
     /* static assets — tokens/components come straight from the design system,
        so there is exactly one source of truth for the CSS. */
     if (seg[0] === 'assets') {
@@ -121,7 +133,10 @@ const server = createServer(async (req, res) => {
       let buf = ASSET_CACHE.get(name);
       if (!buf) { buf = await readFile(map[name]); ASSET_CACHE.set(name, buf); }
       return send(res, 200, buf, { 'Content-Type': MIME[extname(name)] || 'text/plain',
-                                   'Cache-Control': 'public, max-age=3600' });
+                                   'Cache-Control': url.searchParams.has('v')
+                                     /* the version is the boot time, so a deploy is a new URL */
+                                     ? 'public, max-age=31536000, immutable'
+                                     : 'public, max-age=3600' });
     }
 
     /* images */

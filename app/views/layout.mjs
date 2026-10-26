@@ -466,6 +466,7 @@ ${fabEl}
     </nav>
   </div>
 </footer>
+<div class="app-toast" role="status" aria-live="polite" hidden data-fail="${esc(t('fav.fail'))}"></div>
 <script src="/assets/app.js?v=${ASSET_V}"></script>
 </body>
 </html>`;

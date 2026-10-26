@@ -159,6 +159,9 @@ function rail({ locale, t, path, sel, bounds, counts }) {
     : t('filter.condition.any');
 
   return h`<form class="zl-rail js-filterform" method="get" action="${path}">
+    ${/* The group headings below are h3. Without an h2 above them the outline
+         went h1 → h3 for anyone navigating by headings. */ raw('')}
+    <h2 class="zl-sr-only">${t('filter.title')}</h2>
     <!-- Marks this search as rail-driven, so an empty campus selection is
          honoured as "all" rather than falling back to the header scope. -->
     <input type="hidden" name="f" value="1">

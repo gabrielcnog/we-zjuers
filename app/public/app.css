@@ -1164,3 +1164,15 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 .app-gloss__see,
 .zl-link-arrow{ min-height:28px; }
 .zl-seller__name a{ display:inline-flex; align-items:center; min-height:28px; }
+
+/* A short message for a failed background action (a Save that did not go
+   through). Above the footer, clear of the thumb, and announced by role=status. */
+.app-toast{
+  position:fixed; left:50%; bottom:var(--zl-space-4); transform:translateX(-50%);
+  z-index:var(--zl-z-toast); max-width:min(92vw, 420px);
+  padding:var(--zl-space-3) var(--zl-space-4); border-radius:var(--zl-radius);
+  background:var(--zl-ink); color:var(--zl-text-on-fill);
+  font-size:var(--zl-text-sm); box-shadow:var(--zl-shadow-pop); text-align:center;
+}
+.app-toast[hidden]{ display:none; }
+.app-gloss__head{ min-height:28px; }

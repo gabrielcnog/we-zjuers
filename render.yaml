@@ -23,7 +23,7 @@ services:
     # step into app/ rather than setting rootDir.
     buildCommand: cd app && npm ci
     startCommand: cd app && node server.mjs
-    healthCheckPath: /en/community
+    healthCheckPath: /healthz
     envVars:
       - key: NODE_VERSION
         value: "22"

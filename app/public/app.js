@@ -176,7 +176,16 @@
           return r.json();
         })
         .then(function (d) { if (d) state(d.on); })
-        .catch(function () { state(was); })
+        .catch(function () {
+          state(was);
+          /* Say so: the button quietly snapping back looked like it did nothing. */
+          var toast = document.querySelector('.app-toast');
+          if (toast) {
+            toast.textContent = toast.dataset.fail; toast.hidden = false;
+            clearTimeout(toast.zlTimer);
+            toast.zlTimer = setTimeout(function () { toast.hidden = true; }, 4000);
+          }
+        })
         .then(function () { delete btn.dataset.busy; });
     });
   });
