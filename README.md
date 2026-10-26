@@ -80,7 +80,8 @@ Demo mode is a single switch, enforced in one place rather than route by route
 - **No accounts.** Email sign-in and sign-up are refused outright, not merely
   hidden: a hand-written request gets the same refusal as the form.
 - **Read-only.** Every write is refused unless it is on a short allowlist
-  (sign out, the demo login, revealing a seller's WeChat ID). A route added later
+  (sign out, the demo login, revealing a seller's WeChat ID, saving a
+  listing, the bug form). A route added later
   is read-only by default.
 - **Shared, short-lived account.** One demo student, a one-day session, and a
   cap on how fast sessions can be created.
