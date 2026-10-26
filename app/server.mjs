@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { migrate, expireOverdue, pool, now, DATABASE_URL } from './db.mjs';
 import * as Q from './lib/queries.mjs';
 import * as A from './lib/auth.mjs';
-import { DEMO, PROD, DEMO_EMAIL, DEMO_SESSION_DAYS, refusal, ensureDemoUser } from './lib/demo.mjs';
+import { DEMO, PROD, DEMO_EMAIL, DEMO_SESSION_DAYS, refusal, ensureDemoUser, resetDemoSaves } from './lib/demo.mjs';
 import { loadSnapshotIfEmpty, freshenIfStale } from './lib/snapshot.mjs';
 import { saveBug, forwardBug, retryUnforwarded, KINDS as BUG_KINDS, LIMITS as BUG_LIMITS } from './lib/bugs.mjs';
 import { translator, LOCALES } from './lib/i18n.mjs';
@@ -494,6 +494,7 @@ const server = createServer(async (req, res) => {
         if (!A.rateLimit('demo-login', 300, 36e5))
           return fail(429, 'error.slow');
         const id = await ensureDemoUser();
+        await resetDemoSaves(id);
         const tok = await A.createSession(id, DEMO_SESSION_DAYS);
         A.setCookie(res, tok, DEMO_SESSION_DAYS);
         return redirect(res, safeNext(f.next) || L(locale, '/community'),

@@ -14,7 +14,9 @@
 
    The demo account is shared by every visitor, which is the other reason
    writes are off: one stranger's post, vote or saved item would be shown to
-   the next. */
+   the next. Saving a listing is the one write let through anyway, because
+   trying it is part of seeing the product; the demo's saved list is emptied
+   each time someone signs in as the demo student. */
 import { one, run, uid, now } from '../db.mjs';
 
 export const DEMO = process.env.DEMO_MODE === '1';
@@ -33,6 +35,7 @@ const ALLOWED_POSTS = [
   /^\/(en|zh)\/signout$/,
   /^\/(en|zh)\/signin$/,                          // only step=demo gets past the handler
   /^\/(en|zh)\/listing\/[0-9a-f-]{36}\/wechat$/i,
+  /^\/(en|zh)\/fav\/[0-9a-f-]{36}$/i,         // save / unsave a listing (cleared at each demo sign-in, below)
   /^\/(en|zh)\/bug$/,                            // the bug-report form: rate limited, honeypotted, capped (server.mjs)
 ];
 
@@ -64,4 +67,9 @@ export async function ensureDemoUser() {
      VALUES ($1,$2,$3,TRUE,'Demo Student','Student','Demo','zijingang','user',$3,$3)`,
     [id, DEMO_EMAIL, now()]);
   return id;
+}
+
+/* Start each demo visit with nothing saved. */
+export async function resetDemoSaves(userId) {
+  await run('DELETE FROM favorite WHERE user_id = $1', [userId]);
 }
