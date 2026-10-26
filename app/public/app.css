@@ -1142,3 +1142,9 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 
 /* The optional "what did you expect" box: a sentence, not a paragraph. */
 .app-bug__short{ min-height:var(--zl-s-24); }
+
+/* The report form's select and button sit on one row; the select is a full
+   control (16px text, no zoom on iOS) and the sm button was 36px beside it.
+   Both take the same explicit height so they cannot drift apart. */
+.zl-report__body .zl-select,
+.zl-report__body .zl-btn{ height:var(--zl-control); min-height:var(--zl-control); }
