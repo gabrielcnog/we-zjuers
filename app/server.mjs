@@ -944,7 +944,31 @@ const server = createServer(async (req, res) => {
 
 /* Boot: migrate, run the expiry sweep, warm the reference cache, then listen.
    Nothing serves traffic before the database is ready. */
+/* On a managed host the first deploy starts the web service while the database
+   is still being created, so its hostname does not resolve yet (ENOTFOUND) or
+   refuses connections. Exiting on that first failure made a fresh blueprint
+   deploy fail and need a manual retry. Wait for it instead, within a limit, and
+   fail with the reason if it never comes. Only "not reachable yet" errors are
+   waited out; anything else (bad password, missing database) is real. */
+const NOT_YET = new Set(['ENOTFOUND', 'EAI_AGAIN', 'ECONNREFUSED', 'ETIMEDOUT', 'ECONNRESET', 'EHOSTUNREACH', '57P03']);
+async function waitForDatabase() {
+  const limit = Date.now() + Number(process.env.DB_WAIT_SECONDS || 300) * 1000;
+  for (let tries = 1; ; tries++) {
+    try { await pool.query('SELECT 1'); return; }
+    catch (e) {
+      const code = e.code || e.errors?.[0]?.code;
+      if (!NOT_YET.has(code)) return;            // reachable, or an error migrate() will explain
+      if (Date.now() > limit)
+        throw new Error(`database not reachable after ${process.env.DB_WAIT_SECONDS || 300}s (${code}). `
+          + 'If this is Render, check that the web service and the database are in the same region.');
+      if (tries === 1 || tries % 6 === 0) console.log(`  waiting for the database (${code})...`);
+      await new Promise((r) => setTimeout(r, 5000));
+    }
+  }
+}
+
 const boot = async () => {
+  await waitForDatabase();
   const created = await migrate();
   if (created) console.log('  ' + created);
   /* Demo only, and before anything reads the reference data: an empty
