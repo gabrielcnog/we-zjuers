@@ -1,0 +1,21 @@
+{
+  "name": "we-zjuers-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "seed": "node seed.mjs",
+    "photos": "node fetch-photos.mjs",
+    "seed:community": "node seed-community.mjs",
+    "refresh:demo": "node refresh-demo.mjs",
+    "seed:events": "node seed-events.mjs",
+    "snapshot": "bash ../scripts/make-snapshot.sh"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  },
+  "description": "WeZJUers: a free, bilingual student platform for Zhejiang University. Not an official ZJU platform.",
+  "engines": {
+    "node": ">=22"
+  }
+}

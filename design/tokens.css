@@ -1,0 +1,382 @@
+/* ============================================================
+   WeZJUers — Design Tokens v1.0
+   Single source of truth for colour, type, spacing, radius,
+   shadow and layout.
+
+   PROVENANCE
+   ----------
+   Official (ZJU published visual identity):
+     Truth-Seeking Blue #003F88 · Innovation Red #B01F24
+     Navy 900 · Blue 500 · Blue 50 · the neutral ramp
+     The 60/30/10 distribution
+   Proposed extensions (NOT official ZJU specification):
+     type families, type scale, grid, spacing, components,
+     the entire dark theme, and every ramp step added below.
+
+   LEGAL
+   -----
+   Palette, type scale and grid only. No seal, no eagle, no
+   浙江大学 wordmark — see ../docs/decisions.md #18.
+
+   Light theme is the default. Dark follows the system unless
+   [data-theme] on <html> says otherwise.
+   ============================================================ */
+
+/* Inter, Latin subset, self-hosted. Drop the woff2 files in
+   ./fonts/ and uncomment. Until then the stack falls back to
+   the system UI sans, which is a good result, not a broken one.
+   Never load CJK from Google Fonts — see ../docs/interface.md.
+
+@font-face{ font-family:'Inter'; src:url('./fonts/Inter-Regular.woff2') format('woff2');
+            font-weight:400; font-style:normal; font-display:swap;
+            unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+2122; }
+@font-face{ font-family:'Inter'; src:url('./fonts/Inter-Medium.woff2') format('woff2');
+            font-weight:500; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Inter'; src:url('./fonts/Inter-SemiBold.woff2') format('woff2');
+            font-weight:600; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Inter'; src:url('./fonts/Inter-Bold.woff2') format('woff2');
+            font-weight:700; font-style:normal; font-display:swap; }
+*/
+
+:root{
+
+  /* ---------- Brand: blue ramp ----------
+     500 and 800 and 900 are official. The rest are derived. */
+  --zl-blue-50:  #E7EDF6;
+  --zl-blue-200: #C3D6F2;
+  --zl-blue-300: #6FA8F5;   /* dark-theme link + focus */
+  --zl-blue-500: #0A6BD1;   /* OFFICIAL — links */
+  --zl-blue-600: #0A5AAF;   /* derived — hover on a blue-500 fill */
+  --zl-blue-800: #003F88;   /* OFFICIAL — Truth-Seeking Blue */
+  --zl-blue-900: #002451;   /* OFFICIAL — Navy 900 */
+
+  /* ---------- Brand: red ramp ----------
+     500 is official. Reserved meaning — see the rules below. */
+  --zl-red-50:  #FBEAEA;
+  --zl-red-300: #EF7C81;    /* dark-theme danger text */
+  --zl-red-500: #B01F24;    /* OFFICIAL — Innovation Red */
+  --zl-red-700: #8E181C;    /* derived — hover on a red fill */
+
+  /* ---------- Neutrals (official) ---------- */
+  --zl-ink:     #1A1A1A;
+  --zl-slate:   #5B6572;
+  --zl-mist:    #8A93A0;    /* decorative only — fails 3:1 as text on --zl-bg-sunken */
+  --zl-line:    #D9E0E8;
+  --zl-surface: #F4F6F9;
+  --zl-white:   #FFFFFF;
+
+  /* ---------- Neutrals, dark (derived) ---------- */
+  --zl-d-bg:      #0E1319;
+  --zl-d-raised:  #161C25;
+  --zl-d-sunken:  #080B0F;
+  --zl-d-accent:  #16233A;
+  --zl-d-line:    #263140;
+  --zl-d-text:    #E8ECF1;
+  --zl-d-muted:   #A2ADBA;
+  --zl-d-subtle:  #6F7B8A;
+
+  /* ---------- Status tints ---------- */
+  --zl-green-700:#166534;  --zl-green-50:#E6F4EC;
+  --zl-amber-700:#8A5200;  --zl-amber-50:#FBF0DC;
+  --zl-green-300:#4ADE80;  --zl-green-950:#12271B;
+  --zl-amber-300:#E0A94A;  --zl-amber-950:#2A2113;
+  --zl-red-950:  #2A1517;
+
+  /* ============================================================
+     SEMANTIC — LIGHT (default)
+     Every ratio below is measured, not estimated.
+     ============================================================ */
+
+  /* Surfaces */
+  --zl-bg:            var(--zl-white);
+  --zl-bg-raised:     var(--zl-white);
+  --zl-bg-sunken:     var(--zl-surface);
+  --zl-bg-accent:     var(--zl-blue-50);
+  --zl-bg-hover:      rgba(0,63,136,.05);
+  --zl-bg-overlay:    rgba(0,36,81,.45);
+  /* Scrims sit on top of photographs, so they are their own tokens rather than
+     raw values buried in components. */
+  --zl-scrim:         rgb(14 19 25 / .72);
+  --zl-scrim-soft:    rgb(14 19 25 / .68);
+  --zl-on-scrim:      #FFFFFF;
+
+  /* Borders. Two kinds, and the distinction is not cosmetic:
+     a decorative rule may sit below 3:1, but a form input's
+     border is the ONLY thing marking where the field is, so it
+     must clear 3:1 (WCAG 1.4.11). */
+  --zl-border:        var(--zl-line);        /* 1.33:1 — decorative */
+  --zl-border-strong: #A9B6C4;               /* 2.06:1 — emphasis   */
+  --zl-border-input:  #7E8B9B;               /* 3.47:1 — required   */
+
+  /* Text */
+  --zl-text:          var(--zl-ink);         /* 17.40:1 on bg */
+  --zl-text-muted:    var(--zl-slate);       /*  5.92:1 on bg */
+  --zl-text-subtle:   #66707E;               /*  5.02:1 on bg · 4.64:1 on sunken — AA everywhere it is used */
+  --zl-text-on-fill:  var(--zl-white);
+  --zl-text-on-accent:var(--zl-blue-800);    /*  8.63:1 on bg-accent */
+
+  /* Text drawn on a Blue 800 brand surface (the header). Blue 300 was measured
+     here and fails at 4.16:1, which is why the muted tone is a light blue-grey. */
+  --zl-brand-surface:   var(--zl-blue-800);
+  --zl-on-brand:        var(--zl-white);     /* 10.16:1 */
+  --zl-on-brand-muted:  #D9E2EE;             /*  7.77:1 */
+  --zl-on-brand-hover:  rgb(255 255 255 / .12);
+  --zl-on-brand-line:   rgb(255 255 255 / .55);
+
+  /* Interactive */
+  --zl-link:          var(--zl-blue-500);    /*  5.20:1 on bg */
+  --zl-link-hover:    var(--zl-blue-800);
+  /* A link stops passing AA the moment it leaves plain bg. --zl-link measures
+     4.42:1 on the blue tint and 4.47:1 on the red one — both under 4.5 for text
+     below 18.66px — and only scrapes the green and amber tints at 4.59/4.61.
+     So any tinted surface (alerts, the accent hero) gets this one instead:
+     5.24:1 blue · 5.44 green · 5.46 amber · 5.31 red. Same hue, one step down. */
+  --zl-link-on-tint:  #0B5FBF;
+  /* The asking price carries the official blue rather than --zl-link: it is
+     the brand's colour, not a clickable one, and a price that reads as a link
+     invites a click there is nothing behind. 10.16:1 on bg. */
+  --zl-price-ink:     var(--zl-blue-800);
+  /* WeChat's brand green, darkened until white passes AA on it. The brand's
+     own #07C160 carries white at 2.38:1 and the first darkening I tried,
+     #06A552, only reached 3.22 — fine for a large label, not for a button
+     whose text can wrap small. #047A3C measures 5.45:1 and still reads as
+     WeChat green. Not --zl-success: that token means "this went well", and a
+     contact button is not a success state. */
+  --zl-wechat:        #047A3C;
+  --zl-wechat-hover:  #036030;
+  --zl-on-wechat:     var(--zl-white);
+  --zl-focus:         var(--zl-blue-500);    /*  5.20:1 — ring */
+  --zl-ring:          0 0 0 3px rgba(10,107,209,.35);
+  --zl-ring-on-brand: 0 0 0 3px rgb(255 255 255 / .45);   /* focus on the blue header */
+
+  /* Actions */
+  --zl-action:        var(--zl-blue-800);    /* white on it: 10.16:1 */
+  --zl-action-hover:  var(--zl-blue-900);    /* white on it: 15.32:1 */
+  --zl-action-active: var(--zl-blue-900);
+  --zl-urgent:        var(--zl-red-500);     /* white on it:  6.85:1 */
+  --zl-urgent-hover:  var(--zl-red-700);     /* white on it:  9.14:1 */
+
+  /* Status — reserved meanings. Always paired with an icon or
+     a word; colour is never the only signal. */
+  --zl-success:    var(--zl-green-700);   --zl-success-bg: var(--zl-green-50);  /* 6.29:1 */
+  --zl-warning:    var(--zl-amber-700);   --zl-warning-bg: var(--zl-amber-50);  /* 5.66:1 */
+  --zl-danger:     var(--zl-red-700);     --zl-danger-bg:  var(--zl-red-50);    /* 7.86:1 */
+  --zl-info:       var(--zl-blue-800);    --zl-info-bg:    var(--zl-blue-50);   /* 8.63:1 */
+
+  /* ---- Event category tints ----
+     One plate colour per category, because an events grid has no photographs
+     and a wall of identical grey reads worse than a wall of identical
+     photos. Each is a validated pair, foreground on its own ground:
+     party 8.94:1 · sports 8.10 · club 9.61 · cooking 7.37 · culture 10.57 ·
+     talk 8.78. They live here rather than in the component so the dark theme
+     can carry them too — see the dark block below. */
+  --zl-ev-party-bg:   #FDE9F1; --zl-ev-party-fg:   #7A1740;
+  --zl-ev-sports-bg:  #E3F3E8; --zl-ev-sports-fg:  #17512F;
+  --zl-ev-club-bg:    #E7EEFA; --zl-ev-club-fg:    #123A72;
+  --zl-ev-cooking-bg: #FDEFE0; --zl-ev-cooking-fg: #7A3E10;
+  --zl-ev-culture-bg: #EFEAFA; --zl-ev-culture-fg: #3B2473;
+  --zl-ev-talk-bg:    #E6F4F6; --zl-ev-talk-fg:    #0F4A52;
+  --zl-ev-other-bg:   var(--zl-bg-sunken); --zl-ev-other-fg: var(--zl-text-muted);
+
+
+  /* ---------- Type ----------
+     No CJK webfont is ever downloaded: Chinese renders in the
+     system face, which is already on the device and looks
+     native. Serif is Latin-only — 宋体 headings read as dated
+     in Chinese web UI. See ../docs/interface.md. */
+  --zl-font-sans:
+      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+      'Noto Sans CJK SC', 'Noto Sans SC', sans-serif;
+  --zl-font-heading: var(--zl-font-sans);
+  --zl-font-mono:
+      ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  /* Fluid scale. Desktop values are the guidelines' spec; the
+     lower bounds are the mobile extension the deck doesn't
+     cover — 40px H1 on a 320px screen is unusable. */
+  --zl-text-h1:      clamp(26px, 4.2vw, 40px);   --zl-lh-h1: 1.2;   /* 26 on a phone, no override needed */
+  --zl-text-h2:      clamp(24px, 3.2vw, 30px);   --zl-lh-h2: 1.27;
+  --zl-text-h3:      clamp(19px, 2.2vw, 22px);   --zl-lh-h3: 1.36;
+  --zl-text-body-lg: 18px;                       --zl-lh-body-lg: 1.6;
+  /* The asking price on a listing page. Its own step because it is neither a
+     heading nor body: it has to lose to the title and beat everything else,
+     and at --zl-text-body-lg it was losing to the lede as well. */
+  --zl-text-price:   clamp(22px, 2.6vw, 26px);   --zl-lh-price: 1.2;
+  --zl-text-title:   17px;                       /* card and post titles */
+  --zl-text-body:    16px;                       --zl-lh-body: 1.625;  /* 16/26 */
+  --zl-text-sm:      14px;                       --zl-lh-sm: 1.5;
+  --zl-text-caption: 13px;                       --zl-lh-caption: 1.38; /* 13/18 */
+  --zl-text-label:   11px;                       /* uppercase, tracked */
+
+  --zl-weight-regular: 400;
+  --zl-weight-medium:  500;
+  --zl-weight-semi:    600;
+  --zl-weight-bold:    700;
+  --zl-weight-black:   800;   /* the wordmark only */
+  --zl-tracking-label: .08em;
+
+  /* ---------- Spacing — one scale, Tailwind/shadcn numbering ----------
+     The number is the multiple of 4px: --zl-s-4 is 16px, --zl-s-6 is 24px.
+     Half steps (0-5, 1-5, 2-5, 3-5) exist for control internals only —
+     badge padding, icon-to-label gaps — never for layout. Every margin,
+     padding and gap in the system is one of these; no raw px.
+
+     Where they go, so pages share one rhythm:
+       s-1 · s-2    inside a control (icon ↔ label, label ↔ input)
+       s-3 · s-4    between related items (list rows, fields in a group)
+       s-4 · s-6    panel padding (phone · desktop), field ↔ field
+       s-6 · s-8    page header ↔ content, between panels
+       s-12 · s-16  between page sections                                  */
+  --zl-s-0-5:  2px;
+  --zl-s-1:    4px;
+  --zl-s-1-5:  6px;
+  --zl-s-2:    8px;
+  --zl-s-2-5: 10px;
+  --zl-s-3:   12px;
+  --zl-s-3-5: 14px;
+  --zl-s-4:   16px;
+  --zl-s-5:   20px;
+  --zl-s-6:   24px;
+  --zl-s-8:   32px;
+  --zl-s-10:  40px;
+  --zl-s-12:  48px;
+  --zl-s-16:  64px;
+  --zl-s-24:  96px;
+
+  /* The original named steps, kept as aliases so nothing that uses them moves. */
+  --zl-space-1: var(--zl-s-1);
+  --zl-space-2: var(--zl-s-2);
+  --zl-space-3: var(--zl-s-4);
+  --zl-space-4: var(--zl-s-6);
+  --zl-space-5: var(--zl-s-12);
+  --zl-space-6: var(--zl-s-24);
+
+  /* ---------- Sizes ---------- */
+  --zl-control-sm: 36px;   /* dense desktop controls only        */
+  --zl-control:    44px;   /* default = the touch minimum        */
+  --zl-control-lg: 52px;   /* primary actions, floating button   */
+  --zl-icon-sm:    16px;   /* icon inside a button or link       */
+  --zl-icon:       20px;   /* standalone icon button             */
+  --zl-avatar-sm:  28px;
+  --zl-avatar:     40px;
+  --zl-avatar-lg:  64px;
+  --zl-measure:    68ch;   /* longest comfortable line of text   */
+  --zl-narrow:     560px;  /* single-column pages: forms, sign-in */
+
+  /* ---------- Layout (official grid) ---------- */
+  --zl-container:     1200px;
+  --zl-columns:       12;
+  --zl-gutter:        24px;
+  --zl-margin-mobile: 16px;
+  --zl-tap-min:       var(--zl-control);   /* minimum touch target */
+
+  /* ---------- Radius ---------- */
+  --zl-radius-sm:   4px;
+  --zl-radius:      8px;
+  --zl-radius-lg:  16px;
+  --zl-radius-pill: 999px;
+
+  /* ---------- Elevation ---------- */
+  --zl-shadow-sm:    0 1px 2px rgb(0 36 81 / .06);
+  --zl-shadow-card:  0 1px 2px rgb(0 36 81 / .06), 0 2px 8px rgb(0 36 81 / .06);
+  --zl-shadow-pop:   0 4px 16px rgb(0 36 81 / .12);
+  --zl-shadow-modal: 0 8px 32px rgb(0 36 81 / .18);
+
+  /* ---------- Motion ---------- */
+  --zl-ease: cubic-bezier(.2,0,.2,1);
+  --zl-duration: 160ms;
+  --zl-duration-slow: 260ms;
+
+  /* ---------- Stacking ---------- */
+  --zl-z-base: 0;
+  --zl-z-sticky: 200;
+  --zl-z-dropdown: 300;
+  --zl-z-sheet: 400;
+  --zl-z-modal: 500;
+  --zl-z-toast: 600;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   SEMANTIC — DARK  (parked)
+
+   The product is light-only by decision. The measured dark palette is kept
+   below because it cost real work to validate — Truth-Seeking Blue is 1.84:1
+   on a dark ground, so the roles had to shift — but it is NOT auto-activated:
+   the `prefers-color-scheme` block was removed, so a viewer whose system is
+   dark still gets the light theme.
+
+   To bring dark back: restore the media query around the block below, and
+   restore the theme toggle in app/views/layout.mjs and app/public/app.js.
+   ============================================================ */
+
+/* Opt-in only — nothing in the app sets this attribute. */
+:root[data-theme="dark"]{
+  --zl-bg:            var(--zl-d-bg);
+  --zl-bg-raised:     var(--zl-d-raised);
+  --zl-bg-sunken:     var(--zl-d-sunken);
+  --zl-bg-accent:     var(--zl-d-accent);
+  --zl-bg-hover:      rgba(255,255,255,.05);
+  --zl-bg-overlay:    rgba(0,0,0,.65);
+
+  --zl-border:        var(--zl-d-line);
+  --zl-border-strong: #48566B;
+  --zl-border-input:  #5A6A80;
+
+  --zl-text:          var(--zl-d-text);
+  --zl-text-muted:    var(--zl-d-muted);
+  --zl-text-subtle:   var(--zl-d-subtle);
+  --zl-text-on-fill:  var(--zl-white);
+  --zl-text-on-accent:var(--zl-blue-300);
+
+  --zl-link:          var(--zl-blue-300);
+  --zl-link-hover:    #A8CBF8;
+  /* Dark tints are deep enough that the normal link already clears AA on all
+     four (6.45:1 green, the lowest), so there is nothing to correct here. */
+  --zl-link-on-tint:  var(--zl-blue-300);
+  --zl-price-ink:     var(--zl-blue-300);
+  --zl-wechat:        #07C160;   /* on a dark page the undarkened brand green
+                                    carries black text at 8.9:1 */
+  --zl-wechat-hover:  #27D178;
+  --zl-on-wechat:     #06230F;
+  --zl-focus:         var(--zl-blue-300);
+  --zl-ring:          0 0 0 3px rgba(111,168,245,.40);
+
+  --zl-action:        var(--zl-blue-500);
+  --zl-action-hover:  var(--zl-blue-600);
+  --zl-action-active: var(--zl-blue-800);
+  --zl-urgent:        var(--zl-red-500);
+  --zl-urgent-hover:  #C8272D;
+
+  --zl-success: var(--zl-green-300); --zl-success-bg: var(--zl-green-950);
+  --zl-warning: var(--zl-amber-300); --zl-warning-bg: var(--zl-amber-950);
+  --zl-danger:  var(--zl-red-300);   --zl-danger-bg:  var(--zl-red-950);
+  --zl-info:    var(--zl-blue-300);  --zl-info-bg:    var(--zl-d-accent);
+
+  /* Event tints, dark. Measured the same way: party 11.10:1 · sports 10.48 ·
+     club 10.37 · cooking 10.58 · culture 10.37 · talk 10.49 · other 6.86. */
+  --zl-ev-party-bg:   #3A1225; --zl-ev-party-fg:   #F7C9DD;
+  --zl-ev-sports-bg:  #13301F; --zl-ev-sports-fg:  #BFE6CC;
+  --zl-ev-club-bg:    #10263F; --zl-ev-club-fg:    #C3D6F2;
+  --zl-ev-cooking-bg: #36220F; --zl-ev-cooking-fg: #F3D3AE;
+  --zl-ev-culture-bg: #241A3D; --zl-ev-culture-fg: #D5C8F3;
+  --zl-ev-talk-bg:    #0E2B2F; --zl-ev-talk-fg:    #B9DFE4;
+  --zl-ev-other-bg:   #161C25; --zl-ev-other-fg:   #9AA5B4;
+
+
+  --zl-shadow-sm:    0 1px 2px rgb(0 0 0 / .40);
+  --zl-shadow-card:  0 1px 2px rgb(0 0 0 / .40), 0 2px 8px rgb(0 0 0 / .30);
+  --zl-shadow-pop:   0 4px 16px rgb(0 0 0 / .45);
+  --zl-shadow-modal: 0 8px 32px rgb(0 0 0 / .55);
+
+  color-scheme: dark;
+}
+
+/* Breakpoints — custom properties can't be used in media
+   queries, so this comment is the single written reference:
+     mobile  < 640px      feed 2-up · filters in a bottom sheet
+     tablet  640–1024px   feed 3-up
+     desktop 1024–1440px  feed 4-up · filters in a left rail
+     wide    > 1440px     content capped at --zl-container      */

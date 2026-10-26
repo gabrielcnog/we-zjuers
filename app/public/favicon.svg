@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<title>WeZJUers</title>
+<!-- The plate is unchanged: brand navy, 14 of 64 corner radius. -->
+<rect width="64" height="64" rx="14" fill="#003F88"/>
+<g fill="#fff" stroke="#fff" stroke-linejoin="round">
+  <!-- The cap. Its top edge runs parallel to the board's underside, 7 units
+       below it, because the two strokes eat 3.25 of any gap between them and
+       a thinner offset closed the seam up entirely at 32px — the mark went
+       from a mortarboard to a white blob. -->
+  <path d="M18.5 36.5 L20.5 45 Q32 52 43.5 45 L45.5 36.5 L32 43 Z" stroke-width="3"/>
+  <!-- The board. Rounded by stroking the polygon with a round join rather
+       than hand-fitting arcs: at 32px that curve is a pixel either way. -->
+  <path d="M32 14 L55 25 L32 36 L9 25 Z" stroke-width="3.5"/>
+  <!-- Tassel: cord, bead, tuft. Three pieces so each keeps its own weight,
+       and far enough right to stay clear of the cap's shoulder. -->
+  <path d="M53 26.5 L53 33" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="53" cy="36.2" r="3.3"/>
+  <path d="M53 40 L53 45" stroke-width="5.4" stroke-linecap="round"/>
+</g>
+</svg>

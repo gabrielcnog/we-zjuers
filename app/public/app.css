@@ -1,0 +1,1135 @@
+/* App-level layout only. Anything reusable belongs in the design system. */
+/* Sticky header height (72px bar + 40px section tabs) — what sticky side
+   columns offset by, so they never slide underneath it. */
+:root{ --app-header-h:112px; }
+.app-main{ padding:var(--zl-space-5) var(--zl-margin-mobile) var(--zl-space-5); }
+@media (min-width:640px){ .app-main{ padding-inline:var(--zl-gutter); } }
+.app-narrow{ max-width:560px; }
+
+.app-nav{ display:flex; align-items:center; gap:var(--zl-space-2); margin-left:auto; }
+/* On the brand-surface header the nav inverts: the light-theme muted slate
+   measures 1.72:1 there, which is why this block exists at all. */
+.zl-ui .zl-header .app-nav__link{
+  color:var(--zl-on-brand-muted);                                     /* 7.77:1 */
+  /* Same hover as the campus picker beside it: a soft block of white at 12%,
+     the shared radius, and matching padding — they are the same kind of quiet
+     header control, so they should answer the pointer the same way. Applied to
+     the whole nav rather than only the language link: one item lighting up
+     differently from its neighbours reads as a bug, not as emphasis. */
+  padding:0 var(--zl-s-2-5); border-radius:var(--zl-radius);
+  transition:background-color var(--zl-duration) var(--zl-ease),
+             color var(--zl-duration) var(--zl-ease);
+}
+.zl-ui .zl-header .app-nav__link:hover{
+  color:var(--zl-on-brand); background:var(--zl-on-brand-hover);
+}
+.zl-ui .zl-header .app-nav__link:focus-visible{
+  outline:none; box-shadow:var(--zl-ring-on-brand);
+}
+/* Sits last in the row, hard against the right edge, with a little air from the
+   sign-in control so the two do not read as a pair. */
+.app-nav__cta{ margin-left:var(--zl-space-2); padding-inline:var(--zl-s-4); }
+
+/* The unread badge was Innovation Red on blue — 1.48:1, effectively invisible. */
+.zl-ui .zl-header .app-dot{ background:var(--zl-on-brand); color:var(--zl-brand-surface); }
+
+/* `.zl-ui` prefix for specificity — see the note in components.css. */
+.zl-ui .app-nav__link{
+  display:inline-flex; align-items:center; gap:var(--zl-s-1-5); min-height:var(--zl-tap-min);
+  padding:0 var(--zl-s-2); font-size:var(--zl-text-sm); color:var(--zl-text-muted); text-decoration:none;
+}
+.zl-ui .app-nav__link:hover{ color:var(--zl-text); text-decoration:none; }
+.app-nav__btn{ background:none; border:0; font-family:inherit; cursor:pointer; }
+.app-dot{
+  display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px;
+  padding:0 var(--zl-s-1); border-radius:var(--zl-radius-pill);
+  background:var(--zl-urgent); color:var(--zl-text-on-fill); font-size:var(--zl-text-label); font-weight:600;
+}
+@media (max-width:860px){
+  .zl-header__inner{ flex-wrap:wrap; }
+  .zl-search{ order:3; flex-basis:100%; }
+  .app-nav{ gap:0; }
+  .app-nav__link{ padding:0 var(--zl-s-1-5); }
+}
+
+/* The border already separates the footer; 96px of margin on top of the page's
+   own bottom padding left a dead band the height of a whole card. */
+.app-footer{ border-top:1px solid var(--zl-border); padding:var(--zl-space-4) 0; margin-top:0; }
+.app-footer__inner{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:var(--zl-space-3); flex-wrap:wrap;
+}
+.app-footer__note{ margin:0; }
+.app-footer__menu{ display:flex; gap:var(--zl-space-4); margin-left:auto; }
+.zl-ui .app-footer__menu a{ color:var(--zl-text-muted); text-decoration:none; }
+.zl-ui .app-footer__menu a:hover{ color:var(--zl-text); text-decoration:underline; }
+@media (max-width:560px){
+  .app-footer__inner{ flex-direction:column; align-items:flex-start; gap:var(--zl-space-2); }
+  .app-footer__menu{ margin-left:0; }
+}
+
+/* Listing detail */
+/* Three regions: the gallery, the rail you act in, and the body you read.
+   On a phone they are one column in source order — gallery, rail, body — so
+   the actions and the seller come before the description. Above 900px the
+   body slides under the gallery and the rail spans both rows.
+   Gallery ↔ rail: 24px on a phone (they read as one column), 48px once they
+   sit side by side. The crumbs above already provide the top spacing. */
+.app-detail{ display:grid; gap:var(--zl-s-6); }
+@media (min-width:900px){
+  .app-detail{
+    grid-template-columns:1.2fr 1fr;
+    grid-template-areas:"media side" "body side";
+    /* auto 1fr, not the default auto auto. The side column spans both rows,
+       so when it is taller than media + body — a sports event's team form
+       does it — the grid shares the extra height between the two rows. That
+       grew the media row from 180px to 299px while align-items:start kept
+       the plate at 180, and the difference showed up as dead space under the
+       plate: measured 151px of it, against 32 on an event with no form.
+       1fr on the second row sends all the slack there instead, below the
+       body, where nothing is looking. */
+    grid-template-rows:auto 1fr;
+    column-gap:var(--zl-s-12); row-gap:var(--zl-s-8);
+    align-items:start;
+  }
+  .app-detail__media{ grid-area:media; }
+  .app-detail__side{ grid-area:side; }
+  .app-detail__body{ grid-area:body; }
+  /* Keep price and contact in view while the gallery and details scroll —
+     offset by the sticky header's height. */
+  .app-detail__side{ position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+}
+/* Save and Share are peers: one row, equal halves. Without JavaScript Share
+   never appears and Save simply takes the width. */
+/* The revealed handle, in the slot the button occupied. Selectable, in the
+   mono face so a handle with l/1/O in it can be copied by eye without
+   guessing. The mark stays WeChat green; the text is ordinary ink. */
+.app-wechat-out{
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--zl-s-1) var(--zl-s-2);
+  padding:var(--zl-s-3); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); background:var(--zl-bg-sunken);
+}
+.app-wechat-out__mark{ display:inline-flex; color:var(--zl-wechat); }
+.app-wechat-out__mark svg{ width:var(--zl-icon-sm); height:var(--zl-icon-sm); }
+.app-wechat-out__id{
+  font-family:var(--zl-font-mono); font-size:var(--zl-text-body);
+  user-select:all; overflow-wrap:anywhere;
+}
+
+.app-detail__minor{ display:flex; gap:var(--zl-s-2); }
+/* The heart fills when the item is saved — same state rule as the card. */
+.zl-ui .js-fav[aria-pressed="true"] svg path{ fill:currentColor; }
+/* In the rail the seller card is a sidebar block, not a page header: smaller
+   avatar, tighter padding, and the languages sit on their label's line. Forty
+   pixels of card is what decides whether Report makes the first screen on a
+   768px-tall laptop. The profile page keeps the full-size card. */
+/* Stacked: the profile's own card. Avatar on top, everything centred, one
+   fact per line with room between them — the horizontal card packs the same
+   fields beside a small avatar, which reads fine in a 210px sidebar next to a
+   listing but looks crowded when the card is the page's subject. Variant
+   rather than a second component: same markup, same data, different frame. */
+/* Doubled class, not a bare .zl-seller--stacked. The base .zl-seller rule
+   further down this file sets gap and padding at the same specificity and
+   comes later, so it won: the card declared 24/20px padding and rendered
+   16px all round. Two classes makes the variant win without depending on
+   source order. */
+.zl-seller.zl-seller--stacked{
+  flex-direction:column; align-items:center; text-align:center;
+  /* 24px above and below, 16px at the sides. The sides were 20, which left
+     238px for the language chips; English, Spanish and Portuguese need 241 on
+     one row, so Portuguese dropped alone to a second line. 16 leaves 246. */
+  gap:var(--zl-s-4); padding:var(--zl-s-6) var(--zl-s-4);
+}
+.zl-seller--stacked .zl-avatar{
+  width:80px; height:80px; font-size:var(--zl-text-h2);
+}
+/* Three groups, spaced as groups. Identity (name and badge), facts, and
+   languages used to sit an even 12px apart, which made one stack of six lines
+   with no way to tell what belonged to what. Inside a group the lines stay
+   tight; between groups there is real room, and the languages get a rule so
+   the card reads as a header, a few facts, and a footer. */
+.zl-seller--stacked .zl-seller__body{ flex:none; width:100%; justify-items:center; gap:var(--zl-s-5); }
+/* The badge drops under the name instead of sitting beside it. */
+.zl-seller--stacked .zl-row{ flex-direction:column; align-items:center; gap:var(--zl-s-2); }
+.zl-seller--stacked .zl-seller__facts{ display:grid; justify-items:center; gap:var(--zl-s-1); }
+.zl-seller--stacked .zl-seller__meta{ margin:0; }
+/* Campus and "member since" stack as two lines rather than one joined by a
+   dot: with a long campus the dot dangled at the end of the first line. */
+.zl-seller--stacked .zl-seller__where,
+.zl-seller--stacked .zl-seller__since{ display:block; }
+.zl-seller--stacked .zl-seller__dot{ display:none; }
+.zl-seller--stacked .zl-seller__speaks{
+  display:grid; justify-items:center; gap:var(--zl-s-2);
+  width:100%; padding-top:var(--zl-s-5); border-top:1px solid var(--zl-border);
+}
+.zl-seller--stacked .zl-seller__label{ margin:0; }
+.zl-seller--stacked .zl-seller__langs{ justify-content:center; margin-top:0; }
+
+/* Everywhere else the facts wrapper is transparent, so the horizontal and
+   compact cards lay out exactly as they did before it existed. And outside
+   the stacked card the phrase may not break between its two halves' words:
+   it wraps between "campus" and "member since", never inside either. */
+.zl-seller__facts{ display:contents; }
+.zl-seller__where, .zl-seller__since{ white-space:nowrap; }
+
+.zl-seller--compact{ padding:var(--zl-s-3); gap:var(--zl-s-3); }
+.zl-seller--compact .zl-seller__speaks{
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--zl-s-1-5);
+}
+.zl-seller--compact .zl-seller__label{ margin:0; }
+.zl-seller--compact .zl-seller__langs{ margin-top:0; }
+.app-detail__media{ min-width:0; }
+/* The row carries the price and, when there is one, the old price struck out
+   beside it. Baseline alignment so the small figure sits on the big one's
+   line rather than floating at its cap. */
+.app-detail__price{
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:var(--zl-s-2);
+  margin-top:var(--zl-space-2);
+}
+/* A fact and its icon travel together: inline-flex so the pair never breaks
+   across a line, and the icon sized here rather than in the sprite, which is
+   how every other icon in this system gets its size. */
+.app-detail__fact{ display:inline-flex; align-items:center; gap:var(--zl-s-1); }
+.app-detail__fact svg{ width:14px; height:14px; flex:none; opacity:.75; }
+
+.app-detail__desc{ white-space:pre-wrap; color:var(--zl-text-muted); line-height:var(--zl-lh-body); }
+.zl-breadcrumbish{ margin-bottom:var(--zl-space-3); }
+
+/* Search: rail + results. The rail collapses into a normal block above the
+   results below 900px rather than becoming a drawer — at four filter groups
+   there is not enough in it to justify one. */
+.app-search{ display:grid; gap:var(--zl-space-5); }
+@media (min-width:900px){
+  .app-search{ grid-template-columns:220px minmax(0,1fr); align-items:start; }
+  .app-search__rail{ position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+}
+
+/* Search price bar */
+.app-pricebar{ display:flex; align-items:flex-end; gap:var(--zl-space-2); flex-wrap:wrap; margin:var(--zl-space-3) 0; }
+/* Inside the rail the same form stacks instead of running across the page. */
+.app-pricebar--rail{ display:grid; gap:var(--zl-space-2); margin:0; }
+.app-pricebar--rail .zl-field,
+.app-pricebar--rail .zl-field:last-of-type{ max-width:none; }
+.app-pricebar--rail .app-pricebar__sep{ display:none; }
+.app-pricebar--rail .zl-btn{ width:100%; }
+.app-pricebar .zl-field{ max-width:120px; }
+.app-pricebar .zl-field:last-of-type{ max-width:180px; }
+.app-pricebar__sep{ padding-bottom:var(--zl-s-3-5); }
+/* The apply button sits on the same baseline as the fields beside it — it was
+   36px against their 44px, which is what made the row look assembled rather
+   than designed. */
+.app-pricebar .zl-btn{ min-height:var(--zl-tap-min); }
+
+/* My listings */
+.app-mylist{ display:flex; flex-direction:column; gap:var(--zl-space-3); }
+.app-mylist__row{
+  display:flex; align-items:center; gap:var(--zl-space-3); flex-wrap:wrap;
+  padding:var(--zl-space-4); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  background:var(--zl-bg-raised);
+}
+.app-mylist__thumb img{ border-radius:var(--zl-radius-sm); object-fit:cover; display:block; }
+.app-mylist__thumb{ flex:none; }
+/* The price field and its button on one line, sized to the number rather
+   than stretching: a four-digit price does not need half the row. */
+.app-mylist__price{ display:flex; align-items:center; gap:var(--zl-s-2); }
+.app-mylist__price .zl-price-input{ width:11ch; }
+.app-mylist__price .zl-input{ width:100%; }
+
+.app-mylist__actions{ display:flex; gap:var(--zl-space-2); margin-left:auto; }
+
+/* Inbox + thread */
+.app-inbox{ display:flex; flex-direction:column; gap:var(--zl-s-3); }
+.zl-ui .app-inbox__row{
+  display:flex; align-items:center; gap:var(--zl-space-3);
+  padding:var(--zl-space-4); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  background:var(--zl-bg-raised); text-decoration:none; color:inherit;
+}
+.zl-ui .app-inbox__row:hover{ border-color:var(--zl-border-strong); text-decoration:none; }
+.app-inbox__name{ font-weight:var(--zl-weight-semi); }
+.app-thread__head{
+  display:flex; gap:var(--zl-space-3); align-items:center; margin:var(--zl-space-4) 0;
+  padding:var(--zl-space-4); background:var(--zl-bg-sunken);
+  border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+}
+.app-thread{ margin:var(--zl-space-4) 0; }
+.app-composer{ display:flex; gap:var(--zl-space-2); }
+.app-composer .zl-input{ flex:1; }
+
+/* Post form thumbnails */
+.app-thumbs{ display:flex; gap:var(--zl-space-2); flex-wrap:wrap; margin-top:var(--zl-space-2); }
+.app-thumbs img{
+  width:72px; height:54px; object-fit:cover;
+  border-radius:var(--zl-radius-sm); border:1px solid var(--zl-border);
+}
+
+/* Category swap in progress: dim the old results rather than blanking them,
+   so the page doesn't jump. Only after a short delay — fast swaps never flash. */
+.app-feed-region{ transition:opacity .15s ease .12s; }
+.app-feed-region[aria-busy="true"]{ opacity:.45; pointer-events:none; }
+
+/* ============================================================
+   Sections (Marketplace / Community) — second row of the header
+   ============================================================ */
+.app-sections{
+  background:var(--zl-brand-surface); box-shadow:inset 0 1px 0 rgb(255 255 255 / .16);
+  /* Pinned under the sticky header on desktop; pinned on its own once the
+     header scrolls away on a phone. */
+  position:sticky; top:72px; z-index:calc(var(--zl-z-sticky) - 1);
+}
+.app-sections__inner{
+  display:flex; gap:var(--zl-space-4);
+  max-width:var(--zl-container); margin-inline:auto; padding-inline:var(--zl-margin-mobile);
+}
+.zl-ui .app-sections__tab{
+  display:inline-flex; align-items:center; min-height:40px; padding-top:var(--zl-s-1);
+  border-bottom:3px solid transparent;
+  font-size:var(--zl-text-sm); font-weight:var(--zl-weight-medium);
+  color:var(--zl-on-brand-muted); text-decoration:none;               /* 7.77:1 */
+}
+.zl-ui .app-sections__tab:hover{ color:var(--zl-on-brand); text-decoration:none; }
+/* Matches the attribute, not one value of it: the current section carries
+   aria-current="page" on its own index and "true" on a listing, profile or
+   event inside it. Both are "you are here" and both get the underline. */
+.zl-ui .app-sections__tab[aria-current]{
+  color:var(--zl-on-brand); border-bottom-color:var(--zl-on-brand); font-weight:var(--zl-weight-semi);
+}
+.zl-ui .app-sections__tab:focus-visible{ outline:none; box-shadow:inset 0 0 0 2px rgb(255 255 255 / .6); border-radius:var(--zl-radius-sm); }
+
+/* ============================================================
+   Community
+   ============================================================ */
+.app-com{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-space-4); align-items:start; }
+.app-com__boards{ display:none; }
+.app-com__side{ display:grid; gap:var(--zl-space-3); align-content:start; }
+@media (min-width:900px){
+  .app-com{ grid-template-columns:minmax(0,1fr) 300px; }
+  .app-com__side{ position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+}
+@media (min-width:1140px){
+  .app-com{ grid-template-columns:210px minmax(0,1fr) 300px; }
+  .app-com--post{ grid-template-columns:minmax(0,1fr) 300px; }
+  .app-com__boards{ display:block; position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+  .app-com__chips{ display:none; }
+}
+.app-com__chips{ margin-bottom:var(--zl-space-3); }
+.app-com__head .zl-h2{ margin:0; }
+.app-com__bar{ display:flex; align-items:flex-end; justify-content:space-between; gap:var(--zl-space-3); margin:var(--zl-space-3) 0; }
+.app-com__tabs{ flex:1; }
+.app-crumbs{ margin-bottom:var(--zl-space-3); }
+/* Breadcrumbs were 16px tall: padded out to a 32px hit area without moving the text. */
+.zl-ui .app-crumbs a, .zl-ui .zl-breadcrumbish a{ padding-block:var(--zl-s-2); margin-block:calc(-1 * var(--zl-s-2)); }
+
+/* Board list */
+/* The vertical filter rail. Named generically because two sections use it:
+   the Community board list and the Events date/category filters. Same job —
+   one choice per row, count on the right — so it is one component, not two
+   that drift. */
+.app-boards, .app-railnav{ display:flex; flex-direction:column; gap:var(--zl-s-0-5); }
+.app-boards__label, .app-railnav__label{ padding:0 var(--zl-s-2-5) var(--zl-s-2); }
+.zl-ui .app-boards__item,
+.zl-ui .app-railnav__item{
+  display:flex; align-items:center; gap:var(--zl-s-2-5); min-height:40px; padding:0 var(--zl-s-2-5);
+  border-radius:var(--zl-radius); font-size:var(--zl-text-sm);
+  color:var(--zl-text-muted); text-decoration:none;
+}
+.zl-ui .app-boards__item:hover,
+.zl-ui .app-railnav__item:hover{ background:var(--zl-bg-hover); color:var(--zl-text); text-decoration:none; }
+.zl-ui .app-boards__item[aria-current="page"],
+.zl-ui .app-railnav__item[aria-current="page"]{ background:var(--zl-bg-accent); color:var(--zl-text-on-accent); font-weight:var(--zl-weight-semi); }
+.app-boards__icon, .app-railnav__icon{ width:20px; text-align:center; flex:none; }
+.app-boards__n, .app-railnav__n{ margin-left:auto; font-size:var(--zl-text-caption); color:var(--zl-text-subtle); font-variant-numeric:tabular-nums; }
+
+/* Post card. The title link is stretched over the card (same pattern as the
+   listing card); votes, board links and actions sit above it. */
+.app-posts{ display:grid; gap:var(--zl-space-2); }
+.app-post{
+  position:relative; display:grid; grid-template-columns:44px minmax(0,1fr); gap:var(--zl-space-2);
+  padding:var(--zl-space-3) var(--zl-space-3) var(--zl-space-2) var(--zl-space-2);
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  transition:border-color var(--zl-duration) var(--zl-ease), box-shadow var(--zl-duration) var(--zl-ease);
+}
+.app-post:hover{ border-color:var(--zl-border-strong); box-shadow:var(--zl-shadow-sm); }
+.app-post--full, .app-post--full:hover{ border-color:var(--zl-border); box-shadow:none; padding-bottom:var(--zl-space-3); }
+.app-post__main{ min-width:0; }
+.zl-ui .app-post__link{ color:var(--zl-text); text-decoration:none; }
+.app-post__link::after{ content:""; position:absolute; inset:0; border-radius:inherit; }
+.app-post__link:focus-visible{ outline:none; }
+.app-post__link:focus-visible::after{ box-shadow:var(--zl-ring); }
+.app-vote, .app-post__meta a, .app-post__action, .app-linked, .app-post__tools > *{ position:relative; z-index:1; }
+.app-post__meta{
+  display:flex; flex-wrap:wrap; align-items:center; gap:var(--zl-s-1-5);
+  font-size:var(--zl-text-caption); color:var(--zl-text-subtle);
+}
+.zl-ui .app-post__board{ color:var(--zl-text); font-weight:var(--zl-weight-semi); text-decoration:none; }
+.zl-ui .app-post__board:hover{ text-decoration:underline; }
+.app-verified{ color:var(--zl-success); font-weight:var(--zl-weight-bold); }
+.app-post__title{ margin:var(--zl-s-1-5) 0 0; font-size:var(--zl-text-title); line-height:1.4; font-weight:var(--zl-weight-semi); overflow-wrap:anywhere; }
+.app-post__title--full{ font-size:var(--zl-text-h3); line-height:var(--zl-lh-h3); }
+.app-post__excerpt{
+  margin:var(--zl-s-1) 0 0; font-size:var(--zl-text-sm); color:var(--zl-text-muted);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.app-post__body{ margin-top:var(--zl-space-3); max-width:var(--zl-measure); white-space:pre-wrap; line-height:var(--zl-lh-body); overflow-wrap:anywhere; }
+.app-post__foot{ display:flex; gap:var(--zl-space-3); margin-top:var(--zl-s-1); }
+.app-post__tools{ margin-top:var(--zl-space-2); align-items:center; }
+.zl-ui .app-post__action{
+  display:inline-flex; align-items:center; gap:var(--zl-s-1-5); min-height:var(--zl-tap-min); padding:0 var(--zl-s-2-5); margin-left:calc(-1 * var(--zl-s-2-5));
+  border:0; border-radius:var(--zl-radius); background:none; cursor:pointer; list-style:none;
+  font-family:inherit; font-size:var(--zl-text-caption); font-weight:var(--zl-weight-medium);
+  color:var(--zl-text-muted); text-decoration:none;
+}
+.zl-ui .app-post__action:hover{ background:var(--zl-bg-hover); color:var(--zl-text); text-decoration:none; }
+summary.app-post__action::-webkit-details-marker{ display:none; }
+
+/* Flair: colour plus a word, never colour alone. */
+.app-flair{
+  display:inline-block; vertical-align:2px; margin-right:var(--zl-s-1-5); padding:0 var(--zl-s-2);
+  border-radius:var(--zl-radius-pill); font-size:var(--zl-text-label); line-height:19px;
+  font-weight:var(--zl-weight-semi); letter-spacing:.02em; white-space:nowrap;
+}
+.app-flair--question{   background:var(--zl-info-bg);    color:var(--zl-text-on-accent); }
+.app-flair--discussion{ background:var(--zl-bg-sunken);  color:var(--zl-text-muted); }
+.app-flair--tip{        background:var(--zl-success-bg); color:var(--zl-success); }
+.app-flair--event{      background:var(--zl-warning-bg); color:var(--zl-warning); }
+
+/* Upvote */
+.app-vote{ display:flex; flex-direction:column; align-items:center; gap:0; margin:0; }
+.app-vote--inline{ flex-direction:row; gap:var(--zl-s-0-5); }
+.app-vote__btn{
+  display:grid; place-items:center; width:var(--zl-tap-min); height:40px;
+  border:0; border-radius:var(--zl-radius); background:none; cursor:pointer; color:var(--zl-text-subtle);
+  transition:background-color var(--zl-duration) var(--zl-ease), color var(--zl-duration) var(--zl-ease);
+}
+.app-vote__btn:hover{ background:var(--zl-bg-hover); color:var(--zl-action); }
+.app-vote__btn:focus-visible{ outline:none; box-shadow:var(--zl-ring); }
+.app-vote__btn[aria-pressed="true"]{ color:var(--zl-action); }
+.app-vote__btn[aria-pressed="true"] path{ fill:currentColor; }
+.app-vote__n{ font-size:var(--zl-text-sm); font-weight:var(--zl-weight-semi); font-variant-numeric:tabular-nums; color:var(--zl-text); min-width:2ch; text-align:center; }
+
+/* Listing linked from a post — the bridge back to the marketplace. */
+.zl-ui .app-linked{
+  display:flex; align-items:center; gap:var(--zl-s-3); max-width:440px; margin-top:var(--zl-space-2); padding:var(--zl-s-2);
+  background:var(--zl-bg-sunken); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  color:var(--zl-text); text-decoration:none;
+}
+.zl-ui .app-linked:hover{ border-color:var(--zl-border-strong); text-decoration:none; }
+.app-linked img{ width:72px; height:54px; object-fit:cover; border-radius:var(--zl-radius-sm); flex:none; }
+.app-linked__text{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.app-linked__title{ font-size:var(--zl-text-sm); font-weight:var(--zl-weight-medium); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.app-linked .zl-price{ font-size:var(--zl-text-sm); }
+/* A linked listing that is sold or expired: the price stays legible as
+   context but stops being the loudest thing on the card, and the badge
+   carries the state. The photo dims so the card reads as past tense. */
+.app-linked__foot{ display:flex; align-items:center; gap:var(--zl-s-2); flex-wrap:wrap; }
+.app-linked--gone img{ opacity:.55; }
+.app-linked--gone .zl-price{ color:var(--zl-text-subtle); font-weight:var(--zl-weight-regular); }
+
+/* Sidebar */
+.app-side-card{ padding:var(--zl-space-3); background:var(--zl-bg-raised); border:1px solid var(--zl-border); border-radius:var(--zl-radius); }
+.app-side-card__title{ margin:0; font-size:var(--zl-text-sm); font-weight:var(--zl-weight-semi); }
+.app-side-card__body{ margin:var(--zl-s-1-5) 0 var(--zl-space-3); }
+.app-stats{ display:flex; gap:var(--zl-space-4); margin:0 0 var(--zl-space-3); }
+.app-stats div{ display:flex; flex-direction:column-reverse; }
+.app-stats dt{ font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+.app-stats dd{ margin:0; font-size:var(--zl-text-title); font-weight:var(--zl-weight-bold); font-variant-numeric:tabular-nums; }
+.app-guidelines{ display:grid; gap:var(--zl-s-1-5); margin:var(--zl-space-2) 0 var(--zl-space-3); padding-left:var(--zl-s-4); font-size:var(--zl-text-sm); color:var(--zl-text-muted); }
+
+/* Comments */
+.app-comments{ margin-top:var(--zl-s-8); }
+.app-comment-form, .app-signin-prompt{
+  margin-bottom:var(--zl-space-4); padding:var(--zl-space-3);
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+}
+.app-comment-form .zl-textarea{ margin-top:var(--zl-s-1-5); min-height:84px; width:100%; }
+.app-signin-prompt{ display:flex; align-items:center; justify-content:space-between; gap:var(--zl-space-2); flex-wrap:wrap; color:var(--zl-text-muted); }
+.app-reply__buttons{ display:flex; justify-content:flex-end; margin-top:var(--zl-space-2); }
+.app-thread{ display:grid; gap:var(--zl-space-3); }
+.app-comment__head{ display:flex; align-items:center; gap:var(--zl-s-2); font-size:var(--zl-text-sm); }
+/* Author links: the name reads as text until you point at it, the same way
+   the board link in a byline behaves. The comment's avatar and name are one
+   target so the whole chip is clickable, and it keeps the head's own gap so
+   the thread rail still lines up with the avatar's centre. */
+.zl-ui .app-comment__author{
+  display:flex; align-items:center; gap:var(--zl-s-2);
+  color:inherit; text-decoration:none; min-width:0;
+}
+.zl-ui .app-comment__author:hover b{ text-decoration:underline; }
+.zl-ui .app-post__author{ color:inherit; text-decoration:none; }
+.zl-ui .app-post__author:hover{ text-decoration:underline; }
+/* Comment geometry is derived from the avatar, not guessed: text starts after
+   avatar + gap, the thread rail runs down the avatar's centre. */
+.app-comment__body{ margin:var(--zl-s-0-5) 0 0 calc(var(--zl-avatar-sm) + var(--zl-s-2)); max-width:var(--zl-measure); white-space:pre-wrap; line-height:1.55; overflow-wrap:anywhere; }
+.app-comment__actions{ display:flex; align-items:center; flex-wrap:wrap; gap:0 var(--zl-s-2); margin-left:calc(var(--zl-avatar-sm) + var(--zl-s-2) - var(--zl-s-2-5)); }
+.app-comment__children{ display:grid; gap:var(--zl-space-3); margin:var(--zl-s-1) 0 0 calc(var(--zl-avatar-sm) / 2 - 1px); padding-left:var(--zl-s-6); border-left:2px solid var(--zl-border); }
+.app-comment__children.is-flat{ margin-left:0; padding-left:0; border-left:0; }
+.app-op{ padding:0 var(--zl-s-1-5); border-radius:var(--zl-radius-pill); background:var(--zl-info-bg); color:var(--zl-text-on-accent); font-size:var(--zl-text-label); font-weight:var(--zl-weight-semi); }
+.app-reply[open]{ flex-basis:100%; }
+.app-reply__form{ margin:var(--zl-s-1) 0 var(--zl-space-2) var(--zl-s-2-5); }
+.app-reply__form .zl-textarea{ width:100%; min-height:72px; }
+
+/* New post: post type as a row of selectable flairs */
+.app-fieldset{ border:0; padding:0; margin:0; min-width:0; }
+.app-kinds{ display:flex; flex-wrap:wrap; gap:var(--zl-s-2); margin-top:var(--zl-s-1-5); }
+.app-kind{ position:relative; cursor:pointer; }
+.app-kind input{ position:absolute; opacity:0; width:1px; height:1px; }
+.app-kind .app-flair{ margin:0; padding:var(--zl-s-2) var(--zl-s-3-5); font-size:var(--zl-text-sm); line-height:1.3; border:2px solid transparent; }
+.app-kind input:checked + .app-flair{ border-color:currentColor; }
+.app-kind input:focus-visible + .app-flair{ box-shadow:var(--zl-ring); }
+.app-ico{ margin-right:.35em; }
+
+/* ============================================================
+   Guidebook
+   ============================================================ */
+.app-guide{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-space-4); align-items:start; }
+.app-guide__main{ min-width:0; }
+.app-guide__toc, .app-guide__glossary{ min-width:0; }
+/* Narrow: contents and glossary collapse above the chapters (glossary after
+   contents), so neither pushes the actual guide far down the page. */
+.app-guide__toc{ order:1; } .app-guide__glossary{ order:2; } .app-guide__main{ order:3; }
+@media (min-width:900px){
+  .app-guide{ grid-template-columns:minmax(0,1fr) 300px; }
+  .app-guide__main{ order:1; } .app-guide__glossary{ order:2; }
+  .app-guide__toc{ order:0; grid-column:1 / -1; }
+  .app-guide__glossary{ position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+}
+@media (min-width:1140px){
+  .app-guide{ grid-template-columns:210px minmax(0,1fr) 300px; }
+  .app-guide__toc{ order:0; grid-column:auto; position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+}
+
+/* Contents */
+.app-toc > summary{ list-style:none; cursor:pointer; padding:0 var(--zl-s-2-5) var(--zl-s-2); }
+.app-toc > summary::-webkit-details-marker{ display:none; }
+.app-toc__list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--zl-s-0-5); }
+@media (min-width:900px) and (max-width:1139px){
+  .app-toc > summary{ display:none; }
+  .app-toc__list{ flex-direction:row; flex-wrap:wrap; gap:var(--zl-s-1-5); }
+  .zl-ui .app-toc__link{ min-height:36px; border:1px solid var(--zl-border); border-radius:var(--zl-radius-pill); padding:0 var(--zl-s-3); }
+}
+.zl-ui .app-toc__link{
+  display:flex; align-items:center; gap:var(--zl-s-2-5); min-height:38px; padding:var(--zl-s-1) var(--zl-s-2-5);
+  border-radius:var(--zl-radius); font-size:var(--zl-text-sm); line-height:1.3;
+  color:var(--zl-text-muted); text-decoration:none;
+}
+.zl-ui .app-toc__link:hover{ background:var(--zl-bg-hover); color:var(--zl-text); text-decoration:none; }
+.zl-ui .app-toc__link[aria-current="true"]{ background:var(--zl-bg-accent); color:var(--zl-text-on-accent); font-weight:var(--zl-weight-semi); }
+.app-toc__icon{ width:20px; text-align:center; flex:none; }
+
+/* Header + source */
+.app-guide__head .zl-h2{ margin:0; }
+.app-source{
+  margin-top:var(--zl-space-3); padding:var(--zl-space-3);
+  background:var(--zl-bg-sunken); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+}
+.app-source__text{ display:flex; flex-direction:column; gap:var(--zl-s-0-5); }
+/* [POLISH] Ran to ~93 characters a line at desktop width, well past the 60-80
+   that stays comfortable to read. --zl-measure is the system's answer for
+   long-form text; a 13px caption gets there sooner, so it is capped shorter. */
+.app-source__note{ margin:var(--zl-space-2) 0 0; max-width:60ch; }
+.app-guide__results{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--zl-space-2); flex-wrap:wrap;
+  margin-top:var(--zl-space-3); padding:var(--zl-space-2) var(--zl-space-3);
+  background:var(--zl-bg-accent); border-radius:var(--zl-radius); color:var(--zl-text-on-accent);
+}
+
+/* Chapters. scroll-margin keeps headings clear of the sticky header on jump. */
+.app-chapter{
+  margin-top:var(--zl-space-4); padding:var(--zl-space-4) var(--zl-space-4) var(--zl-space-3);
+  background:var(--zl-bg-raised); border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  scroll-margin-top:calc(var(--app-header-h) + var(--zl-space-3));
+}
+@media (max-width:639px){ .app-chapter{ padding:var(--zl-space-3); } }
+.app-chapter__title{ margin:0; font-size:var(--zl-text-h3); line-height:var(--zl-lh-h3); }
+.app-chapter__intro{ margin:var(--zl-s-1-5) 0 var(--zl-space-3); color:var(--zl-text-muted); max-width:var(--zl-measure); }
+.app-chapter__h{ margin:var(--zl-space-4) 0 var(--zl-space-2); font-size:var(--zl-text-body); font-weight:var(--zl-weight-semi); }
+.app-chapter p{ max-width:70ch; line-height:var(--zl-lh-body); }
+.app-guide-list, .app-steps{ margin:0; padding-left:var(--zl-s-6); display:grid; gap:var(--zl-s-1-5); max-width:70ch; line-height:1.55; }
+.app-steps{ counter-reset:step; list-style:none; padding-left:0; }
+.app-steps > li{ counter-increment:step; position:relative; padding-left:var(--zl-s-8); min-height:26px; }
+.app-steps > li::before{
+  content:counter(step); position:absolute; left:0; top:1px;
+  width:24px; height:24px; display:grid; place-items:center; border-radius:50%;
+  background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
+  font-size:var(--zl-text-caption); font-weight:var(--zl-weight-semi);
+}
+.app-guide-note{ margin:var(--zl-space-3) 0; }
+.app-guide-note p{ margin:var(--zl-s-0-5) 0 0; }
+.app-guide-note__actions{ display:flex; gap:var(--zl-space-2); flex-wrap:wrap; margin-top:var(--zl-space-2); }
+
+.app-table-wrap{ overflow-x:auto; margin:var(--zl-space-2) 0; border:1px solid var(--zl-border); border-radius:var(--zl-radius); }
+.app-table{ width:100%; border-collapse:collapse; font-size:var(--zl-text-sm); }
+.app-table th, .app-table td{ padding:var(--zl-s-2-5) var(--zl-s-3); text-align:left; vertical-align:top; border-top:1px solid var(--zl-border); }
+.app-table thead th{ border-top:0; background:var(--zl-bg-sunken); font-size:var(--zl-text-caption); color:var(--zl-text-muted); font-weight:var(--zl-weight-semi); }
+.app-table tbody th{ font-weight:var(--zl-weight-semi); white-space:nowrap; }
+
+.app-contacts{ display:grid; gap:var(--zl-s-2); margin:var(--zl-space-3) 0 0; }
+.app-contacts div{ display:grid; gap:1px; padding-left:var(--zl-s-3); border-left:3px solid var(--zl-border); }
+/* Contact labels also sit on tinted alert backgrounds, where subtle drops to
+   4.45:1 — muted holds 5.5:1 everywhere they appear. */
+.app-contacts dt{ font-size:var(--zl-text-caption); color:var(--zl-text-muted); }
+.app-contacts dd{ margin:0; font-size:var(--zl-text-sm); overflow-wrap:anywhere; }
+.app-contacts--inline{ margin-top:var(--zl-space-2); }
+.app-links{ list-style:none; margin:0; padding:0; display:grid; gap:var(--zl-s-2-5); }
+.app-links li{ display:flex; flex-direction:column; }
+
+/* Glossary term inside the text: dotted, not a normal link — it opens the
+   definition beside the text rather than taking you somewhere. */
+.zl-ui .app-term{ color:inherit; text-decoration:underline dotted var(--zl-link); text-decoration-thickness:1.5px; text-underline-offset:3px; }
+.zl-ui .app-term:hover{ color:var(--zl-link); }
+
+.app-guide__foot{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--zl-space-3); flex-wrap:wrap;
+  margin-top:var(--zl-space-4); padding:var(--zl-space-3) var(--zl-space-4);
+  background:var(--zl-bg-sunken); border-radius:var(--zl-radius);
+}
+.app-guide__foot p{ margin:0; max-width:52ch; color:var(--zl-text-muted); }
+
+/* Glossary sidebar */
+.app-gloss{ background:var(--zl-bg-raised); border:1px solid var(--zl-border); border-radius:var(--zl-radius); padding:var(--zl-space-3); }
+.app-gloss__head{ display:flex; align-items:baseline; justify-content:space-between; list-style:none; cursor:pointer; }
+.app-gloss__head::-webkit-details-marker{ display:none; }
+@media (min-width:900px){ .app-gloss__head{ cursor:default; pointer-events:none; } }
+.app-gloss__filter{ margin:var(--zl-space-2) 0; width:100%; }
+.app-gloss__list{ margin:0; display:grid; gap:var(--zl-s-0-5); }
+@media (min-width:900px){
+  .app-gloss__list{ max-height:calc(100vh - var(--app-header-h) - 190px); overflow-y:auto; overscroll-behavior:contain; margin-right:calc(-1 * var(--zl-s-2)); padding-right:var(--zl-s-2); }
+}
+.app-gloss__item{ padding:var(--zl-s-2-5) var(--zl-s-2); border-radius:var(--zl-radius); scroll-margin:8px; transition:background-color .6s var(--zl-ease); }
+.app-gloss__item + .app-gloss__item{ border-top:1px solid var(--zl-border); }
+.app-gloss__item.is-flash{ background:var(--zl-warning-bg); transition:none; }
+.app-gloss__item dt{ font-weight:var(--zl-weight-semi); font-size:var(--zl-text-sm); }
+.app-gloss__alt{ font-weight:var(--zl-weight-regular); color:var(--zl-text-muted); }
+.app-gloss__pinyin{ display:block; font-weight:var(--zl-weight-regular); font-style:italic; font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+.app-gloss__item dd{ margin:var(--zl-s-1) 0 0; font-size:var(--zl-text-caption); line-height:1.45; color:var(--zl-text-muted); }
+.app-gloss__see{ white-space:nowrap; }
+/* Narrow: contents and glossary are two matching collapsible cards with a
+   chevron, so they read as controls rather than stray labels. */
+@media (max-width:899px){
+  .app-toc{ background:var(--zl-bg-raised); border:1px solid var(--zl-border); border-radius:var(--zl-radius); padding:var(--zl-space-3); }
+  .app-toc > summary{ padding:0; font-size:var(--zl-text-sm); font-weight:var(--zl-weight-semi); letter-spacing:0; text-transform:none; color:var(--zl-text); }
+  .app-toc[open] > summary{ margin-bottom:var(--zl-space-2); }
+  .app-toc > summary, .app-gloss__head{ display:flex; align-items:center; gap:var(--zl-s-2); min-height:24px; }
+  .app-toc > summary::after, .app-gloss__head::after{
+    content:""; width:8px; height:8px; margin-left:auto;
+    border-right:2px solid var(--zl-text-muted); border-bottom:2px solid var(--zl-text-muted);
+    transform:rotate(45deg) translateY(-3px); transition:transform var(--zl-duration) var(--zl-ease);
+  }
+  .app-gloss__head > .zl-caption{ margin-left:auto; }
+  .app-gloss__head::after{ margin-left:var(--zl-s-2-5); }
+  .app-toc[open] > summary::after, .app-gloss[open] .app-gloss__head::after{ transform:rotate(225deg) translate(-2px,-2px); }
+  .app-guide{ gap:var(--zl-space-2); }
+  .app-guide__main{ margin-top:var(--zl-space-3); }
+}
+
+/* Type-ahead: group headings and the "search for everything" first row. */
+.zl-suggest{ max-height:min(60vh, 420px); overflow-y:auto; }
+.zl-suggest__group{ padding:var(--zl-s-2-5) var(--zl-s-2-5) var(--zl-s-1); }
+.zl-suggest__item--all{ font-weight:var(--zl-weight-medium); }
+.zl-suggest__item--all + .zl-suggest__group{ border-top:1px solid var(--zl-border); margin-top:var(--zl-s-1); }
+.zl-suggest__item > span[aria-hidden]{ flex:none; }
+/* Long definitions/board names stay on one line rather than widening the row. */
+.zl-suggest__scope{ max-width:45%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ============================================================
+   Mobile pass — measured on a 375×812 phone.
+
+   The header was 220px of a 812px screen and it was sticky, so a third of
+   every screenful was chrome and the first card sat 584px down. Below 860px
+   the header now scrolls away like normal content and only the section bar
+   (40px) stays pinned: navigation you can always reach, without the logo,
+   campus picker and search taking a permanent cut of the screen.
+   ============================================================ */
+@media (max-width:860px){
+  :root{ --app-header-h:44px; }
+  .zl-header{ position:static; }
+  .app-sections{ top:0; z-index:var(--zl-z-sticky); }
+  /* Centred on a phone: the three tabs measure 282px inside 343px, so they
+     fit with room to spare and the bar reads as its own piece of navigation
+     rather than something hanging off the left edge. `safe center` keeps the
+     first tab reachable if a translation ever makes the row overflow. */
+  .app-sections__inner{
+    overflow-x:auto; scrollbar-width:none;
+    justify-content:center; justify-content:safe center;
+  }
+  .app-sections__inner::-webkit-scrollbar{ display:none; }
+
+  /* The disclaimer wrapped to two lines and cost 54px before anything else. */
+  .zl-disclaimer{ padding-block:var(--zl-s-1-5); }
+
+  .zl-header__inner{ min-height:0; padding-block:var(--zl-s-2-5); row-gap:var(--zl-s-2-5); }
+  .app-nav{ gap:var(--zl-s-1); }
+  .app-nav__cta{ margin-left:var(--zl-s-1); padding-inline:var(--zl-s-3-5); }
+
+  /* 48px of air above and below the content on a phone is a whole card. */
+  .app-main{ padding-block:var(--zl-space-4); }
+  .app-com__bar{ margin:var(--zl-space-2) 0 var(--zl-space-3); }
+
+  /* Feed: tighter gutters mean wider cards at the same column count. */
+  .zl-feed{ gap:var(--zl-space-3); }
+  .app-post{ padding:var(--zl-space-2) var(--zl-space-3) var(--zl-space-2) var(--zl-space-2); }
+  .app-post__title{ font-size:var(--zl-text-body); }
+  .app-chapter{ margin-top:var(--zl-space-3); }
+}
+
+/* Touch targets that measured under 44px in the audit. */
+.app-vote__btn{ height:var(--zl-tap-min); }
+.zl-ui .app-post__board{ padding-block:var(--zl-s-1-5); margin-block:calc(-1 * var(--zl-s-1-5)); }
+.zl-ui .app-post__meta a, .zl-ui .app-gloss__see, .zl-ui .app-term{ -webkit-tap-highlight-color:rgb(0 63 136 / .12); }
+button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
+@media (max-width:860px){
+  /* Header actions were 36px tall; 40 is the minimum that still fits the row. */
+  .zl-header .zl-btn--sm{ min-height:40px; }
+}
+@media (max-width:640px){
+  /* The section is named in the tab bar directly above it, so on a phone the
+     explanatory line costs 90px to repeat what the heading already says. */
+  /* With the lede hidden, the heading was sitting straight on the category
+     chips. Give the marketplace back the same rhythm the other sections have. */
+  .app-main > .zl-h1{ margin-bottom:var(--zl-space-3); }
+  .app-main > .zl-chipscroll{ margin-bottom:var(--zl-space-3); }
+  .zl-resultbar{ margin-block:var(--zl-space-2); }
+}
+
+/* ============================================================
+   Mobile header, second pass
+   The header was three stacked rows plus the section bar. The primary action
+   is the widest thing in it, and on a phone it belongs in thumb reach, not in
+   the top-right corner (docs/ux-guidelines.md 5.2) — so it becomes a floating
+   button and the header loses a row. Nothing is removed: signed-in links stay,
+   they just sit on their own compact row (docs/ux-guidelines.md 5.1).
+   ============================================================ */
+.app-fab{ display:none; }
+@media (max-width:860px){
+  .app-nav__cta{ display:none; }
+  /* The floating button IS a .zl-btn (primary · lg · pill); this only places
+     it. No colours, padding or type are redefined here. */
+  .app-fab{
+    display:inline-flex; position:fixed; z-index:var(--zl-z-sticky);
+    right:var(--zl-s-4); bottom:calc(var(--zl-s-4) + env(safe-area-inset-bottom));
+    box-shadow:var(--zl-shadow-pop);
+  }
+  .app-fab:focus-visible{ box-shadow:var(--zl-ring), var(--zl-shadow-pop); }
+  /* A fab that posts (messaging a seller) needs a form around it; the form is
+     only a wrapper and takes no space of its own. */
+  .app-fab-form{ margin:0; }
+  /* The floating button steps aside once you reach the footer, so the footer
+     keeps its normal padding instead of reserving a button-sized gap. */
+  .app-footer{ padding-bottom:calc(var(--zl-space-4) + env(safe-area-inset-bottom)); }
+  .app-fab{ transition:opacity var(--zl-duration) var(--zl-ease), transform var(--zl-duration) var(--zl-ease); }
+  .app-fab.is-away{ opacity:0; transform:translateY(12px); pointer-events:none; }
+
+  /* Header rows: logo + campus + utilities on one line, search on the next. */
+  /* Logo, campus and the utility links share one line: the gaps and the
+     button padding are what decide whether it wraps into a second row. */
+  .zl-header__inner{ padding-block:var(--zl-s-2); row-gap:var(--zl-s-2); column-gap:var(--zl-s-1); }
+  .zl-campus{ padding-inline:var(--zl-s-1); gap:var(--zl-s-1); }
+  .zl-campus__eyebrow{ display:none; }          /* the pin already says "place" */
+  .zl-campus__value{ font-size:var(--zl-text-sm); }
+  .app-nav{ gap:var(--zl-s-0-5); }
+  .zl-header .zl-btn--sm{ padding-inline:var(--zl-s-3); }
+  .zl-header .zl-campus__pin svg{ width:16px; height:16px; }
+  .zl-ui .app-nav__link{ font-size:var(--zl-text-caption); padding:0 var(--zl-s-2); }
+}
+@media (max-width:420px){
+  /* .zl-ui-scoped to match the rule it is overriding: the base wordmark is
+     .zl-ui .zl-wordmark (0,2,0), so this bare .zl-wordmark (0,1,0) never
+     applied and the mark stayed 19px on a phone. The BETA tag is sized in em,
+     so it steps down with it. */
+  .zl-ui .zl-wordmark{ font-size:var(--zl-text-title); }
+  .zl-campus__value{ max-width:11ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+}
+
+/* Footer: a centred stack on a phone, one line on a desktop. */
+.app-footer__note{ display:flex; align-items:center; gap:var(--zl-s-1-5); flex-wrap:wrap; }
+@media (max-width:640px){
+  .app-footer__inner{ flex-direction:column; align-items:center; gap:var(--zl-space-3); text-align:center; }
+  .app-footer__note{ flex-direction:column; gap:var(--zl-s-1); }
+  .app-footer__menu{ margin-left:0; justify-content:center; }
+}
+
+/* [POLISH] Type-ahead busy state: a hairline under the field while a
+   suggestion request is in flight, so a slow network does not look dead. */
+.js-searchinput[aria-busy="true"]{
+  background-image:linear-gradient(90deg, var(--zl-action) 0 40%, transparent 40%);
+  background-size:200% 2px; background-repeat:no-repeat; background-position:0 100%;
+  animation:zl-busy 1s linear infinite;
+}
+@keyframes zl-busy{ from{ background-position:-100% 100%; } to{ background-position:100% 100%; } }
+@media (prefers-reduced-motion:reduce){ .js-searchinput[aria-busy="true"]{ animation:none; } }
+
+/* Value proposition for signed-out visitors on the front page. Deliberately
+   one short block, not a marketing panel: Krug's rule is that introductory
+   copy earns its place only if it says what the thing is. */
+.app-hero{
+  padding:var(--zl-space-4); margin-bottom:var(--zl-space-3);
+  background:var(--zl-bg-accent); border-radius:var(--zl-radius-lg);
+}
+/* Same rule as the alerts: the hero sits on the accent tint, so its links need
+   the tinted-surface blue to clear AA. */
+.zl-ui .app-hero a:not(.zl-btn){ color:var(--zl-link-on-tint); }
+.zl-ui .app-hero a:not(.zl-btn):hover{ color:var(--zl-link-hover); }
+.app-hero__title{ margin:0; max-width:22ch; }
+.app-hero__body{ margin:var(--zl-space-2) 0 var(--zl-space-3); max-width:var(--zl-measure); color:var(--zl-text); }
+.app-hero__actions{ display:flex; gap:var(--zl-space-2); flex-wrap:wrap; }
+.app-hero__points{
+  display:flex; flex-wrap:wrap; gap:var(--zl-space-2) var(--zl-space-4);
+  margin:var(--zl-space-3) 0 0; padding:0; list-style:none;
+  font-size:var(--zl-text-caption); color:var(--zl-text-muted);
+}
+.app-hero__points li::before{ content:"✓"; margin-right:var(--zl-s-1-5); color:var(--zl-success); font-weight:var(--zl-weight-bold); }
+.app-auth__why{ margin:calc(-1 * var(--zl-space-3)) 0 var(--zl-space-4); max-width:52ch; }
+/* No interpuncts. They were a descendant rule — .app-detail__signals span —
+   so once each fact became an icon wrapping its own <span>, every inner span
+   drew one too: "· 12d ago · · 66 views". The icons mark where one fact
+   starts, which is the job the dots were doing, so the separator is the gap.
+   The gap is --zl-s-2, the same one the badge row above it uses, so the two
+   lines of the header sit on one rhythm instead of two. */
+.app-detail__signals{
+  display:flex; flex-wrap:wrap;
+  gap:var(--zl-space-1) var(--zl-s-2);
+  margin:0 0 var(--zl-space-3);
+}
+@media (max-width:640px){ .app-hero{ padding:var(--zl-space-3); } }
+
+
+/* ============================================================
+   Building blocks used by every view (see views/layout.mjs)
+   ============================================================ */
+
+/* Breadcrumbs */
+.zl-crumbs{ margin-bottom:var(--zl-s-4); font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+.zl-crumbs ol{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--zl-s-1); margin:0; padding:0; list-style:none; }
+.zl-crumbs li{ display:inline-flex; align-items:center; gap:var(--zl-s-1); min-width:0; }
+.zl-crumbs li:last-child{ min-width:0; flex:1 1 0; }
+.zl-crumbs [aria-current]{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--zl-text-muted); }
+.zl-crumbs__sep{ display:inline-flex; color:var(--zl-border-strong); }
+.zl-crumbs__sep svg{ width:14px; height:14px; }
+.zl-ui .zl-crumbs a{ color:var(--zl-text-muted); padding-block:var(--zl-s-2); margin-block:calc(-1 * var(--zl-s-2)); }
+.zl-ui .zl-crumbs a:hover{ color:var(--zl-link-hover); }
+
+/* Links with a trailing icon (in-site arrow, leaves-the-site) */
+.zl-link-arrow, .zl-link-ext{ display:inline-flex; align-items:center; gap:var(--zl-s-1); }
+.zl-link-arrow svg, .zl-link-ext svg{ width:14px; height:14px; flex:none; }
+.zl-link-ext svg{ opacity:.8; }
+
+/* Alert anatomy: icon · content(title, body, extra) */
+.zl-alert{ gap:var(--zl-s-3); padding:var(--zl-s-4); }
+.zl-alert .zl-icon-ring{ width:var(--zl-control-sm); height:var(--zl-control-sm); }
+.zl-alert__content{ display:grid; gap:var(--zl-s-1); min-width:0; align-content:center; min-height:var(--zl-control-sm); }
+.zl-alert__title{ margin:0; font-weight:var(--zl-weight-semi); }
+.zl-alert__body{ margin:0; }
+.zl-alert__content > .zl-link-arrow{ margin-top:var(--zl-s-1); font-size:var(--zl-text-caption); }
+.zl-icon-ring svg{ width:var(--zl-icon); height:var(--zl-icon); }
+.zl-alert .zl-icon-ring svg{ width:18px; height:18px; }
+.zl-icon-ring--info{    border-color:var(--zl-info);    color:var(--zl-info); }
+.zl-icon-ring--warning{ border-color:var(--zl-warning); color:var(--zl-warning); }
+.zl-icon-ring--danger{  border-color:var(--zl-danger);  color:var(--zl-danger); }
+.zl-icon-ring--success{ border-color:var(--zl-success); color:var(--zl-success); }
+.zl-icon-ring--lg svg{ width:24px; height:24px; }
+
+/* Badges with an icon (verified) */
+.zl-badge svg{ width:12px; height:12px; flex:none; }
+
+/* Icon-only controls that used text glyphs */
+.zl-card__nav svg{ width:16px; height:16px; }
+.zl-gallery__nav svg{ width:20px; height:20px; }
+.app-boards__icon svg, .app-railnav__icon svg{ width:16px; height:16px; }
+.app-verified svg{ width:12px; height:12px; vertical-align:-1px; }
+/* Sized, not just flex:none — see the svg() helper. Without a size the icon
+   filled the button at 112px. */
+.zl-minor-action > svg{ flex:none; width:var(--zl-icon-sm); height:var(--zl-icon-sm); }
+
+/* Rows / empty / no-results */
+.zl-row--center{ justify-content:center; }
+.zl-empty__body{ margin:0; max-width:38ch; }
+.zl-noresults > .zl-icon-ring{ margin:0 auto var(--zl-s-4); }
+.zl-noresults > .zl-muted{ margin:0; }
+.zl-gallery__slide--empty{ background:var(--zl-bg-sunken); }
+.zl-chiprow--secondary{ margin-top:var(--zl-s-2); }
+
+/* Seller card */
+.zl-seller{ gap:var(--zl-s-4); padding:var(--zl-s-4); }
+.zl-seller__body{ flex:1 1 0; min-width:0; display:grid; gap:var(--zl-s-1); }
+.zl-seller__name{ margin:0; font-size:var(--zl-text-body); }
+.zl-seller__meta{ margin:0; font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+.zl-seller__label{ margin:var(--zl-s-2) 0 0; font-size:var(--zl-text-caption); color:var(--zl-text-subtle); }
+.zl-seller__langs{ display:flex; flex-wrap:wrap; gap:var(--zl-s-1); margin:0; padding:0; list-style:none; }
+
+/* Listing detail */
+.app-detail__head{ display:grid; gap:var(--zl-s-2); }
+.app-desc{ min-width:0; }
+.app-detail__head .zl-h2{ margin:0; }
+.app-detail__price{ margin:0; }
+.app-detail__signals{ margin:0; }
+.app-detail__desc{ margin:0; }
+.app-specs__title{ margin:0 0 var(--zl-s-2); }
+.app-detail__more{ margin-top:var(--zl-s-12); }
+
+/* Page-level pieces */
+/* Profile: the person on the left, their listings and events on the right.
+   The aside is wider than the Marketplace and Events rails (280 against 210)
+   because it holds a card with language chips rather than a list of links. */
+.app-profile{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-s-6); align-items:start; }
+.app-profile__main{ min-width:0; }
+@media (min-width:900px){
+  .app-profile{ grid-template-columns:280px minmax(0,1fr); gap:var(--zl-s-8); }
+  .app-profile__aside{ position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3)); }
+  /* Three across in the main column: the aside takes 280px, and the feed's
+     usual four would leave cards too narrow for a title and a price. */
+  .app-profile__main .zl-feed{ grid-template-columns:repeat(3,1fr); }
+  .app-profile__main .app-ev-list{ grid-template-columns:repeat(3,1fr); }
+}
+.app-page-tabs{ margin-bottom:var(--zl-s-6); }
+.app-thread__extra{ margin-top:var(--zl-s-4); }
+.app-devcode{ font-size:var(--zl-text-h3); letter-spacing:.08em; }
+.app-form-error{ margin-bottom:var(--zl-s-5); }
+.app-list{ margin:0; padding-left:var(--zl-s-5); display:grid; gap:var(--zl-s-1-5); color:var(--zl-text-muted); }
+.app-nav__form{ display:inline; margin:0; }
+.app-source__title{ font-weight:var(--zl-weight-semi); }
+.app-guide__head .zl-page-header{ margin-bottom:var(--zl-s-4); }
+
+/* Section headers on phones: the section is already named in the tab bar, so
+   the marketplace and community taglines give way to content there. */
+@media (max-width:640px){
+  .zl-page-header.is-compact-mobile .zl-page-header__description{ display:none; }
+  .zl-page-header.is-compact-mobile{ margin-bottom:var(--zl-s-4); }
+}
+
+/* ============================================================
+   Marketplace layout
+   ============================================================ */
+/* Same shape as Events: a category rail at 900px, chips below that. The feed
+   inside the main column runs three across rather than the four it uses
+   full-bleed — the rail takes 210px, and a fourth column here would leave
+   cards too narrow for a title and a price. */
+.app-mk{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-s-6); align-items:start; }
+.app-mk__aside{ display:none; }
+.app-mk__main{ min-width:0; }
+.app-mk__chips{ margin-bottom:var(--zl-s-2); }
+@media (min-width:900px){
+  .app-mk{ grid-template-columns:210px minmax(0,1fr); }
+  .app-mk__aside{
+    display:block;
+    position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3));
+  }
+  .app-mk__chips{ display:none; }
+  .app-mk__main .zl-feed{ grid-template-columns:repeat(3,1fr); }
+}
+
+/* ============================================================
+   Events
+   ============================================================ */
+/* Rail + tiles. The rail appears at 900px, the same width the marketplace
+   search rail needs; below that the chip rows do the filtering and the rail
+   is not rendered at all rather than wrapped above the content. */
+.app-ev{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-s-6); align-items:start; }
+.app-ev__aside{ display:none; }
+.app-ev__rail{ display:grid; gap:var(--zl-s-6); }
+.app-ev__main{ min-width:0; }
+/* Declared before the breakpoint, not after it: an unlayered rule later in
+   the file beats a media query earlier in it, and this pair is exactly how
+   the chips stayed on screen next to the rail the first time. */
+/* minmax(0,1fr), not the implicit auto column. A grid item defaults to
+   min-width:auto, so the column grew to the widest chip row — 1173px inside a
+   343px box. The rows then never clipped, .zl-chiprow's overflow-x:auto had
+   nothing to scroll, and the "more" arrow stayed hidden because the script
+   correctly measured no overflow. The marketplace's wrapper is a plain block,
+   which is why it never had the problem. The grid is here only for the gap
+   between the two rows (When and Category), so it keeps the gap and gives up
+   the content-sized column. */
+.app-ev__chips{ display:grid; grid-template-columns:minmax(0,1fr); gap:var(--zl-s-2); margin-bottom:var(--zl-s-5); }
+@media (min-width:900px){
+  .app-ev{ grid-template-columns:210px minmax(0,1fr); }
+  .app-ev__aside{
+    display:block;
+    position:sticky; top:calc(var(--app-header-h) + var(--zl-space-3));
+  }
+  .app-ev__chips{ display:none; }
+}
+
+/* The tile grid follows the marketplace feed's rhythm — 2-up on a phone, 3-up
+   on a tablet — but steps back to 2 at 900px, where the 210px rail appears
+   and takes that width out of the main column, then back to 3 once there is
+   room for it again. */
+.app-ev-grid{ display:grid; gap:var(--zl-s-4); grid-template-columns:repeat(2,1fr); }
+@media (min-width:640px){  .app-ev-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (min-width:900px){  .app-ev-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1140px){ .app-ev-grid{ grid-template-columns:repeat(3,1fr); } }
+
+/* Profile sections have no rail, so they follow the feed exactly. */
+.app-ev-list{ display:grid; gap:var(--zl-s-4); grid-template-columns:repeat(2,1fr); }
+@media (min-width:640px){  .app-ev-list{ grid-template-columns:repeat(3,1fr); } }
+@media (min-width:1024px){ .app-ev-list{ grid-template-columns:repeat(4,1fr); } }
+
+/* The plate stands in for a listing's photo: same 4:3 box, so a row of event
+   tiles lines up with a row of listing cards. Tinted per category — a wall of
+   identical grey would be worse than a wall of identical photos. */
+.app-ev-tile__plate{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:var(--zl-s-1); background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
+}
+.app-ev-tile__emoji{ font-size:34px; line-height:1; }
+.app-ev-tile__date{
+  display:flex; flex-direction:column; align-items:center; line-height:1.25;
+  font-size:var(--zl-text-caption);
+}
+.app-ev-tile__date b{ font-size:var(--zl-text-sm); font-weight:var(--zl-weight-bold); }
+/* The proximity cue sits top-LEFT on the plate, opposite the state flag on
+   the right, so the two never collide. A solid --zl-text fill rather than a
+   per-category rule: measured on all seven plate tints it is the one fill
+   that clears AA on every one of them. */
+.app-ev-tile__soon{
+  position:absolute; top:var(--zl-s-2); left:var(--zl-s-2); z-index:2; pointer-events:none;
+  padding:var(--zl-s-0-5) var(--zl-s-1-5); border-radius:var(--zl-radius-pill);
+  font-size:var(--zl-text-label); font-weight:var(--zl-weight-semi);
+  letter-spacing:.02em; text-transform:uppercase;
+  background:var(--zl-text); color:var(--zl-bg);
+}
+.app-ev-when__soon{ color:var(--zl-text-muted); font-weight:var(--zl-weight-medium); }
+/* Only shown when places are genuinely running out, so it should read as a
+   nudge rather than as another grey stat beside it. */
+.app-ev-scarce{ color:var(--zl-warning); font-weight:var(--zl-weight-semi); }
+/* The join disclosure sits under the button it qualifies. */
+.app-ev-consent{ margin-top:var(--zl-s-2); }
+
+/* Sits above the stretched link so it is not covered by it, and passes
+   clicks straight through: it is a label, not a control, and a dead patch in
+   the corner of an otherwise clickable tile is a small betrayal. */
+.app-ev-tile__flag{
+  position:absolute; top:var(--zl-s-2); right:var(--zl-s-2); z-index:2;
+  pointer-events:none;
+}
+/* Inverted, because the plate is a tinted surface and the pale badge fills
+   are not. Measured against all seven plate colours: the neutral badge
+   separated from its plate by 1.00-1.09 and the pale green by 1.00-1.05 —
+   on the finished tile the badge and the plate were the same colour exactly,
+   so the tag had no edge at all. A solid fill clears 5:1 on every plate and
+   keeps green meaning "you are in". */
+.zl-ui .app-ev-tile__flag{ background:var(--zl-text-muted); color:var(--zl-bg); }
+.zl-ui .app-ev-tile__flag.zl-badge--success{ background:var(--zl-success); color:var(--zl-bg); }
+.app-ev-tile__org{
+  margin:0; font-size:var(--zl-text-caption); color:var(--zl-text-muted);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.app-ev-tile--gone .app-ev-tile__plate{ background:var(--zl-bg-sunken); color:var(--zl-text-subtle); }
+.app-ev-tile--gone .zl-card__title{ color:var(--zl-text-muted); }
+
+/* Category tints come from tokens, not from hexes written here: the dark
+   palette carries its own pair for each one, so restoring dark mode does not
+   leave seven pastel plates glowing on a near-black page. */
+.app-ev-tile__plate--party{   background:var(--zl-ev-party-bg);   color:var(--zl-ev-party-fg); }
+.app-ev-tile__plate--sports{  background:var(--zl-ev-sports-bg);  color:var(--zl-ev-sports-fg); }
+.app-ev-tile__plate--club{    background:var(--zl-ev-club-bg);    color:var(--zl-ev-club-fg); }
+.app-ev-tile__plate--cooking{ background:var(--zl-ev-cooking-bg); color:var(--zl-ev-cooking-fg); }
+.app-ev-tile__plate--culture{ background:var(--zl-ev-culture-bg); color:var(--zl-ev-culture-fg); }
+.app-ev-tile__plate--talk{    background:var(--zl-ev-talk-bg);    color:var(--zl-ev-talk-fg); }
+.app-ev-tile__plate--other{   background:var(--zl-ev-other-bg);   color:var(--zl-ev-other-fg); }
+
+/* The detail page keeps the wide plate it already had. */
+.app-ev-hero{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:var(--zl-s-2); min-height:180px; border-radius:var(--zl-radius);
+  background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
+}
+.app-ev-hero__cat{ font-size:56px; line-height:1; }
+.app-ev-hero__label{ font-size:var(--zl-text-sm); font-weight:var(--zl-weight-semi); }
+.app-ev-when{
+  font-size:var(--zl-text-h3); font-weight:var(--zl-weight-semi);
+  color:var(--zl-link); margin:0;
+}
+.app-ev-joined{
+  display:flex; align-items:center; gap:var(--zl-s-2);
+  padding:var(--zl-s-3); margin-bottom:var(--zl-s-2);
+  background:var(--zl-success-bg); color:var(--zl-success);
+  border-radius:var(--zl-radius); font-weight:var(--zl-weight-semi);
+}
+/* The shared svg() helper emits a viewBox and no width/height — every other
+   caller sizes it in CSS (.zl-btn > svg does), and this one only said
+   flex:none. With no intrinsic size the tick grew to fill the column: 391px
+   of green checkmark. Size it like the button icons it sits beside. */
+.app-ev-joined svg{ flex:none; width:var(--zl-icon-sm); height:var(--zl-icon-sm); }
+.app-ev-team{
+  border:1px solid var(--zl-border); border-radius:var(--zl-radius);
+  padding:var(--zl-s-4); margin:0 0 var(--zl-s-3);
+}
+.app-ev-team legend{ padding:0 var(--zl-s-2); }
+/* Fixed height: the box is already sized to the squad (rows follows
+   team_size), and a drag handle on a field with a worked example in it
+   invites people to stretch it rather than read it. */
+.app-ev-team__mates{ resize:none; }
+
+/* The organising body, above the campus line in the organiser's card. Reads
+   as a role rather than a second name — the person is the heading. */
+.zl-seller__note{ margin:0; font-size:var(--zl-text-sm); color:var(--zl-text-muted); }
+.zl-seller__note b{ color:var(--zl-text); font-weight:var(--zl-weight-semi); }
+
+/* Who is going. One row per person, name and avatar, link to the profile —
+   the same list the profile shows from the other side. */
+/* Two columns of tiles. One column on a phone, where half of 375px cannot
+   hold an avatar beside a family name without wrapping it to shreds. */
+.app-ev-people{
+  list-style:none; margin:0; padding:0;
+  display:grid; grid-template-columns:1fr; gap:var(--zl-s-2);
+}
+@media (min-width:560px){
+  .app-ev-people{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+.app-ev-person{ min-width:0; }
+/* The tile is the link: the whole card is one target, so it clears the 44px
+   touch minimum without a hit-area hack. */
+.zl-ui .app-ev-person__link{
+  display:flex; align-items:center; gap:var(--zl-s-2-5); min-width:0;
+  padding:var(--zl-s-2); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); background:var(--zl-bg);
+  color:var(--zl-text); text-decoration:none;
+  transition:background-color var(--zl-duration) var(--zl-ease),
+             border-color var(--zl-duration) var(--zl-ease);
+}
+.zl-ui .app-ev-person__link:hover{
+  background:var(--zl-bg-sunken); border-color:var(--zl-border-strong);
+}
+.zl-ui .app-ev-person__link:hover .app-ev-person__name{ text-decoration:underline; }
+.app-ev-person__text{ display:grid; gap:1px; min-width:0; }
+/* The name truncates; the badge does not. Ellipsis on the row clipped the
+   verified badge to "? Z" on a long family name, which loses the one trust
+   signal the tile carries. The badge keeps its width and the name yields. */
+.app-ev-person__name{
+  display:flex; align-items:center; gap:var(--zl-s-1); min-width:0;
+  font-weight:var(--zl-weight-medium);
+}
+.app-ev-person__who{
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.app-ev-person__name > .app-verified{ flex:none; display:inline-flex; }
+.app-ev-person__team{
+  font-size:var(--zl-text-caption); color:var(--zl-text-muted);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+/* The organiser's team sheet. Marked out as a private block so it does not
+   read as part of the public page it sits above. */
+.app-ev-roster{
+  display:grid; gap:var(--zl-s-2);
+  padding:var(--zl-s-4); border:1px solid var(--zl-border);
+  border-radius:var(--zl-radius); background:var(--zl-bg-sunken);
+}
+.app-ev-roster__list{ list-style:none; margin:0; padding:0; display:grid; gap:var(--zl-s-3); }
+.app-ev-roster__team{ display:grid; gap:var(--zl-s-0-5); }
+.app-ev-roster__mates{ margin:var(--zl-s-1) 0 0; padding-left:var(--zl-s-5); color:var(--zl-text-muted); font-size:var(--zl-text-sm); }
+
+.app-ev-people__gate{ margin:var(--zl-s-2) 0; }
+.app-ev-people-sec{ margin-top:var(--zl-s-2); }
+
+/* The linked-event card in a community post, matching the linked listing. */
+.app-linked__cat{
+  flex:none; width:72px; height:54px; display:flex; align-items:center;
+  justify-content:center; background:var(--zl-bg-sunken);
+  border-radius:var(--zl-radius-sm); font-size:24px;
+}
+.app-linked__go{ color:var(--zl-link); font-weight:var(--zl-weight-medium); }
+
+/* Demo banner, under the section tabs. A note, not an alert: it is there so a
+   visitor who finds a button dead knows why, and then gets out of the way. */
+.app-demobar{
+  background:var(--zl-bg-accent); color:var(--zl-text-on-accent);
+  font-size:var(--zl-text-sm); padding:var(--zl-s-2) 0; text-align:center;
+}
