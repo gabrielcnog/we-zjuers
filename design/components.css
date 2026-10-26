@@ -326,7 +326,7 @@
    OS picker, keyboard behaviour and mobile wheel for free. The visible text is
    aria-hidden; the select carries the accessible name. */
 .zl-campus{
-  display:flex; align-items:center; gap:var(--zl-s-2); position:relative; flex:none;
+  display:flex; align-items:center; gap:var(--zl-s-2); position:relative; flex:0 1 auto; min-width:0;
   min-height:var(--zl-tap-min); padding:0 var(--zl-s-2-5);
   border-radius:var(--zl-radius); color:var(--zl-on-brand);
   transition:background-color var(--zl-duration) var(--zl-ease);
@@ -341,10 +341,13 @@
   letter-spacing:.02em;
 }
 .zl-campus__value{
-  display:flex; align-items:center; gap:var(--zl-s-1);
+  display:flex; align-items:center; gap:var(--zl-s-1); min-width:0;
   font-size:var(--zl-text-sm); font-weight:var(--zl-weight-semi);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
+/* Only the name gives way when space runs out, and with a real ellipsis: it
+   is its own element because text-overflow does not apply to the bare text
+   inside a flex container, which is how the arrow used to get clipped with it. */
+.zl-campus__label{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .zl-campus__value svg{ flex:none; opacity:.85; }
 /* The real control: invisible, on top, full size. */
 .zl-campus__native{

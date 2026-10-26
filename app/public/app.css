@@ -743,7 +743,6 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
      applied and the mark stayed 19px on a phone. The BETA tag is sized in em,
      so it steps down with it. */
   .zl-ui .zl-wordmark{ font-size:var(--zl-text-title); }
-  .zl-campus__value{ max-width:11ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
 
 /* Footer: a centred stack on a phone, one line on a desktop. */

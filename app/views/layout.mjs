@@ -375,7 +375,7 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
            once rather than twice. -->
       <span class="zl-campus__text" aria-hidden="true">
         <span class="zl-campus__eyebrow">${esc(t('campus.searching'))}</span>
-        <span class="zl-campus__value">${esc(campusLabel(campus, locale, t))}${unwrap(ICON.chevron)}</span>
+        <span class="zl-campus__value"><span class="zl-campus__label">${esc(campusLabel(campus, locale, t))}</span>${unwrap(ICON.chevron)}</span>
       </span>
       <label class="zl-sr-only" for="campusPick">${esc(t('campus.searching'))}</label>
       <select class="zl-campus__native js-autosubmit" id="campusPick" name="to">
