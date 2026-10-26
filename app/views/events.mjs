@@ -373,11 +373,11 @@ export function eventPage({ locale, t, e, parts, user, error, organiser, organis
 
     <div class="app-detail__body zl-stack">
       ${e.venue ? h`<section class="app-ev-where">
-        <h2 class="zl-label app-specs__title">${t('ev.venue')}</h2>
+        <h2 class="zl-label app-specs__title app-specs__title--ico">${ICONS.mapPin}${t('ev.venue')}</h2>
         <p class="app-detail__desc">${e.venue}</p>
       </section>` : raw('')}
       ${e.body ? h`<section class="app-desc">
-        <h2 class="zl-label app-specs__title">${t('ev.f.body')}</h2>
+        <h2 class="zl-label app-specs__title app-specs__title--ico">${ICONS.details}${t('ev.f.body')}</h2>
         <p class="app-detail__desc">${e.body}</p>
       </section>` : raw('')}
       ${mine && e.team_size ? roster({ t, rows: parts }) : raw('')}

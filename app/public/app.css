@@ -863,6 +863,8 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
 .app-detail__signals{ margin:0; }
 .app-detail__desc{ margin:0; }
 .app-specs__title{ margin:0 0 var(--zl-s-2); }
+.app-specs__title--ico{ display:flex; align-items:center; gap:var(--zl-s-2); }
+.app-specs__title--ico > svg{ width:18px; height:18px; flex:none; }
 .app-detail__more{ margin-top:var(--zl-s-12); }
 
 /* Page-level pieces */
