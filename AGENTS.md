@@ -3,12 +3,12 @@
 WeZJUers (formerly "Listings") is a free, bilingual student platform for Zhejiang University, starting from second-hand trading. Independent student project, not official. The name is under review and may change. Users are students on campus in China, mostly on phones. Run: `cd app && DEMO_MODE=1 npm start` then http://localhost:4400 (Node 22, local PostgreSQL). Specs are in `docs/`.
 
 ## Folder rule (all projects)
-- Built mainly by Claude: `~/Documents/claude-ai/<project>` (today the real path is `~/Documents/Artificial Intelligence/claude-ai/<project>`; this project is at `zju-projects/we-zjuers`).
+- Built mainly by Claude: `~/Documents/claude-ai/<project>`.
 - Built mainly by another AI, or several AIs with similar impact: `~/Documents/maestri/<project>`.
 - Never move a project without asking Gabriel.
 
 ## Second brain (Obsidian)
-Notes are in `/Users/gabrielnogueira/Documents/Obsidian Vault/projects/we-zjuers/`.
+Notes are in the maintainer's private Obsidian vault (`projects/we-zjuers/`), not in this repo.
 - Always start from `index.md` (under one page). If you need more, search that folder with `rg`, then follow `[[wikilinks]]` at most 2 steps.
 - Open at most 5 vault notes per task; ask Gabriel before opening more.
 - Never read the rest of the vault or personal notes. `task-log.md` is read only at the weekly review.
@@ -71,7 +71,7 @@ Starting values; the current values live in the "WeZJUers Maestro" role after th
 5. The builder commits as its last step with Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `style:`, `chore:`), small steps, never secrets.
 6. Update the vault and log the task.
 7. `maestri notify` Gabriel and wait.
-8. Land the floor or open a PR only when Gabriel says so. Never push, force-push, delete branches, deploy or rewrite history without his explicit OK. This project shares a git repo with unrelated work and a MetricLab remote: stage only files under `zju-projects/we-zjuers`.
+8. Land the floor or open a PR only when Gabriel says so. Never push, force-push, delete branches, deploy or rewrite history without his explicit OK.
 
 ## Task log and self-tuning
 After every task append one line to `task-log.md` in the vault folder: `date | tier | task type | agents in order | runtime | outcome` (on time / extended / handed over / failed review). Weekly review (Sunday evening, Beijing time): `python3 task-log-stats.py` in the vault folder; adjust a tier only with at least 5 tasks that week. Lower a cap when 80% of tasks finish under half the cap (new cap about 1.5x median). Raise by 25% when 30% were extended or handed over and the handed-over ones were nearly done. Max change 50% per week; limits simple 3 to 15 min, medium 10 to 40 min. Cap changes: Maestro applies them alone (update the role, add a line to `decisions.md`). Changing which agent starts a task type needs Gabriel's OK.
