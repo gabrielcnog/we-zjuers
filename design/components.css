@@ -200,9 +200,10 @@
   min-height:72px; max-width:var(--zl-container); margin-inline:auto;
   padding-inline:var(--zl-margin-mobile);
 }
-/* Wordmark: real text in the body face, never an image and
-   never the ZJU seal. Recolours with the theme, stays sharp at
-   any density, is selectable and screen-reader readable. */
+/* Wordmark: the white PNG in the header (it carries the BETA pill, so the
+   header renders no separate tag). The text rules below still style the
+   wordmark on the pages that render it as text — footer, sign-in — and that is
+   all they do; nothing falls back to them. See ../docs/decisions.md #3. */
 /* Scoped under .zl-ui for the same reason as the hover below: the wordmark is
    an <a>, and the global `.zl-ui a` (0,1,1) outranks a bare `.zl-wordmark`. */
 .zl-ui .zl-wordmark{
@@ -210,6 +211,12 @@
   font-weight:var(--zl-weight-black); font-size:19px; letter-spacing:-.035em;
   color:var(--zl-text); text-decoration:none; white-space:nowrap;
 }
+/* The header image. display:block kills the inline baseline gap; the fixed
+   height and the width/height attributes on the <img> reserve the box before
+   the file lands, so the header never shifts. 24px on a phone (≈121×24, about
+   the width the text form took), 28px from tablet up. */
+.zl-wordmark__img{ display:block; height:24px; width:auto; }
+@media (min-width:640px){ .zl-wordmark__img{ height:28px; } }
 /* The name keeps the mark's tight tracking; the tag must not inherit it or
    four uppercase letters at 10px close up into a smudge. */
 .zl-wordmark__name{ letter-spacing:inherit; }

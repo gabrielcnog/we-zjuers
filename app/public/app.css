@@ -738,11 +738,9 @@ button, .zl-btn, .zl-chip, .zl-tab, .app-vote__btn{ touch-action:manipulation; }
      it breaks mid-word. */
   .zl-ui .zl-header .app-nav__link{ padding-inline:var(--zl-s-1-5); white-space:nowrap; }
   .app-nav{ flex-wrap:wrap; }
-  /* .zl-ui-scoped to match the rule it is overriding: the base wordmark is
-     .zl-ui .zl-wordmark (0,2,0), so this bare .zl-wordmark (0,1,0) never
-     applied and the mark stayed 19px on a phone. The BETA tag is sized in em,
-     so it steps down with it. */
-  .zl-ui .zl-wordmark{ font-size:var(--zl-text-title); }
+  /* The header wordmark is an image now (see design/components.css), so the
+     font-size step that used to shrink the text mark no longer applies: the
+     logo keeps its 24px height and the burger keeps the end of the row. */
 }
 
 /* Footer: a centred stack on a phone, one line on a desktop. */

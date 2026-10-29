@@ -331,11 +331,10 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
   /* Demo: every creation button would lead to a refusal, so there are none. */
   const cta = mayAct && !DEMO ? { href: L(locale, sec.cta.href), label: t(sec.cta.label) } : null;
   const switchPath = '/' + o + (path.replace(/^\/(en|zh)/, '') || '/');
-  /* The logo is the name and nothing else: no mark beside it, no spans inside
-     it. Real text — sharp at any density, selectable, readable by a screen
-     reader, and it costs no download (docs/decisions.md #3). Setting the name
-     as one word is what fixed the junction the spaced form had: with a capital
-     already leading the word, the eye expects the capitals inside it. */
+  /* The logo is the white wordmark PNG, which already carries the BETA pill.
+     It is an image now, not real text: a rename means new PNGs (decisions #3).
+     The alt text is the brand name from the i18n dictionary (t('brand')), so a
+     screen reader still hears the name and the name still has one home. */
   const wordmark = esc(t('brand'));
   /* The floating button is the section's action by default, but a page can
      claim it: on a listing, "Add listing" is not what the thumb is there for.
@@ -368,7 +367,7 @@ export function page({ locale, t, user, title, body, unread = 0, path = '/', sea
 <div class="zl-disclaimer"><b class="zl-disclaimer__a">${esc(t('disclaimer.a'))}</b><span class="zl-disclaimer__sep" aria-hidden="true"> · </span><span class="zl-disclaimer__b">${esc(t('disclaimer.b'))}</span></div>
 <header class="zl-header">
   <div class="zl-header__inner">
-    <a class="zl-wordmark" href="${L(locale, '/community')}"><span class="zl-wordmark__name">${wordmark}</span><span class="zl-wordmark__beta">${esc(t('brand.beta'))}</span></a>
+    <a class="zl-wordmark" href="${L(locale, '/community')}"><img class="zl-wordmark__img" src="/assets/logo-white.png?v=${ASSET_V}" alt="${wordmark}" width="2338" height="465"></a>
     <form class="zl-campus" method="get" action="${L(locale, '/campus')}">
       <input type="hidden" name="next" value="${esc(path + (search || ''))}">
       <span class="zl-campus__pin">${unwrap(ICON.pin)}</span>

@@ -170,6 +170,11 @@ answered while building.
    every page. 求是 is still out: the motto reads as institutional voice. If the
    university ever objects, the name is the thing that changes and the product
    is not — it lives in one i18n key and one SVG.
+   **Update: the header now uses the PNG wordmark** (`app/public/logo-white.png`)
+   instead of real text. This supersedes the real-text wordmark described above.
+   The trade-off: a rename now needs new PNGs, not just a new string. The `alt`
+   text still comes from the brand name in the i18n dictionary (`t('brand')`),
+   so screen readers and the rename rule hold.
 4. **Measure the real latency from campus before building around it.** A timing
    run from a Chinese network against the Brazilian host, at ~21:00 China time
    when the links are busiest. It decides whether the CDN work is urgent or

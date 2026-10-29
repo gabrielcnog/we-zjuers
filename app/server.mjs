@@ -148,6 +148,10 @@ async function handle(req, res) {
            for an iOS home screen — see the <link> tags in views/layout.mjs. */
         'icon-32.png': join(HERE, 'public', 'icon-32.png'),
         'icon-180.png': join(HERE, 'public', 'icon-180.png'),
+        /* The white wordmark used in the header (2338×465, BETA pill baked in).
+           Its alt text comes from the brand name in the i18n dictionary, so a
+           rename still means new PNGs. See views/layout.mjs and decisions #3. */
+        'logo-white.png': join(HERE, 'public', 'logo-white.png'),
       };
       if (!map[name]) return send(res, 404, 'Not found');
       // Read once per file per boot: these change only when the server restarts,
